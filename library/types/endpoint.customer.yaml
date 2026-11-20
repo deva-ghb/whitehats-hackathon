@@ -1,0 +1,31 @@
+id: endpoint.customer
+version: 1
+family: endpoints
+display_name: Customers or patients
+aliases: [customers, patients, end users, consumers, members]
+vendors: []
+icon: endpoint.customer.svg
+properties:
+  - key: count_estimate
+    tier: required
+    type: number
+  - key: channels
+    tier: recommended
+    type: list
+  - key: mfa
+    tier: recommended
+    type: enum
+    values: ["off", optional, "on"]
+edges:
+  allowed_out: [authenticates_via, calls, routes_through, depends_on, contained_in]
+  allowed_in: [depends_on]
+connection_test:
+  kind: manual
+  description: A person confirms how customers reach the service and sign in
+whitehat_modes: [identity]
+default_sense_points:
+  - mode: identity
+    reason: Credential stuffing and account takeover against customer accounts
+attack_techniques: [T1110.004, T1539, T1566]
+importers: [manual]
+deploy_guide_template: guides/endpoint.customer.md

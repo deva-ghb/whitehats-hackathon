@@ -1,0 +1,210 @@
+/* Editing affordances for Clone Studio. Colours and type stay the tokens in styles.css. */
+.rail-hint { margin: 0; font-size: 12.5px; line-height: 1.4; color: var(--muted); }
+.studio-clone .select-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.studio-save { font-size: 12px; }
+.studio-save.bad { color: var(--crit); font-weight: 700; }
+.field-problem { margin: 0; font-size: 12.5px; color: var(--crit); }
+.inspector-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.inspector-fields { display: flex; flex-direction: column; gap: 10px; }
+
+/* Handles stay invisible in a snapshot, and show when the item is hovered or focused so a person can draw. */
+.studio.editing .estate-node .react-flow__handle,
+.studio.editing .boundary-node .react-flow__handle {
+  width: 14px; height: 14px; border-radius: 99px; opacity: 0;
+  background: var(--surface); border: 2px solid var(--brand);
+}
+.studio.editing .react-flow__node:hover .react-flow__handle,
+.studio.editing .react-flow__node:focus-visible .react-flow__handle,
+.studio.editing .react-flow__node:focus-within .react-flow__handle { opacity: 1; }
+.studio-canvas.drop-target { box-shadow: inset 0 0 0 2px var(--brand); }
+.studio-canvas .studio-wait { pointer-events: none; }
+
+@media (max-width: 1023px) {
+  .studio .studio-bar .btn,
+  .studio .inspector-body .input,
+  .studio .inspector-body .select-trigger,
+  .studio .rail-type { min-height: 44px; }
+}
+@media (max-width: 767px) {
+  .studio-bar .wide-only { display: none; }
+  .studio-save { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .studio-canvas.drop-target { box-shadow: inset 0 0 0 2px var(--brand); }
+}
+
+/* ---------- The editor (STUDIO.1) ---------- */
+.hidden-text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.bar-group { display: flex; gap: 4px; padding-right: 8px; margin-right: 4px; border-right: 1px solid var(--line); }
+.btn.icon-only { width: 34px; padding: 0; justify-content: center; }
+.btn.icon-only.on { background: var(--brand-soft); border-color: var(--brand); color: var(--brand); }
+.btn.icon-only:disabled { opacity: .45; }
+.tool-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.rail-type.generic { opacity: .75; }
+.rail-type[draggable="true"] { cursor: grab; }
+.studio-readonly b { font-weight: 800; }
+.shortcuts { display: grid; gap: 16px 32px; }
+@media (min-width: 900px) { .shortcuts { grid-template-columns: repeat(2, minmax(0, 1fr)); } .shortcut-list > div { grid-template-columns: minmax(0, 11rem) minmax(0, 1fr); } }
+.shortcut-list { margin: 0; display: grid; gap: 8px; font-size: 13px; }
+.shortcut-list > div { display: grid; grid-template-columns: minmax(0, 14rem) minmax(0, 1fr); gap: 4px 16px; }
+.shortcut-list dt { font-weight: 700; color: var(--ink); }
+.shortcut-list dd { margin: 0; color: var(--ink-2); }
+.history-table td, .history-table th { vertical-align: top; }
+.history-table td:nth-child(3) { overflow-wrap: anywhere; }
+
+/* Drawing a connection: ends that take a typed connection are ringed, ends that only take a Generic relation fade. */
+.estate-node.link-typed, .boundary-node.link-typed { box-shadow: 0 0 0 3px var(--brand-soft), var(--shadow); border-color: var(--brand); }
+.estate-node.link-generic, .boundary-node.link-generic { opacity: .55; }
+
+/* Resizing a container: a thin line and square handles, in the brand colour. */
+.resize-line { border-color: var(--brand) !important; }
+.resize-handle { width: 10px !important; height: 10px !important; border-radius: 3px !important; background: var(--surface) !important; border: 2px solid var(--brand) !important; }
+@media (max-width: 1023px) {
+  .btn.icon-only { width: 44px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .estate-node.link-generic, .boundary-node.link-generic { transition: none; }
+}
+
+/* A connection can be dropped anywhere on an item. The big target is invisible and only takes the pointer while a connection is being drawn. */
+.react-flow__handle.drop-zone { left: 0; top: 0; transform: none; width: 100%; height: 100%; min-width: 0; min-height: 0;
+  border-radius: inherit; pointer-events: none; }
+.studio.editing .react-flow__node .react-flow__handle.drop-zone { width: 100% !important; height: 100% !important; opacity: 0 !important; background: transparent !important; border: 0 !important; }
+.studio-canvas.connecting .react-flow__handle.drop-zone { pointer-events: all; }
+
+/* A tablet keeps the bar to two rows: every button except Library and New clone shrinks to its icon (its name stays for screen readers). */
+@media (min-width: 768px) and (max-width: 1279px) {
+  .studio-bar .btn:not([aria-expanded]) .btn-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .studio-bar .btn.small:not([aria-expanded]) { width: 44px; padding: 0; justify-content: center; }
+}
+@media (max-width: 1023px) { .studio-bar .desktop-only { display: none; } }
+
+/* ---------- Where to watch: the sense point panel (P6.3), over the top left of the canvas in both views ---------- */
+.sense-panel { grid-area: canvas; align-self: start; justify-self: start; z-index: 6; margin: 12px; width: auto; min-width: 220px; max-width: calc(100% - 200px); max-height: calc(100% - 24px);
+  display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--line-2); border-radius: 10px; box-shadow: var(--shadow); overflow: hidden; }
+.sense-panel.open { width: min(340px, calc(100% - 200px)); }
+.sense-head { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 40px; padding: 8px 12px; background: transparent; border: 0; color: var(--ink); cursor: pointer; font: inherit; text-align: left; }
+.sense-head:focus-visible { outline: 2px solid var(--brand); outline-offset: -2px; }
+.sense-title { display: flex; align-items: center; gap: 6px; font-weight: 700; flex: 1; }
+.sense-figure { font-variant-numeric: tabular-nums; font-weight: 800; color: var(--brand); background: var(--brand-soft); border-radius: 99px; padding: 2px 10px; font-size: 13px; }
+.sense-body { padding: 4px 12px 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--line); }
+.sense-body p { margin: 0; font-size: 13px; line-height: 1.45; }
+.sense-body .sense-reason { font-size: 12.5px; line-height: 1.4; }
+.sense-stale { background: var(--warn-soft); border-radius: 8px; padding: 6px 8px; }
+.sense-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.sense-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.sense-item { border: 1px solid var(--line); border-radius: 8px; padding: 8px; display: flex; flex-direction: column; gap: 4px; background: var(--surface); }
+.sense-item.accepted { border-color: var(--brand); background: var(--brand-soft); }
+.sense-item.rejected { opacity: .8; }
+.sense-line { display: flex; align-items: center; gap: 8px; justify-content: space-between; }
+.sense-name { background: transparent; border: 0; padding: 0; font: inherit; font-weight: 700; color: var(--ink); cursor: pointer; text-align: left; display: flex; align-items: center; gap: 6px; min-width: 0; }
+.sense-name:hover { text-decoration: underline; }
+.sense-rank { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 99px; background: var(--ink); color: var(--surface); font-size: 11px; font-weight: 700; flex: none; }
+.sense-status { font-size: 11.5px; font-weight: 700; letter-spacing: .02em; padding: 1px 8px; border-radius: 99px; border: 1px solid var(--line-2); white-space: nowrap; }
+.sense-status.accepted { color: var(--brand); border-color: var(--brand); }
+.sense-status.rejected { color: var(--muted); text-decoration: line-through; }
+.sense-status.suggested { border-style: dashed; }
+.sense-reason { color: var(--ink-2); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.sense-mode { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--brand); }
+.sense-decide { display: flex; flex-wrap: wrap; gap: 6px; }
+@media (max-width: 1023px) {
+  .sense-head, .sense-name { min-height: 44px; }
+  .sense-panel .btn { min-height: 44px; }
+}
+/* Below 1280 px the canvas is too narrow to share its top edge with the view switch, so the panel sits under it. */
+@media (max-width: 1279px) {
+  .sense-panel { max-width: calc(100% - 24px); margin-top: 84px; max-height: calc(100% - 96px); }
+  .sense-panel.open { width: min(340px, calc(100% - 24px)); }
+}
+/* A sense point on the flat plan: a word on the card, so it never relies on colour (accepted solid, suggested dashed, rejected struck through). */
+.estate-state.sense { background: var(--surface); color: var(--ink-2); border: 1px dashed var(--brand); }
+.estate-state.sense.accepted { background: var(--brand-soft); color: var(--brand); border: 1px solid var(--brand); }
+.estate-state.sense.rejected { color: var(--muted); border-color: var(--line-2); text-decoration: line-through; }
+.estate-node.compact .estate-state.sense, .estate-node.icons .estate-state.sense { display: none; }
+/* SC.1: known package weaknesses, coloured by reach: on an attack path, reachable, internal only. Words, never colour alone. */
+.estate-state.weak { border: 1px solid transparent; }
+.estate-state.weak.reach-1 { background: var(--crit-soft); color: var(--crit); border-color: var(--crit); }
+.estate-state.weak.reach-2 { background: var(--warn-soft); color: var(--warn); border-color: var(--warn); }
+.estate-state.weak.reach-3 { background: var(--surface); color: var(--ink-2); border-color: var(--line-2); }
+.estate-node.icons .estate-state.weak { display: none; }
+.weak-why { margin: 0 0 8px; font-size: 12.5px; line-height: 1.5; }
+.weak-list { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 10px; font-size: 12.5px; }
+.weak-list li { overflow-wrap: anywhere; }
+.weak-row-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-weight: 600; }
+.weak-source { font-size: 11.5px; margin: 8px 0 0; }
+.weak-more { font-size: 12.5px; margin: 8px 0 0; overflow-wrap: anywhere; }
+.weak-image { margin: 0 0 8px; font-size: 12.5px; overflow-wrap: anywhere; }
+.weak-image span { font-weight: 600; }
+
+/* ---------- A connection node's panel in the inspector (STUDIO.4) ---------- */
+.connection-setup > summary { cursor: pointer; font-weight: 700; font-size: 13px; padding: 6px 0; }
+.connection-setup > summary:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; border-radius: 4px; }
+.connection-scope .row input { flex: none; }
+@media (max-width: 1279px) {
+  .connection-setup > summary { min-height: 44px; display: flex; align-items: center; }
+  .connection-scope .row { min-height: 44px; }
+}
+
+/* STUDIO.7: the connections draw the map. No library rail, the scene alone, and where search will be, marked as coming. */
+.studio.no-rail { grid-template-columns: 0 minmax(0, 1fr) 320px; }
+.studio.narrow.no-rail { grid-template-columns: minmax(0, 1fr); }
+.studio-search-soon { grid-area: canvas; align-self: start; justify-self: end; z-index: 6; margin: 12px; display: flex; align-items: center; gap: 8px;
+  background: var(--surface); border: 1px solid var(--line-2); border-radius: 10px; box-shadow: var(--shadow); padding: 4px 6px 4px 10px; color: var(--faint); }
+.studio-search-soon .input { width: 160px; min-height: 30px; border: 0; background: transparent; padding: 0; box-shadow: none; }
+.studio-search-soon .input:disabled { cursor: not-allowed; }
+.studio-search-soon .pill { white-space: nowrap; }
+@media (max-width: 1023px) { .studio-search-soon .input { width: 96px; } }
+@media (max-width: 767px) { .studio-search-soon .input { display: none; } }
+.connect-source { width: 100%; display: grid; justify-content: stretch; justify-items: start; gap: 2px; text-align: left; padding: 10px 12px; height: auto; white-space: normal; }
+.connect-source span { font-size: 12.5px; font-weight: 400; }
+.connect-source[aria-busy="true"]:disabled { opacity: 1; cursor: progress; border-color: var(--brand); }
+
+/* Open cloud alerts on the selected building: one row each, title, then when and how severe, then where to act. */
+.inspector-alerts { display: grid; gap: 8px; margin-top: 10px; }
+.inspector-alert { display: grid; gap: 2px; margin: 0; font-size: 12.5px; line-height: 1.4; }
+.inspector-alert a { justify-self: start; font-weight: 600; }
+
+/* The AWS connection's settings check: one quiet line, a spinner while it runs. */
+.settings-check { font-size: 12.5px; margin: 0; }
+.settings-check.running { display: flex; align-items: center; gap: 8px; color: var(--ink-2, inherit); }
+
+/* Alerts about what the map does not draw (users, roles, the account) */
+.account-alerts { width: auto; min-width: 220px; max-width: 100%; max-height: calc(50vh - 60px); display: flex; flex-direction: column;
+  background: var(--surface); border: 1px solid var(--line-2); border-radius: 10px; box-shadow: var(--shadow); overflow: hidden; }
+.account-alerts.open { width: 100%; }
+.account-alerts-count { font-variant-numeric: tabular-nums; font-weight: 800; color: #fff; background: var(--crit); border-radius: 99px; padding: 2px 10px; font-size: 13px; }
+.account-alert { border: 1px solid var(--line); border-left: 4px solid var(--warn); border-radius: 8px; padding: 8px; display: flex; flex-direction: column; gap: 3px; font-size: 13px; }
+.account-alert.critical, .account-alert.high { border-left-color: var(--crit); }
+.account-alert strong { line-height: 1.35; }
+/* The top right of the map: what to switch on, then what happened beyond the map. The key and zoom keep the bottom. */
+.studio-corner { grid-area: canvas; align-self: start; justify-self: end; z-index: 6; margin: 64px 12px 12px; display: flex; flex-direction: column;
+  align-items: flex-end; gap: 8px; max-width: calc(100% - 24px); max-height: calc(100% - 24px); pointer-events: none; }
+.studio-corner > * { pointer-events: auto; }
+.studio-corner:has(.open) { width: min(380px, calc(100% - 24px)); z-index: 8; } /* an opened one sits above "Where to watch" */
+/* On a phone the two sit side by side as icon and count, above "Where to watch"; the open one takes the width. */
+@media (max-width: 767px) {
+  .studio-corner { flex-direction: row; flex-wrap: wrap; justify-content: flex-end; margin-top: 60px; }
+  .studio-corner > :not(.open) { min-width: 0; }
+  .studio-corner > :not(.open) .corner-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .sense-panel { margin-top: 116px; }
+}
+/* REC.1: what to switch on so WhiteHats sees more, at the top right of the map */
+.studio-recs { width: auto; min-width: 200px; max-width: 100%; max-height: calc(60vh - 60px); display: flex; flex-direction: column; background: var(--surface);
+  border: 1px solid var(--line-2); border-radius: 10px; box-shadow: var(--shadow); overflow: hidden; }
+.studio-recs.open, .studio-corner:has(.open) > * { width: 100%; }
+.studio-recs-count { font-variant-numeric: tabular-nums; font-weight: 800; color: #fff; background: var(--warn); border-radius: 99px; padding: 2px 10px; font-size: 13px; }
+.studio-rec { border: 1px solid var(--line); border-left: 4px solid var(--info); border-radius: 8px; padding: 8px; display: flex; flex-direction: column; gap: 4px; font-size: 13px; line-height: 1.4; }
+.studio-rec.high { border-left-color: var(--crit); }
+.studio-rec.medium { border-left-color: var(--warn); }
+.studio-rec strong { line-height: 1.35; }
+.studio-rec summary { cursor: pointer; color: var(--brand); font-weight: 600; font-size: 12.5px; }
+.studio-rec details p { margin: 6px 0 0; }
+
+.twin-relation {
+  justify-content: space-between;
+  text-align: left;
+  white-space: normal;
+  flex-wrap: wrap;
+}
+.twin-relation small { color: var(--muted); }
+.twin-relation-entry { gap: 4px; }

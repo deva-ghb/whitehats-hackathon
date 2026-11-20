@@ -1,0 +1,40 @@
+id: edge.route53
+version: 1
+family: network
+display_name: Amazon Route 53 hosted zone
+aliases: [route 53, route53, dns, hosted zone]
+vendors: [Amazon Web Services]
+icon: edge.route53.svg
+properties:
+  - key: zone_name
+    tier: required
+    type: string
+  - key: private
+    tier: recommended
+    type: boolean
+  - key: dnssec
+    tier: recommended
+    type: boolean
+  - key: query_logging
+    tier: recommended
+    type: boolean
+  - key: record_count
+    tier: derived
+    type: number
+  - key: credential
+    tier: secret
+    type: string
+    scopes_hint: ["route53:GetHostedZone", "route53:ListResourceRecordSets"]
+edges:
+  allowed_out: [emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [depends_on]
+connection_test:
+  kind: aws_api
+  description: "Call route53:GetHostedZone with the read-only role, expect the zone name"
+whitehat_modes: [iac, network]
+default_sense_points:
+  - mode: iac
+    reason: Records pointing at deleted resources allow subdomain takeover
+attack_techniques: [T1584.001, T1584.002, T1071.004]
+importers: [aws_config, terraform_aws_provider]
+deploy_guide_template: guides/edge.route53.md

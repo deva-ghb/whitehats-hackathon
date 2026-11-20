@@ -1,0 +1,34 @@
+id: saas.twilio
+version: 1
+family: saas
+display_name: Twilio
+aliases: [twilio, sms, otp, voice]
+vendors: [Twilio]
+icon: saas.twilio.svg
+properties:
+  - key: account_sid
+    tier: required
+    type: string
+  - key: geo_permissions
+    tier: recommended
+    type: list
+  - key: webhook_signatures_verified
+    tier: recommended
+    type: boolean
+  - key: credential
+    tier: secret
+    type: string
+    scopes_hint: [API key with read access to messaging logs]
+edges:
+  allowed_out: [calls, syncs_with, emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [calls, syncs_with, depends_on]
+connection_test:
+  kind: http
+  description: "Read the account with the API key, expect 200"
+whitehat_modes: [saas]
+default_sense_points:
+  - mode: saas
+    reason: SMS pumping fraud and leaked keys that send messages as the company
+attack_techniques: [T1199, T1496, T1552.001]
+importers: [manual]
+deploy_guide_template: guides/saas.twilio.md

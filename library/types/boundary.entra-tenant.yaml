@@ -1,0 +1,34 @@
+id: boundary.entra-tenant
+version: 1
+family: boundaries
+display_name: Microsoft Entra tenant
+aliases: [azure ad tenant, entra tenant, aad tenant, tenant]
+vendors: [Microsoft]
+icon: boundary.entra-tenant.svg
+properties:
+  - key: tenant_id
+    tier: required
+    type: string
+  - key: primary_domain
+    tier: recommended
+    type: string
+  - key: subscription_count
+    tier: derived
+    type: number
+  - key: credential
+    tier: secret
+    type: string
+    scopes_hint: [Directory.Read.All, AuditLog.Read.All]
+edges:
+  allowed_out: [emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [contained_in, depends_on]
+connection_test:
+  kind: graph_api
+  description: "Read /organization through Microsoft Graph, expect this tenant id"
+whitehat_modes: [identity]
+default_sense_points:
+  - mode: identity
+    reason: "Tenant-wide settings, guest access and cross-tenant trust"
+attack_techniques: [T1484.002, T1078.004, T1556.007, T1098.003]
+importers: [graph_api, azure_resource_graph]
+deploy_guide_template: guides/boundary.entra-tenant.md

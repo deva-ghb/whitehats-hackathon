@@ -1,0 +1,379 @@
+{
+  "about": "Real Fix Factory answers to GET /api/runs/<id>, recorded 2026-10-09 on the practice repo (factory/.factory). Only item.evidence is left out: it cited WhiteHats that are not built.",
+  "merged": {
+    "run_id": "WH-INT-2208-1-20261009192613763247",
+    "mode": "live",
+    "item": {
+      "id": "WH-INT-2208-1",
+      "repo": "demo",
+      "title": "SQL injection in user lookup",
+      "summary": "find_user() builds its SQL by pasting the caller's input into the query text. A crafted name such as x' OR '1'='1 returns every user, including admins.",
+      "severity": "high",
+      "source": "whitehats",
+      "reply_to": {},
+      "has_proof": true
+    },
+    "status": "verified",
+    "note": "",
+    "score": 100,
+    "score_parts": [
+      {
+        "label": "Proof passes after the fix",
+        "points": 40,
+        "max": 40
+      },
+      {
+        "label": "Project tests pass",
+        "points": 20,
+        "max": 20
+      },
+      {
+        "label": "No new scanner findings",
+        "points": 15,
+        "max": 15
+      },
+      {
+        "label": "Independent reviewer approves",
+        "points": 15,
+        "max": 15
+      },
+      {
+        "label": "Fixed on the first try",
+        "points": 10,
+        "max": 10
+      }
+    ],
+    "cost_usd": 0.1992,
+    "seconds": 43.4,
+    "branch": "fix-factory/WH-INT-2208-1-20261009192613763247",
+    "delivered": "branch fix-factory/WH-INT-2208-1-20261009192613763247",
+    "verification": [
+      {
+        "check": "Proof of weakness",
+        "before": "failed",
+        "after": "passed"
+      },
+      {
+        "check": "Project tests",
+        "before": "passed",
+        "after": "passed"
+      },
+      {
+        "check": "Scanner findings",
+        "before": "2",
+        "after": "1"
+      }
+    ],
+    "triage": {
+      "in_scope": true,
+      "reason": "SQL injection in find_user() is fixable with a single-line parameterized query replacement, matching the safe pattern already used in add_user().",
+      "files": [
+        "users.py"
+      ],
+      "plan": "1. Replace the f-string query in find_user() with parameterized SQL using ? placeholder. 2. Pass the name parameter as a tuple to db.execute(). 3. Verify existing tests pass (including the o'brien edge case with embedded quote). 4. Deploy - no signature or behavior changes, only security improvement."
+    },
+    "attempts": [
+      {
+        "number": 1,
+        "passed": true,
+        "rejected": [],
+        "files": [
+          "users.py"
+        ],
+        "diff_lines": 4,
+        "agent_note": "`find_user()` built its SQL query by directly interpolating the caller-supplied name into an f-string, allowing input like `x' OR '1'='1` to alter the query logic and dump every row. I replaced the f-string with a parameterized query using a `?` placeholder, passing `name` as a tuple to `db.execute()`, which preserves the existing behavior while eliminating the injection vector.",
+        "cost_usd": 0.0788
+      }
+    ],
+    "review": {
+      "approve": true,
+      "concerns": [
+        "No regression test added: suite still only covers plain lookups, so the injection payload and the existing \"o'brien\" fixture are never asserted against",
+        "Sibling modules (payments.py, files.py) were not reviewed in this change and may carry the same string-built-SQL pattern"
+      ],
+      "summary": "Correct fix - the name is now bound as a real query parameter rather than escaped or filtered, exact-match behaviour is unchanged (and apostrophe names now work), and the diff touches only find_user; only gap is the missing regression test."
+    },
+    "diff": "diff --git a/users.py b/users.py\nindex 7505b33..064699b 100644\n--- a/users.py\n+++ b/users.py\n@@ -14,5 +14,5 @@ def add_user(db: sqlite3.Connection, name: str, email: str, is_admin: bool = Fal\n \n \n def find_user(db: sqlite3.Connection, name: str) -> list[tuple]:\n-    query = f\"SELECT name, email FROM users WHERE name = '{name}'\"\n-    return db.execute(query).fetchall()\n+    query = \"SELECT name, email FROM users WHERE name = ?\"\n+    return db.execute(query, (name,)).fetchall()\n",
+    "row": {
+      "id": "WH-INT-2208-1-20261009192613763247",
+      "item_id": "WH-INT-2208-1",
+      "repo": "demo",
+      "source": "whitehats",
+      "title": "SQL injection in user lookup",
+      "status": "verified",
+      "score": 100,
+      "attempts": 1,
+      "cost_usd": 0.1992,
+      "seconds": 43.4,
+      "delivered": "branch fix-factory/WH-INT-2208-1-20261009192613763247",
+      "started_at": "2026-10-09T19:26:13.763+00:00",
+      "finished_at": "2026-10-09T19:26:57.211+00:00",
+      "mode": "live",
+      "replay_of": null,
+      "approval": "approved",
+      "approved_at": "2026-10-09T19:29:21.825+00:00",
+      "merged": "38696a9e58765996de93d242d4ae11054a9efd3c"
+    },
+    "events": [
+      {
+        "run_id": "WH-INT-2208-1-20261009192613763247",
+        "at": "2026-10-09T19:26:13.834+00:00",
+        "stage": "intake",
+        "message": "Cloned demo into an isolated workspace on fix-factory/WH-INT-2208-1-20261009192613763247",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-2208-1-20261009192613763247",
+        "at": "2026-10-09T19:26:13.835+00:00",
+        "stage": "reproduce",
+        "message": "Running the project tests and the proof on the untouched code",
+        "level": "info"
+      },
+      {
+        "run_id": "WH-INT-2208-1-20261009192613763247",
+        "at": "2026-10-09T19:26:14.400+00:00",
+        "stage": "reproduce",
+        "message": "Project tests pass before any change",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-2208-1-20261009192613763247",
+        "at": "2026-10-09T19:26:14.576+00:00",
+        "stage": "reproduce",
+        "message": "Weakness reproduced: VULNERABLE: injection returned 2 rows; name with a quote crashed the lookup: OperationalError('near \"brien\": syntax error')",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-2208-1-20261009192613763247",
+        "at": "2026-10-09T19:26:15.013+00:00",
+        "stage": "reproduce",
+        "message": "Scanner baseline: 2 findings",
+        "level": "info"
+      },
+      {
+        "run_id": "WH-INT-2208-1-20261009192613763247",
+        "at": "2026-10-09T19:26:15.013+00:00",
+        "stage": "triage",
+        "message": "Reading the code to decide if a small, local fix is in scope",
+        "level": "info"
+      },
+      {
+        "run_id": "WH-INT-2208-1-20261009192613763247",
+        "at": "2026-10-09T19:26:31.200+00:00",
+        "stage": "triage",
+        "message": "In scope: SQL injection in find_user() is fixable with a single-line parameterized query replacement, matching the safe pattern already used in add_user().",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-2208-1-20261009192613763247",
+        "at": "2026-10-09T19:26:31.201+00:00",
+        "stage": "fix",
+        "message": "Attempt 1: the agent is editing files",
+        "level": "info"
+      },
+      {
+        "run_id": "WH-INT-2208-1-20261009192613763247",
+        "at": "2026-10-09T19:26:41.085+00:00",
+        "stage": "fix",
+        "message": "Attempt 1: changed users.py",
+        "level": "info"
+      },
+      {
+        "run_id": "WH-INT-2208-1-20261009192613763247",
+        "at": "2026-10-09T19:26:41.086+00:00",
+        "stage": "verify",
+        "message": "Attempt 1: running proof, tests and scanner in the sandbox",
+        "level": "info"
+      },
+      {
+        "run_id": "WH-INT-2208-1-20261009192613763247",
+        "at": "2026-10-09T19:26:41.962+00:00",
+        "stage": "verify",
+        "message": "Attempt 1 passed every check",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-2208-1-20261009192613763247",
+        "at": "2026-10-09T19:26:41.980+00:00",
+        "stage": "review",
+        "message": "A separate reviewer is reading the change",
+        "level": "info"
+      },
+      {
+        "run_id": "WH-INT-2208-1-20261009192613763247",
+        "at": "2026-10-09T19:26:57.117+00:00",
+        "stage": "review",
+        "message": "Approved: Correct fix - the name is now bound as a real query parameter rather than escaped or filtered, exact-match behaviour is unchanged (and apostrophe names now work), and the diff touches only find_user; only gap is the missing regression test.",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-2208-1-20261009192613763247",
+        "at": "2026-10-09T19:26:57.210+00:00",
+        "stage": "deliver",
+        "message": "Fix branch pushed to demo, awaiting approval",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-2208-1-20261009192613763247",
+        "at": "2026-10-09T19:26:57.211+00:00",
+        "stage": "done",
+        "message": "verified, score 100/100",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-2208-1-20261009192613763247",
+        "at": "2026-10-09T19:29:21.825+00:00",
+        "stage": "approve",
+        "message": "Approved and merged into demo at 38696a9e58",
+        "level": "ok"
+      }
+    ]
+  },
+  "declined": {
+    "run_id": "WH-INT-2216-1-20261009192613809884",
+    "mode": "live",
+    "item": {
+      "id": "WH-INT-2216-1",
+      "repo": "demo",
+      "title": "Login sessions never expire",
+      "summary": "Sign-in sessions issued by the shared session service never expire. Fixing this needs changes to the session store used by the auth service, the API gateway and the mobile app, none of which live in this repository, plus a planned forced sign-out of about 40,000 active users.",
+      "severity": "medium",
+      "source": "whitehats",
+      "reply_to": {},
+      "has_proof": false
+    },
+    "status": "declined",
+    "note": "This repository contains no session management or authentication logic; the finding explicitly states the fix requires changes to the session store (auth service), API gateway, and mobile app, which are not present in this codebase.",
+    "score": 0,
+    "score_parts": [
+      {
+        "label": "Proof passes after the fix",
+        "points": 0,
+        "max": 40
+      },
+      {
+        "label": "Project tests pass",
+        "points": 0,
+        "max": 20
+      },
+      {
+        "label": "No new scanner findings",
+        "points": 0,
+        "max": 15
+      },
+      {
+        "label": "Independent reviewer approves",
+        "points": 0,
+        "max": 15
+      },
+      {
+        "label": "Fixed on the first try",
+        "points": 0,
+        "max": 10
+      }
+    ],
+    "cost_usd": 0.0481,
+    "seconds": 27.9,
+    "branch": "fix-factory/WH-INT-2216-1-20261009192613809884",
+    "delivered": null,
+    "verification": [
+      {
+        "check": "Proof of weakness",
+        "before": "not run",
+        "after": "not run"
+      },
+      {
+        "check": "Project tests",
+        "before": "passed",
+        "after": "not run"
+      }
+    ],
+    "triage": {
+      "in_scope": false,
+      "reason": "This repository contains no session management or authentication logic; the finding explicitly states the fix requires changes to the session store (auth service), API gateway, and mobile app, which are not present in this codebase.",
+      "files": [],
+      "plan": "Not applicable - issue is in external services."
+    },
+    "attempts": [],
+    "review": {},
+    "diff": "",
+    "row": {
+      "id": "WH-INT-2216-1-20261009192613809884",
+      "item_id": "WH-INT-2216-1",
+      "repo": "demo",
+      "source": "whitehats",
+      "title": "Login sessions never expire",
+      "status": "declined",
+      "score": 0,
+      "attempts": 0,
+      "cost_usd": 0.0481,
+      "seconds": 27.9,
+      "delivered": null,
+      "started_at": "2026-10-09T19:26:13.811+00:00",
+      "finished_at": "2026-10-09T19:27:34.275+00:00",
+      "mode": "live",
+      "replay_of": null,
+      "approval": null,
+      "approved_at": null,
+      "merged": null
+    },
+    "events": [
+      {
+        "run_id": "WH-INT-2216-1-20261009192613809884",
+        "at": "2026-10-09T19:27:06.452+00:00",
+        "stage": "intake",
+        "message": "Cloned demo into an isolated workspace on fix-factory/WH-INT-2216-1-20261009192613809884",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-2216-1-20261009192613809884",
+        "at": "2026-10-09T19:27:06.453+00:00",
+        "stage": "reproduce",
+        "message": "Running the project tests and the proof on the untouched code",
+        "level": "info"
+      },
+      {
+        "run_id": "WH-INT-2216-1-20261009192613809884",
+        "at": "2026-10-09T19:27:06.793+00:00",
+        "stage": "reproduce",
+        "message": "Project tests pass before any change",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-2216-1-20261009192613809884",
+        "at": "2026-10-09T19:27:06.794+00:00",
+        "stage": "reproduce",
+        "message": "No proof supplied: judged on tests, scanner and review only",
+        "level": "warn"
+      },
+      {
+        "run_id": "WH-INT-2216-1-20261009192613809884",
+        "at": "2026-10-09T19:27:07.037+00:00",
+        "stage": "reproduce",
+        "message": "Scanner baseline: 2 findings",
+        "level": "info"
+      },
+      {
+        "run_id": "WH-INT-2216-1-20261009192613809884",
+        "at": "2026-10-09T19:27:07.039+00:00",
+        "stage": "triage",
+        "message": "Reading the code to decide if a small, local fix is in scope",
+        "level": "info"
+      },
+      {
+        "run_id": "WH-INT-2216-1-20261009192613809884",
+        "at": "2026-10-09T19:27:34.273+00:00",
+        "stage": "triage",
+        "message": "Declined, sent to a person: This repository contains no session management or authentication logic; the finding explicitly states the fix requires changes to the session store (auth service), API gateway, and mobile app, which are not present in this codebase.",
+        "level": "warn"
+      },
+      {
+        "run_id": "WH-INT-2216-1-20261009192613809884",
+        "at": "2026-10-09T19:27:34.276+00:00",
+        "stage": "done",
+        "message": "declined, score 0/100",
+        "level": "warn"
+      }
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "about": "Recorded from api.github.com on 2026-10-26: an App token signed by an unknown key.",
+  "clock": 1793029830,
+  "calls": [
+    {
+      "method": "POST",
+      "url": "https://api.github.com/app/installations/12345678/access_tokens",
+      "status": 401,
+      "headers": {},
+      "body": {
+        "message": "A JSON web token could not be decoded",
+        "documentation_url": "https://docs.github.com/rest",
+        "status": "401"
+      }
+    }
+  ]
+}

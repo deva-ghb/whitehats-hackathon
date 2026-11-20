@@ -1,0 +1,36 @@
+id: data.fhir
+version: 1
+family: data
+display_name: FHIR service (Azure Health Data Services)
+aliases: [fhir, health data services, hl7, healthcare api]
+vendors: [Microsoft]
+icon: data.fhir.svg
+properties:
+  - key: service_name
+    tier: required
+    type: string
+  - key: smart_on_fhir
+    tier: recommended
+    type: boolean
+  - key: audit_logging
+    tier: recommended
+    type: boolean
+  - key: public_network_access
+    tier: recommended
+    type: boolean
+  - key: resource_id
+    tier: derived
+    type: string
+edges:
+  allowed_out: [replicates_to, backs_up_to, emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [reads, writes, replicates_to, backs_up_to, depends_on]
+connection_test:
+  kind: azure_api
+  description: "Read the FHIR service with the Reader role, expect 200; never read resources"
+whitehat_modes: [data, identity]
+default_sense_points:
+  - mode: data
+    reason: "Every patient record; reads by unusual callers matter most"
+attack_techniques: [T1530, T1213, T1565.001]
+importers: [azure_resource_graph, bicep]
+deploy_guide_template: guides/data.fhir.md

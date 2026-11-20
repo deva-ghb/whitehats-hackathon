@@ -1,0 +1,50 @@
+id: messaging.sqs
+version: 1
+family: messaging
+display_name: Amazon SQS queue
+aliases: [sqs, queue, simple queue service]
+vendors: [Amazon Web Services]
+icon: messaging.sqs.svg
+properties:
+  - key: queue_name
+    tier: required
+    type: string
+  - key: region
+    tier: required
+    type: string
+  - key: dlq
+    tier: recommended
+    type: string
+  - key: encryption
+    tier: recommended
+    type: enum
+    values: [sse_sqs, sse_kms, none]
+  - key: fifo
+    tier: recommended
+    type: boolean
+  - key: access_policy
+    tier: derived
+    type: string
+  - key: retention_seconds
+    tier: optional
+    type: number
+  - key: arn
+    tier: derived
+    type: string
+  - key: credential
+    tier: secret
+    type: string
+    scopes_hint: ["sqs:GetQueueAttributes", "sqs:ListQueues"]
+edges:
+  allowed_out: [emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [publishes_to, consumes_from, depends_on]
+connection_test:
+  kind: aws_api
+  description: "Call sqs:GetQueueAttributes with the read-only role, expect 200; never receive messages"
+whitehat_modes: [messaging]
+default_sense_points:
+  - mode: messaging
+    reason: A queue policy open to other accounts lets anyone inject jobs
+attack_techniques: [T1565, T1499.003]
+importers: [aws_config, terraform_aws_provider]
+deploy_guide_template: guides/messaging.sqs.md

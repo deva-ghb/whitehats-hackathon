@@ -1,0 +1,34 @@
+id: observability.sentinel
+version: 1
+family: observability
+display_name: Microsoft Sentinel
+aliases: [sentinel, siem, azure sentinel]
+vendors: [Microsoft]
+icon: observability.sentinel.svg
+properties:
+  - key: workspace_id
+    tier: required
+    type: string
+  - key: analytics_rules
+    tier: recommended
+    type: number
+  - key: connectors
+    tier: derived
+    type: list
+  - key: credential
+    tier: secret
+    type: string
+    scopes_hint: [Microsoft Sentinel Reader]
+edges:
+  allowed_out: [emits_telemetry_to, writes, depends_on, contained_in]
+  allowed_in: [emits_telemetry_to, depends_on]
+connection_test:
+  kind: azure_api
+  description: "List incidents with Microsoft Sentinel Reader, expect 200"
+whitehat_modes: [telemetry]
+default_sense_points:
+  - mode: telemetry
+    reason: "Existing rules and incidents, so WhiteHats does not duplicate them"
+attack_techniques: [T1685.002, T1685]
+importers: [azure_resource_graph]
+deploy_guide_template: guides/observability.sentinel.md

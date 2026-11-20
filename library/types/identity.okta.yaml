@@ -1,0 +1,37 @@
+id: identity.okta
+version: 1
+family: identity
+display_name: Okta
+aliases: [okta, sso, identity provider, idp]
+vendors: [Okta]
+icon: identity.okta.svg
+properties:
+  - key: org_url
+    tier: required
+    type: url
+  - key: mfa_enforced
+    tier: recommended
+    type: boolean
+  - key: admin_count
+    tier: derived
+    type: number
+  - key: apps
+    tier: derived
+    type: list
+  - key: credential
+    tier: secret
+    type: string
+    scopes_hint: [okta.logs.read, okta.users.read, okta.groups.read, okta.apps.read]
+edges:
+  allowed_out: [emits_telemetry_to, syncs_with, depends_on, contained_in]
+  allowed_in: [authenticates_via, syncs_with, depends_on]
+connection_test:
+  kind: http
+  description: "Read /api/v1/org with the read-only token, expect 200"
+whitehat_modes: [identity]
+default_sense_points:
+  - mode: identity
+    reason: "New admins, removed MFA factors and unusual sign-ins show here first"
+attack_techniques: [T1078.004, T1110.003, T1556.006, T1621, T1098.003, T1606.002]
+importers: [okta_api]
+deploy_guide_template: guides/identity.okta.md

@@ -1,0 +1,719 @@
+{
+  "about": "Recorded from moto, the AWS simulator, on 2026-11-11. Shapes are AWS's; the data is invented.",
+  "clock": 1794409947.0,
+  "calls": [
+    {
+      "service": "sts",
+      "method": "assume_role",
+      "params": {
+        "RoleArn": "arn:aws:iam::111122223333:role/whitehats-reader",
+        "RoleSessionName": "whitehats-reader",
+        "ExternalId": "recorded-external-id"
+      },
+      "region": "ap-southeast-2",
+      "response": {
+        "Credentials": {
+          "AccessKeyId": "recorded-placeholder",
+          "SecretAccessKey": "recorded-placeholder",
+          "SessionToken": "recorded-placeholder",
+          "Expiration": "2030-01-01T00:00:00Z"
+        },
+        "AssumedRoleUser": {
+          "AssumedRoleId": "AROARZPUZDIKCSUFNGKKZ:whitehats-reader",
+          "Arn": "arn:aws:sts::111122223333:assumed-role/whitehats-reader/whitehats-reader"
+        },
+        "PackedPolicySize": 6
+      }
+    },
+    {
+      "service": "cloudtrail",
+      "method": "lookup_events",
+      "params": {
+        "StartTime": "2026-11-11T14:12:27Z",
+        "MaxResults": 2,
+        "LookupAttributes": [
+          {
+            "AttributeKey": "ReadOnly",
+            "AttributeValue": "false"
+          }
+        ]
+      },
+      "region": "ap-southeast-2",
+      "response": {
+        "Events": [
+          {
+            "EventId": "evt-0",
+            "EventName": "StopLogging",
+            "EventTime": "2026-11-11T15:11:27Z",
+            "CloudTrailEvent": "{\"eventName\": \"StopLogging\"}"
+          },
+          {
+            "EventId": "evt-1",
+            "EventName": "ConsoleLogin",
+            "EventTime": "2026-11-11T15:11:28Z",
+            "CloudTrailEvent": "{\"eventName\": \"ConsoleLogin\"}"
+          }
+        ],
+        "NextToken": "2"
+      }
+    },
+    {
+      "service": "cloudtrail",
+      "method": "lookup_events",
+      "params": {
+        "StartTime": "2026-11-11T14:12:27Z",
+        "MaxResults": 2,
+        "LookupAttributes": [
+          {
+            "AttributeKey": "ReadOnly",
+            "AttributeValue": "false"
+          }
+        ],
+        "NextToken": "2"
+      },
+      "region": "ap-southeast-2",
+      "response": {
+        "Events": [
+          {
+            "EventId": "evt-2",
+            "EventName": "CreateAccessKey",
+            "EventTime": "2026-11-11T15:11:29Z",
+            "CloudTrailEvent": "{\"eventName\": \"CreateAccessKey\"}"
+          }
+        ]
+      }
+    },
+    {
+      "service": "cloudtrail",
+      "method": "lookup_events",
+      "params": {
+        "StartTime": "2026-11-11T14:12:27Z",
+        "MaxResults": 2,
+        "LookupAttributes": [
+          {
+            "AttributeKey": "ReadOnly",
+            "AttributeValue": "false"
+          }
+        ]
+      },
+      "region": "us-west-2",
+      "response": {
+        "Events": []
+      }
+    },
+    {
+      "service": "cloudtrail",
+      "method": "lookup_events",
+      "params": {
+        "StartTime": "2026-11-11T14:12:27Z",
+        "MaxResults": 2,
+        "LookupAttributes": [
+          {
+            "AttributeKey": "ReadOnly",
+            "AttributeValue": "false"
+          }
+        ]
+      },
+      "region": "us-east-1",
+      "response": {
+        "Events": []
+      }
+    },
+    {
+      "service": "logs",
+      "method": "filter_log_events",
+      "params": {
+        "logGroupName": "/aws/lambda/shop-api",
+        "startTime": 1794406347000,
+        "limit": 2
+      },
+      "region": "ap-southeast-2",
+      "response": {
+        "events": [
+          {
+            "logStreamName": "s1",
+            "timestamp": 1794409887000,
+            "message": "{\"event\": 0}",
+            "ingestionTime": 1794409948300,
+            "eventId": "0"
+          },
+          {
+            "logStreamName": "s1",
+            "timestamp": 1794409887001,
+            "message": "{\"event\": 1}",
+            "ingestionTime": 1794409948300,
+            "eventId": "1"
+          }
+        ],
+        "searchedLogStreams": [
+          {
+            "logStreamName": "s1",
+            "searchedCompletely": true
+          }
+        ],
+        "nextToken": "/aws/lambda/shop-api@s1@1"
+      }
+    },
+    {
+      "service": "resourcegroupstaggingapi",
+      "method": "get_resources",
+      "params": {
+        "ResourcesPerPage": 2,
+        "TagFilters": [
+          {
+            "Key": "project",
+            "Values": [
+              "whitehats-proving-ground"
+            ]
+          }
+        ]
+      },
+      "region": "ap-southeast-2",
+      "response": {
+        "PaginationToken": "c0239223-dcc9-4451-900b-051438ab986b",
+        "ResourceTagMappingList": [
+          {
+            "ResourceARN": "arn:aws:s3:::pg-receipts",
+            "Tags": [
+              {
+                "Key": "project",
+                "Value": "whitehats-proving-ground"
+              }
+            ]
+          },
+          {
+            "ResourceARN": "arn:aws:s3:::pg-trail",
+            "Tags": [
+              {
+                "Key": "project",
+                "Value": "whitehats-proving-ground"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "service": "resourcegroupstaggingapi",
+      "method": "get_resources",
+      "params": {
+        "ResourcesPerPage": 2,
+        "TagFilters": [
+          {
+            "Key": "project",
+            "Values": [
+              "whitehats-proving-ground"
+            ]
+          }
+        ],
+        "PaginationToken": "c0239223-dcc9-4451-900b-051438ab986b"
+      },
+      "region": "ap-southeast-2",
+      "response": {
+        "PaginationToken": "852e3174-dcfe-41c4-a77a-5369e2a8010d",
+        "ResourceTagMappingList": [
+          {
+            "ResourceARN": "arn:aws:s3:::pg-state",
+            "Tags": [
+              {
+                "Key": "project",
+                "Value": "whitehats-proving-ground"
+              }
+            ]
+          },
+          {
+            "ResourceARN": "arn:aws:lambda:ap-southeast-2:111122223333:function:shop-api",
+            "Tags": [
+              {
+                "Key": "project",
+                "Value": "whitehats-proving-ground"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "service": "resourcegroupstaggingapi",
+      "method": "get_resources",
+      "params": {
+        "ResourcesPerPage": 2,
+        "TagFilters": [
+          {
+            "Key": "project",
+            "Values": [
+              "whitehats-proving-ground"
+            ]
+          }
+        ],
+        "PaginationToken": "852e3174-dcfe-41c4-a77a-5369e2a8010d"
+      },
+      "region": "ap-southeast-2",
+      "response": {
+        "PaginationToken": "a2150f46-ad6a-41cc-b274-377165e08913",
+        "ResourceTagMappingList": [
+          {
+            "ResourceARN": "arn:aws:logs:ap-southeast-2:111122223333:log-group:/aws/lambda/shop-api",
+            "Tags": [
+              {
+                "Key": "project",
+                "Value": "whitehats-proving-ground"
+              }
+            ]
+          },
+          {
+            "ResourceARN": "arn:aws:dynamodb:ap-southeast-2:111122223333:table/orders",
+            "Tags": [
+              {
+                "Key": "project",
+                "Value": "whitehats-proving-ground"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "service": "resourcegroupstaggingapi",
+      "method": "get_resources",
+      "params": {
+        "ResourcesPerPage": 2,
+        "TagFilters": [
+          {
+            "Key": "project",
+            "Values": [
+              "whitehats-proving-ground"
+            ]
+          }
+        ],
+        "PaginationToken": "a2150f46-ad6a-41cc-b274-377165e08913"
+      },
+      "region": "ap-southeast-2",
+      "response": {
+        "ResourceTagMappingList": [
+          {
+            "ResourceARN": "arn:aws:sqs:ap-southeast-2:111122223333:payment-jobs",
+            "Tags": [
+              {
+                "Key": "project",
+                "Value": "whitehats-proving-ground"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "service": "resourcegroupstaggingapi",
+      "method": "get_resources",
+      "params": {
+        "ResourcesPerPage": 2,
+        "TagFilters": [
+          {
+            "Key": "project",
+            "Values": [
+              "whitehats-proving-ground"
+            ]
+          }
+        ]
+      },
+      "region": "us-west-2",
+      "response": {
+        "PaginationToken": "b0ff625f-c140-4576-a4b7-db35847eea3a",
+        "ResourceTagMappingList": [
+          {
+            "ResourceARN": "arn:aws:s3:::pg-receipts",
+            "Tags": [
+              {
+                "Key": "project",
+                "Value": "whitehats-proving-ground"
+              }
+            ]
+          },
+          {
+            "ResourceARN": "arn:aws:s3:::pg-trail",
+            "Tags": [
+              {
+                "Key": "project",
+                "Value": "whitehats-proving-ground"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "service": "resourcegroupstaggingapi",
+      "method": "get_resources",
+      "params": {
+        "ResourcesPerPage": 2,
+        "TagFilters": [
+          {
+            "Key": "project",
+            "Values": [
+              "whitehats-proving-ground"
+            ]
+          }
+        ],
+        "PaginationToken": "b0ff625f-c140-4576-a4b7-db35847eea3a"
+      },
+      "region": "us-west-2",
+      "response": {
+        "PaginationToken": "87321e89-e231-42db-be4b-45c3cf15bad6",
+        "ResourceTagMappingList": [
+          {
+            "ResourceARN": "arn:aws:s3:::pg-state",
+            "Tags": [
+              {
+                "Key": "project",
+                "Value": "whitehats-proving-ground"
+              }
+            ]
+          },
+          {
+            "ResourceARN": "arn:aws:ec2:us-west-2:111122223333:instance/i-1deb64b7a4c5bd8fd",
+            "Tags": [
+              {
+                "Key": "project",
+                "Value": "whitehats-proving-ground"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "service": "resourcegroupstaggingapi",
+      "method": "get_resources",
+      "params": {
+        "ResourcesPerPage": 2,
+        "TagFilters": [
+          {
+            "Key": "project",
+            "Values": [
+              "whitehats-proving-ground"
+            ]
+          }
+        ],
+        "PaginationToken": "87321e89-e231-42db-be4b-45c3cf15bad6"
+      },
+      "region": "us-west-2",
+      "response": {
+        "PaginationToken": "1dab0f1a-9abe-4224-9edf-5710fb52b515",
+        "ResourceTagMappingList": [
+          {
+            "ResourceARN": "arn:aws:ec2:us-west-2:111122223333:security-group/sg-458ba0a6d875decd5",
+            "Tags": [
+              {
+                "Key": "project",
+                "Value": "whitehats-proving-ground"
+              }
+            ]
+          },
+          {
+            "ResourceARN": "arn:aws:ec2:us-west-2:111122223333:vpc/vpc-bdf3f163ce468ef4d",
+            "Tags": [
+              {
+                "Key": "project",
+                "Value": "whitehats-proving-ground"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "service": "resourcegroupstaggingapi",
+      "method": "get_resources",
+      "params": {
+        "ResourcesPerPage": 2,
+        "TagFilters": [
+          {
+            "Key": "project",
+            "Values": [
+              "whitehats-proving-ground"
+            ]
+          }
+        ],
+        "PaginationToken": "1dab0f1a-9abe-4224-9edf-5710fb52b515"
+      },
+      "region": "us-west-2",
+      "response": {
+        "ResourceTagMappingList": [
+          {
+            "ResourceARN": "arn:aws:rds:us-west-2:111122223333:db:orders-db",
+            "Tags": [
+              {
+                "Key": "project",
+                "Value": "whitehats-proving-ground"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "service": "iam",
+      "method": "get_role",
+      "params": {
+        "RoleName": "whitehats-reader"
+      },
+      "region": "ap-southeast-2",
+      "response": {
+        "Role": {
+          "Path": "/",
+          "RoleName": "whitehats-reader",
+          "RoleId": "AROARZPUZDIKCSUFNGKKZ",
+          "Arn": "arn:aws:iam::111122223333:role/whitehats-reader",
+          "CreateDate": "2026-11-11T15:12:28.108885+00:00",
+          "AssumeRolePolicyDocument": "{\"Version\": \"2012-10-17\", \"Statement\": [{\"Effect\": \"Allow\", \"Principal\": {\"Service\": \"lambda.amazonaws.com\"}, \"Action\": \"sts:AssumeRole\"}]}",
+          "MaxSessionDuration": 3600,
+          "RoleLastUsed": {
+            "LastUsedDate": "2026-11-11T15:12:29.490070+00:00"
+          }
+        }
+      }
+    },
+    {
+      "service": "lambda",
+      "method": "list_functions",
+      "params": {
+        "MaxItems": 1
+      },
+      "region": "ap-southeast-2",
+      "response": {
+        "Functions": [
+          {
+            "FunctionName": "shop-api",
+            "FunctionArn": "arn:aws:lambda:ap-southeast-2:111122223333:function:shop-api",
+            "Runtime": "python3.12",
+            "Role": "arn:aws:iam::111122223333:role/pg-shop",
+            "Handler": "app.handler",
+            "CodeSize": 11,
+            "Description": "",
+            "Timeout": 3,
+            "MemorySize": 128,
+            "LastModified": "2026-11-11T15:12:28.233527000Z",
+            "CodeSha256": "QJeIkjairybCkwM/65ZMTPEYwCJODQY/7AqJ6dBWnvI=",
+            "Version": "$LATEST",
+            "TracingConfig": {
+              "Mode": "PassThrough"
+            },
+            "Layers": [],
+            "State": "Active",
+            "LastUpdateStatus": "Successful",
+            "PackageType": "Zip",
+            "Architectures": [
+              "x86_64"
+            ],
+            "EphemeralStorage": {
+              "Size": 512
+            },
+            "SnapStart": {
+              "ApplyOn": "None",
+              "OptimizationStatus": "Off"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "service": "lambda",
+      "method": "get_function",
+      "params": {
+        "FunctionName": "whitehats-permission-probe"
+      },
+      "region": "ap-southeast-2",
+      "error": {
+        "code": "ResourceNotFoundException",
+        "message": "Function not found: arn:aws:lambda:ap-southeast-2:111122223333:function:whitehats-permission-probe",
+        "status": 404
+      }
+    },
+    {
+      "service": "ecr",
+      "method": "get_authorization_token",
+      "params": {},
+      "region": "ap-southeast-2",
+      "response": {
+        "authorizationData": [
+          {
+            "authorizationToken": "QVdTOjEyMzQ1Njc4OTAxMi1hdXRoLXRva2Vu",
+            "expiresAt": "2015-01-01T00:00:00+05:30",
+            "proxyEndpoint": "https://111122223333.dkr.ecr.ap-southeast-2.amazonaws.com"
+          }
+        ]
+      }
+    },
+    {
+      "service": "apigatewayv2",
+      "method": "get_apis",
+      "params": {
+        "MaxResults": "1"
+      },
+      "region": "ap-southeast-2",
+      "response": {
+        "Items": []
+      }
+    },
+    {
+      "service": "dynamodb",
+      "method": "list_tables",
+      "params": {
+        "Limit": 1
+      },
+      "region": "ap-southeast-2",
+      "response": {
+        "TableNames": [
+          "orders"
+        ]
+      }
+    },
+    {
+      "service": "s3",
+      "method": "get_bucket_location",
+      "params": {
+        "Bucket": "pg-receipts"
+      },
+      "region": "ap-southeast-2",
+      "response": {
+        "LocationConstraint": "ap-southeast-2"
+      }
+    },
+    {
+      "service": "sqs",
+      "method": "list_queues",
+      "params": {
+        "MaxResults": 1
+      },
+      "region": "ap-southeast-2",
+      "response": {
+        "QueueUrls": [
+          "https://sqs.ap-southeast-2.amazonaws.com/111122223333/payment-jobs"
+        ]
+      }
+    },
+    {
+      "service": "ec2",
+      "method": "describe_instances",
+      "params": {
+        "MaxResults": 5
+      },
+      "region": "ap-southeast-2",
+      "response": {
+        "Reservations": []
+      }
+    },
+    {
+      "service": "ec2",
+      "method": "describe_vpcs",
+      "params": {
+        "MaxResults": 5
+      },
+      "region": "ap-southeast-2",
+      "response": {
+        "Vpcs": [
+          {
+            "OwnerId": "111122223333",
+            "InstanceTenancy": "default",
+            "Ipv6CidrBlockAssociationSet": [],
+            "CidrBlockAssociationSet": [
+              {
+                "AssociationId": "vpc-cidr-assoc-34f7b23785420b60c",
+                "CidrBlock": "172.31.0.0/16",
+                "CidrBlockState": {
+                  "State": "associated"
+                }
+              }
+            ],
+            "IsDefault": true,
+            "Tags": [],
+            "VpcId": "vpc-e99f4861ced04b121",
+            "State": "available",
+            "CidrBlock": "172.31.0.0/16",
+            "DhcpOptionsId": "default"
+          }
+        ]
+      }
+    },
+    {
+      "service": "ec2",
+      "method": "describe_security_groups",
+      "params": {
+        "MaxResults": 5
+      },
+      "region": "ap-southeast-2",
+      "response": {
+        "SecurityGroups": [
+          {
+            "GroupId": "sg-bab5085951d08fd8d",
+            "IpPermissionsEgress": [
+              {
+                "IpProtocol": "-1",
+                "UserIdGroupPairs": [],
+                "IpRanges": [
+                  {
+                    "CidrIp": "0.0.0.0/0"
+                  }
+                ],
+                "Ipv6Ranges": [],
+                "PrefixListIds": []
+              }
+            ],
+            "Tags": [],
+            "VpcId": "vpc-e99f4861ced04b121",
+            "SecurityGroupArn": "arn:aws:ec2:ap-southeast-2:111122223333:security-group/sg-bab5085951d08fd8d",
+            "OwnerId": "111122223333",
+            "GroupName": "default",
+            "Description": "default VPC security group",
+            "IpPermissions": []
+          }
+        ]
+      }
+    },
+    {
+      "service": "ec2",
+      "method": "describe_network_interfaces",
+      "params": {
+        "MaxResults": 5
+      },
+      "region": "ap-southeast-2",
+      "response": {
+        "NetworkInterfaces": []
+      }
+    },
+    {
+      "service": "ec2",
+      "method": "describe_flow_logs",
+      "params": {
+        "MaxResults": 5
+      },
+      "region": "ap-southeast-2",
+      "response": {
+        "FlowLogs": []
+      }
+    },
+    {
+      "service": "rds",
+      "method": "describe_db_instances",
+      "params": {
+        "MaxRecords": 20
+      },
+      "region": "ap-southeast-2",
+      "response": {
+        "DBInstances": []
+      }
+    },
+    {
+      "service": "rds",
+      "method": "describe_db_clusters",
+      "params": {
+        "MaxRecords": 20
+      },
+      "region": "ap-southeast-2",
+      "response": {
+        "DBClusters": []
+      }
+    }
+  ]
+}

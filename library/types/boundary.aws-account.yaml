@@ -1,0 +1,40 @@
+id: boundary.aws-account
+version: 1
+family: boundaries
+display_name: AWS account
+aliases: [aws account, account, member account]
+vendors: [Amazon Web Services]
+icon: boundary.aws-account.svg
+properties:
+  - key: account_id
+    tier: required
+    type: string
+  - key: purpose
+    tier: recommended
+    type: enum
+    values: [prod, staging, dev, security, shared_services, sandbox]
+  - key: regions
+    tier: recommended
+    type: list
+  - key: alias
+    tier: derived
+    type: string
+  - key: credential
+    tier: secret
+    type: string
+    scopes_hint: ["ReadOnlyAccess minus s3:GetObject and dynamodb:GetItem", "sts:AssumeRole with an external id"]
+edges:
+  allowed_out: [emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [contained_in, depends_on]
+connection_test:
+  kind: aws_api
+  description: "Assume the read-only role with the external id and call sts:GetCallerIdentity, expect this account id"
+whitehat_modes: [identity, iac]
+default_sense_points:
+  - mode: identity
+    reason: CloudTrail and IAM in this account show who changed what
+  - mode: iac
+    reason: "Account-wide settings: public access block, default encryption, password policy"
+attack_techniques: [T1078.004, T1098.001, T1136.003, T1580, T1685.002]
+importers: [aws_config, aws_resource_explorer, terraform_aws_provider]
+deploy_guide_template: guides/boundary.aws-account.md

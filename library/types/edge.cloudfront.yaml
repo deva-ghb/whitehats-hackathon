@@ -1,0 +1,43 @@
+id: edge.cloudfront
+version: 1
+family: network
+display_name: Amazon CloudFront distribution
+aliases: [cloudfront, cdn, aws cdn]
+vendors: [Amazon Web Services]
+icon: edge.cloudfront.svg
+properties:
+  - key: distribution_id
+    tier: required
+    type: string
+  - key: waf
+    tier: recommended
+    type: boolean
+  - key: viewer_protocol
+    tier: recommended
+    type: enum
+    values: [https_only, redirect_to_https, allow_all]
+  - key: origin_access
+    tier: recommended
+    type: enum
+    values: [origin_access_control, origin_access_identity, public_origin]
+  - key: logging
+    tier: recommended
+    type: boolean
+  - key: aliases
+    tier: derived
+    type: list
+edges:
+  allowed_out: [calls, routes_through, authenticates_via, emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [calls, routes_through, depends_on]
+connection_test:
+  kind: aws_api
+  description: "Call cloudfront:GetDistributionConfig with the read-only role, expect the distribution id"
+whitehat_modes: [network, iac]
+default_sense_points:
+  - mode: network
+    reason: First place an attack against the public site shows up
+  - mode: iac
+    reason: "Missing WAF, plain HTTP and public origins"
+attack_techniques: [T1190, T1498, T1499.003, T1090.004]
+importers: [aws_config, terraform_aws_provider]
+deploy_guide_template: guides/edge.cloudfront.md

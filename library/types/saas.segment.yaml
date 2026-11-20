@@ -1,0 +1,34 @@
+id: saas.segment
+version: 1
+family: saas
+display_name: Segment
+aliases: [segment, twilio segment, analytics, cdp]
+vendors: [Twilio]
+icon: saas.segment.svg
+properties:
+  - key: workspace
+    tier: required
+    type: string
+  - key: destinations
+    tier: recommended
+    type: list
+  - key: data_shared
+    tier: recommended
+    type: string
+  - key: credential
+    tier: secret
+    type: string
+    scopes_hint: [Workspace Read-only token]
+edges:
+  allowed_out: [calls, syncs_with, emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [calls, syncs_with, depends_on]
+connection_test:
+  kind: http
+  description: "List sources with the read-only token, expect 200"
+whitehat_modes: [saas, data]
+default_sense_points:
+  - mode: data
+    reason: Every destination is a copy of customer events outside the company
+attack_techniques: [T1199, T1567, T1528]
+importers: [manual]
+deploy_guide_template: guides/saas.segment.md

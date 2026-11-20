@@ -1,0 +1,33 @@
+id: control.guardduty
+version: 1
+family: security_controls
+display_name: Amazon GuardDuty
+aliases: [guardduty, threat detection, aws ids]
+vendors: [Amazon Web Services]
+icon: control.guardduty.svg
+properties:
+  - key: detector_id
+    tier: required
+    type: string
+  - key: region
+    tier: required
+    type: string
+  - key: delegated_admin_account
+    tier: recommended
+    type: string
+  - key: protection_plans
+    tier: derived
+    type: list
+edges:
+  allowed_out: [emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [emits_telemetry_to, depends_on]
+connection_test:
+  kind: aws_api
+  description: "Call guardduty:GetDetector with the read-only role, expect status ENABLED"
+whitehat_modes: [identity, network]
+default_sense_points:
+  - mode: identity
+    reason: Its findings are evidence WhiteHats links to incidents instead of repeating
+attack_techniques: [T1685, T1078.004]
+importers: [aws_config, terraform_aws_provider]
+deploy_guide_template: guides/control.guardduty.md

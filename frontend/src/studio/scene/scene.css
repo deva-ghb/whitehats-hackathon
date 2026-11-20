@@ -1,0 +1,175 @@
+/* The isometric scene. The palette is the website hero's (website/brand/draw.py), as tokens so the scene can follow the theme.
+   New tokens (--sc-*): the reference scene's colours have no equivalent in styles.css; state tints reuse the product's --crit and --good. */
+.iso-scene {
+  --sc-bg-a: #f1f8f5; --sc-bg-b: #e3eff2; --sc-dot: #8fa6a4;
+  --sc-ink: #0b0c0d; --sc-teal: #0f766e; --sc-muted: #6b7377; --sc-halo: #ffffff; --sc-card: #ffffff;
+  --sc-w-t: #ffffff; --sc-w-l: #f2f4f4; --sc-w-r: #e4e8e9;
+  --sc-s-t: #d9f0ec; --sc-s-l: #c2e5df; --sc-s-r: #a9d8d0;
+  --sc-d-t: #0f766e; --sc-d-l: #0d625c; --sc-d-r: #0a4f4a;
+  --sc-c-t: #fbe8e6; --sc-c-l: #f3cdc8; --sc-c-r: #e8b0a9; --sc-crit: #b8322a;
+  --sc-g: #ffffff; --sc-g-op: .55; --sc-floor: #0f766e; --sc-floor-op: .07; --sc-grid: #e9eced;
+  --sc-hatch-a: #ffffff; --sc-hatch-b: #0b0c0d; --sc-hatch-ta: #d9f0ec; --sc-hatch-tb: #0f766e; --sc-hatch-ca: #fbe8e6; --sc-hatch-cb: #b8322a;
+  --sc-sel: var(--brand, #0b6e6e); --sc-z: 1;
+  background: linear-gradient(160deg, var(--sc-bg-a), var(--sc-bg-b));
+  touch-action: none; user-select: none; -webkit-user-select: none; overflow: hidden;
+}
+@media (prefers-color-scheme: dark) {
+  .iso-scene {
+    --sc-bg-a: #0f1d21; --sc-bg-b: #132a2d; --sc-dot: #5e8583;
+    --sc-ink: #cfdcdc; --sc-teal: #3fc1b4; --sc-muted: #93a5a6; --sc-halo: #0f1d21; --sc-card: #16272b;
+    --sc-w-t: #35494d; --sc-w-l: #2a3c40; --sc-w-r: #213236;
+    --sc-s-t: #2f6762; --sc-s-l: #28585a; --sc-s-r: #204a4b;
+    --sc-d-t: #1d9488; --sc-d-l: #157a70; --sc-d-r: #0f6159;
+    --sc-c-t: #6a312e; --sc-c-l: #572725; --sc-c-r: #451e1c; --sc-crit: #ff8f85;
+    --sc-g: #9fc5c4; --sc-g-op: .16; --sc-floor-op: .12; --sc-grid: #2a3c40;
+    --sc-hatch-a: #35494d; --sc-hatch-b: #cfdcdc; --sc-hatch-ta: #2f6762; --sc-hatch-tb: #8fe0d6; --sc-hatch-ca: #6a312e; --sc-hatch-cb: #ffb1a8;
+    --sc-sel: #6ee0d3;
+  }
+}
+:root[data-theme='dark'] .iso-scene {
+  --sc-bg-a: #0f1d21; --sc-bg-b: #132a2d; --sc-dot: #5e8583;
+  --sc-ink: #cfdcdc; --sc-teal: #3fc1b4; --sc-muted: #93a5a6; --sc-halo: #0f1d21; --sc-card: #16272b;
+  --sc-w-t: #35494d; --sc-w-l: #2a3c40; --sc-w-r: #213236;
+  --sc-s-t: #2f6762; --sc-s-l: #28585a; --sc-s-r: #204a4b;
+  --sc-d-t: #1d9488; --sc-d-l: #157a70; --sc-d-r: #0f6159;
+  --sc-c-t: #6a312e; --sc-c-l: #572725; --sc-c-r: #451e1c; --sc-crit: #ff8f85;
+  --sc-g: #9fc5c4; --sc-g-op: .16; --sc-floor-op: .12; --sc-grid: #2a3c40;
+  --sc-hatch-a: #35494d; --sc-hatch-b: #cfdcdc; --sc-hatch-ta: #2f6762; --sc-hatch-tb: #8fe0d6; --sc-hatch-ca: #6a312e; --sc-hatch-cb: #ffb1a8;
+  --sc-sel: #6ee0d3;
+}
+
+.iso-scene .sc-svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; outline: none; }
+.iso-scene .sc-svg.over-item { cursor: pointer; }
+.iso-scene .sc-svg.editing.over-item { cursor: move; }
+.iso-scene .sc-svg.panning { cursor: grabbing; }
+.iso-scene .sc-svg.connecting { cursor: crosshair; }
+.iso-scene .sc-world * { pointer-events: none; }
+
+/* Inks and faces. Every solid is drawn from these classes, so the theme changes them all at once. */
+.iso-scene .sc-world polygon, .iso-scene .sc-world path, .iso-scene .sc-world ellipse, .iso-scene .sc-world line, .iso-scene .sc-world rect, .iso-scene .sc-world circle {
+  vector-effect: non-scaling-stroke;
+}
+.iso-scene .sc-solid polygon, .iso-scene .sc-solid path, .iso-scene .sc-solid ellipse { stroke: var(--sc-ink); stroke-width: 1.4; stroke-linejoin: round; }
+.iso-scene .sc-solid polygon.draft-base { fill: none; stroke: var(--sc-ink); stroke-width: 1.1; stroke-dasharray: 4 3; stroke-opacity: .7; }
+.iso-scene .sc-solid.plain polygon, .iso-scene .sc-solid.plain path, .iso-scene .sc-solid.plain ellipse { stroke-width: .8; }
+.iso-scene .t-w { fill: var(--sc-w-t); } .iso-scene .l-w { fill: var(--sc-w-l); } .iso-scene .r-w { fill: var(--sc-w-r); }
+.iso-scene .t-s { fill: var(--sc-s-t); } .iso-scene .l-s { fill: var(--sc-s-l); } .iso-scene .r-s { fill: var(--sc-s-r); }
+.iso-scene .t-d { fill: var(--sc-d-t); } .iso-scene .l-d { fill: var(--sc-d-l); } .iso-scene .r-d { fill: var(--sc-d-r); }
+.iso-scene .t-c { fill: var(--sc-c-t); } .iso-scene .l-c { fill: var(--sc-c-l); } .iso-scene .r-c { fill: var(--sc-c-r); }
+.iso-scene .t-g, .iso-scene .l-g, .iso-scene .r-g { fill: var(--sc-g); fill-opacity: var(--sc-g-op); }
+.iso-scene .accent { stroke: var(--sc-teal); }
+.iso-scene .glyph { fill: var(--sc-teal); stroke: none; }
+.iso-scene .sc-solid .glyph, .iso-scene .sc-solid circle.glyph { stroke: none; }
+
+/* The platform and zones */
+.iso-scene .sc-platform polygon { stroke: var(--sc-ink); stroke-width: 1.4; stroke-linejoin: round; }
+.iso-scene .sc-platform .grid { fill: none; stroke: var(--sc-grid); stroke-width: .8; }
+.iso-scene .sc-platform .rim, .iso-scene .sc-rim .rim { fill: none; stroke: var(--sc-teal); stroke-width: 1.1; stroke-dasharray: 5 4; }
+.iso-scene .sc-platform .rim-ground { fill: none; stroke: var(--sc-teal); stroke-width: 1.1; stroke-dasharray: 5 4; }
+.iso-scene .sc-platform polygon.rim-ground { stroke: var(--sc-teal); }
+.iso-scene .sc-platform-label { font: 600 13px/1 var(--f-ui, system-ui); letter-spacing: .16em; fill: var(--sc-teal); text-transform: uppercase; }
+.iso-scene .zone-floor { fill: var(--sc-floor); fill-opacity: var(--sc-floor-op); stroke: var(--sc-teal); stroke-width: 1.1; stroke-dasharray: 5 4; }
+.iso-scene .sc-zone.draft .zone-floor { stroke-dasharray: 2 4; }
+.iso-scene .sc-zone polygon:not(.zone-floor) { stroke: var(--sc-ink); stroke-width: .8; stroke-linejoin: round; }
+.iso-scene .zone-rim { fill: none; stroke: var(--sc-teal); stroke-width: 1; stroke-dasharray: 2 4; stroke-opacity: .8; }
+.iso-scene .ghost { fill: var(--sc-teal); fill-opacity: .1; stroke: var(--sc-teal); stroke-width: 1.4; stroke-dasharray: 4 3; }
+
+/* People floating above their place */
+.iso-scene .badge { fill: var(--sc-teal); stroke: var(--sc-d-r); stroke-width: 1.2; }
+.iso-scene .halo { fill: var(--sc-teal); fill-opacity: .22; stroke: none; }
+.iso-scene .figure { fill: #ffffff; stroke: none; }
+.iso-scene .drop { stroke: var(--sc-teal); stroke-width: 1; stroke-dasharray: 3 5; stroke-opacity: .55; }
+.iso-scene .spot { fill: none; stroke: var(--sc-teal); stroke-width: 1.1; }
+.iso-scene .sc-solid.draft .badge { stroke-dasharray: 3 2; }
+
+/* Connections */
+.iso-scene .sc-edge { fill: none; stroke: var(--sc-teal); stroke-width: 1; stroke-dasharray: 4 3; stroke-opacity: .5; }
+.iso-scene .sc-edge.rel { stroke-width: 1.6; stroke-opacity: 1; }
+.iso-scene .sc-edge.on { stroke: var(--sc-sel); stroke-width: 2.4; stroke-dasharray: none; stroke-opacity: 1; }
+.iso-scene .sc-arrow { fill: var(--sc-teal); }
+.iso-scene .sc-edge-hit { fill: none; stroke: transparent; }
+
+/* Sense points: a target ring with the WhiteHat robot beside it. accepted is solid, suggested hollow and dashed, rejected struck through. */
+.iso-scene .sense .ring { fill: none; stroke: var(--sc-teal); stroke-width: 1.2; }
+.iso-scene .sense .halo { fill: var(--sc-teal); fill-opacity: .25; }
+.iso-scene .sense .dot { fill: var(--sc-teal); stroke: #ffffff; stroke-width: 1.6; }
+.iso-scene .sense.suggested .ring { stroke-dasharray: 2.5 2; }
+.iso-scene .sense.suggested .dot { fill: var(--sc-halo); stroke: var(--sc-teal); }
+.iso-scene .sense.suggested { opacity: .92; }
+.iso-scene .sense.rejected { opacity: .85; }
+.iso-scene .sense.rejected .ring, .iso-scene .sense.rejected .bar { stroke: var(--sc-muted); }
+.iso-scene .sense.rejected .dot { fill: var(--sc-muted); stroke: none; }
+.iso-scene .sense .bar { stroke-width: 1.8; stroke-linecap: round; }
+.iso-scene .robot .head { fill: #d9f0ec; stroke: var(--sc-ink); stroke-width: 1.4; }
+.iso-scene .robot .stroke { stroke: var(--sc-ink); stroke-width: 1.3; }
+.iso-scene .robot .tip { fill: var(--sc-teal); stroke: none; }
+.iso-scene .robot .eye { fill: var(--sc-ink); stroke: none; }
+.iso-scene .robot .mouth { fill: none; stroke: var(--sc-teal); stroke-width: 1.3; }
+.iso-scene .robot.sad .head { fill: #e4e8e9; }
+.iso-scene .robot.sad .mouth { stroke: var(--sc-muted); }
+.iso-scene .robot.asking .head { fill: #ffffff; }
+@media (prefers-color-scheme: dark) {
+  .iso-scene .robot .head { fill: #2f6762; } .iso-scene .robot.sad .head { fill: #2a3c40; } .iso-scene .robot.asking .head { fill: #35494d; }
+}
+@keyframes sc-pulse { 0%, 100% { fill-opacity: .15; } 50% { fill-opacity: .5; } }
+.iso-scene .sense .pulse { animation: sc-pulse 3s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .iso-scene .sense .pulse { animation: none; } }
+
+/* Selection, handles, and what is shown while something is dragged */
+.iso-scene .sc-sel { fill: var(--sc-sel); fill-opacity: .09; stroke: var(--sc-sel); stroke-width: 2.2; stroke-linejoin: round; }
+.iso-scene .sc-focus { fill: none; stroke: var(--sc-ink); stroke-width: 2; stroke-dasharray: 4 3; stroke-linejoin: round; }
+.iso-scene .sc-hover { fill: var(--sc-sel); fill-opacity: .06; stroke: var(--sc-sel); stroke-width: 1.2; stroke-opacity: .7; stroke-linejoin: round; }
+.iso-scene .sc-link-typed { fill: var(--sc-sel); fill-opacity: .12; stroke: var(--sc-sel); stroke-width: 2.4; stroke-linejoin: round; }
+.iso-scene .sc-link-generic { fill: var(--sc-bg-a); fill-opacity: .55; stroke: none; }
+.iso-scene .sc-fixed { transform: scale(calc(1 / var(--sc-z))); }
+.iso-scene .sc-handle { fill: var(--sc-card); stroke: var(--sc-sel); stroke-width: 2; }
+.iso-scene .sc-handle.connect { fill: var(--sc-sel); stroke: var(--sc-card); }
+.iso-scene .sc-rubber { fill: none; stroke: var(--sc-sel); stroke-width: 2; stroke-dasharray: 5 4; }
+.iso-scene .sc-marquee { fill: var(--sc-sel); fill-opacity: .1; stroke: var(--sc-sel); stroke-width: 1.2; stroke-dasharray: 4 3; }
+.iso-scene .sc-alert circle { fill: #b45309; stroke: var(--sc-card); stroke-width: 1.4; }
+.iso-scene .sc-alert text { fill: #ffffff; font: 800 12px var(--f-ui, system-ui); text-anchor: middle; }
+.iso-scene .sc-finding circle { fill: var(--sc-crit); stroke: var(--sc-card); stroke-width: 1.4; }
+.iso-scene .sc-finding text { fill: #ffffff; font: 800 12px var(--f-ui, system-ui); text-anchor: middle; }
+
+/* Names stay 12 px on screen at every zoom: they are drawn at a counter scale. */
+.iso-scene .sc-label text { font: 600 12px/1 var(--f-ui, system-ui); fill: var(--sc-ink); paint-order: stroke; stroke: var(--sc-halo); stroke-width: 3.5px; stroke-linejoin: round; text-anchor: middle; }
+.iso-scene .sc-label text.sub { font: 500 11px/1 var(--f-ui, system-ui); fill: var(--sc-muted); }
+.iso-scene .sc-leader { stroke: var(--sc-muted); stroke-width: 1; stroke-opacity: .7; }
+.iso-scene .sc-label.zone text { fill: var(--sc-teal); font-weight: 700; letter-spacing: .02em; stroke-width: 6px; }
+.iso-scene .sc-label.on text:not(.sub) { fill: var(--sc-sel); }
+
+/* The card shown on hover, in plain words, like the one on the website. */
+.sc-tip { position: absolute; z-index: 6; max-width: 280px; padding: 10px 14px 12px; background: var(--sc-card, #fff); color: var(--ink); border: 1px solid var(--line-2); border-radius: 2px;
+  box-shadow: 0 6px 24px -10px rgba(15, 26, 42, .35); pointer-events: none; }
+.sc-tip b { display: block; font: 700 11px/1.3 var(--f-ui); letter-spacing: .12em; text-transform: uppercase; color: var(--brand); margin-bottom: 4px; }
+.sc-tip span { display: block; font-size: 14px; line-height: 1.4; }
+.sc-tip .name { font-weight: 700; }
+.sc-tip .state { color: var(--muted); font-size: 12.5px; margin-top: 4px; }
+@media (prefers-color-scheme: dark) { .sc-tip { background: #16272b; color: #e6eeee; border-color: #2a3c40; } .sc-tip b { color: #6ee0d3; } .sc-tip .state { color: #93a5a6; } }
+
+/* The zoom buttons and the sense point tools */
+.scene-controls { position: absolute; right: 12px; bottom: 12px; z-index: 5; display: flex; flex-direction: column; gap: 4px; }
+.scene-controls .btn { width: 34px; height: 34px; padding: 0; justify-content: center; }
+.scene-key { position: absolute; left: 12px; bottom: 12px; z-index: 5; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; max-width: min(360px, calc(100% - 80px)); }
+.scene-key ul { list-style: none; margin: 0; padding: 8px 10px; display: grid; gap: 4px; font-size: 12px; line-height: 1.35; color: var(--sc-ink); background: var(--sc-card); border: 1px solid var(--sc-dot); border-radius: 10px; box-shadow: var(--shadow); }
+.scene-key li { display: flex; align-items: baseline; gap: 6px; }
+.scene-key b { font-weight: 600; }
+.scene-key i { flex: none; width: 12px; height: 12px; align-self: center; border: 1px solid var(--sc-ink); background: var(--sc-w-t); }
+.scene-key i.s { background: var(--sc-s-l); } .scene-key i.c { background: var(--sc-c-l); } .scene-key i.d { background: var(--sc-d-t); } .scene-key i.x { border-style: dashed; background: transparent; }
+@media (max-width: 1023px) { .scene-controls .btn { width: 44px; height: 44px; } .scene-key .btn { min-height: 44px; } }
+.iso-scene .sc-fixed-text { transform: scale(calc(1 / var(--sc-z))); }
+/* The view switch sits over the top right corner of the canvas, in the canvas' own grid cell, so the toolbar keeps its width. */
+.studio-view { grid-area: canvas; align-self: start; justify-self: end; z-index: 6; margin: 12px; display: flex; background: var(--surface); border: 1px solid var(--line-2); border-radius: 10px; box-shadow: var(--shadow); padding: 3px; gap: 2px; }
+.studio-view .btn { border: 0; box-shadow: none; background: transparent; min-height: 32px; gap: 6px; }
+.studio-view .btn.on { background: var(--brand-soft); color: var(--brand); }
+@media (max-width: 1023px) { .studio-view .btn { min-height: 44px; min-width: 44px; } }
+
+.iso-scene polygon[class^='t-g'], .iso-scene polygon[class^='l-g'], .iso-scene polygon[class^='r-g'] { stroke-width: .8 !important; }
+.iso-scene .sc-svg.plain .sc-edge { stroke-dasharray: none; stroke-opacity: .22; stroke-width: .8; }
+.iso-scene .sc-svg.plain .sc-edge.rel { stroke-opacity: 1; stroke-width: 1.4; }
+
+/* On a phone the bar wraps to two rows instead of squeezing the clone's name away (it shows only its arrow when several clones exist). */
+@media (max-width: 767px) {
+  .studio .studio-bar { flex-wrap: wrap; }
+  .studio .studio-bar .studio-clone { flex: 1 1 150px; min-width: 150px; }
+}

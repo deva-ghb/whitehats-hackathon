@@ -1,0 +1,56 @@
+id: edge.api-gateway
+version: 1
+family: network
+display_name: Amazon API Gateway
+aliases: [api gateway, apigw, http api, rest api]
+vendors: [Amazon Web Services]
+icon: edge.api-gateway.svg
+properties:
+  - key: api_id
+    tier: required
+    type: string
+  - key: api_type
+    tier: required
+    type: enum
+    values: [http, rest, websocket]
+  - key: region
+    tier: required
+    type: string
+  - key: authorizer
+    tier: recommended
+    type: enum
+    values: [lambda, jwt, iam, cognito, none]
+  - key: throttling_rps
+    tier: recommended
+    type: number
+  - key: throttling_burst
+    tier: recommended
+    type: number
+  - key: rate_limit
+    tier: derived
+    type: enum
+    values: [set, none]
+  - key: public
+    tier: derived
+    type: boolean
+  - key: access_logging
+    tier: recommended
+    type: boolean
+  - key: routes
+    tier: derived
+    type: list
+edges:
+  allowed_out: [calls, routes_through, authenticates_via, emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [calls, routes_through, depends_on]
+connection_test:
+  kind: aws_api
+  description: "Call apigateway:GET on the API with the read-only role, expect the api id"
+whitehat_modes: [network, iac, pentest]
+default_sense_points:
+  - mode: iac
+    reason: A route with no authorizer is open to the internet
+  - mode: network
+    reason: "Access logs show scanning, floods and auth failures"
+attack_techniques: [T1190, T1499.003, T1550.001]
+importers: [aws_config, terraform_aws_provider, openapi]
+deploy_guide_template: guides/edge.api-gateway.md

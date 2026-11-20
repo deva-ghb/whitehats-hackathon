@@ -1,0 +1,47 @@
+id: service.frontend
+version: 1
+family: services
+display_name: Frontend web app
+aliases: [web app, website, spa, next.js app, react app, portal]
+vendors: []
+icon: service.frontend.svg
+properties:
+  - key: runtime
+    tier: required
+    type: string
+  - key: framework
+    tier: recommended
+    type: string
+  - key: hosting
+    tier: recommended
+    type: enum
+    values: [static, server_rendered, app_service, container]
+  - key: csp
+    tier: recommended
+    type: boolean
+  - key: auth_model
+    tier: recommended
+    type: enum
+    values: [none, oauth2_oidc, session_cookie]
+  - key: url
+    tier: recommended
+    type: url
+  - key: sbom
+    tier: derived
+    type: string
+  - key: packages
+    tier: optional
+    type: list
+edges:
+  allowed_out: [calls, publishes_to, consumes_from, reads, writes, deploys_from, runs_on, runs_as, routes_through, authenticates_via, stores_secret_in, emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [calls, depends_on]
+connection_test:
+  kind: http
+  description: "Load the site URL, expect 200 over HTTPS"
+whitehat_modes: [code, supply_chain, pentest]
+default_sense_points:
+  - mode: supply_chain
+    reason: "Third-party scripts and packages run in every visitor's browser"
+attack_techniques: [T1189, T1185, T1539, T1659]
+importers: [repo_scan, kubernetes_api]
+deploy_guide_template: guides/service.frontend.md

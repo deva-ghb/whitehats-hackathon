@@ -1,0 +1,277 @@
+{
+  "about": "Assembled on 2026-10-24 from the proving-ground repository: repository, workflows and pull requests read live with a read-only token; commits, branches and files from main (357599d). The App's token exchange is GitHub's documented answer, because the WhiteHats App does not exist yet. The 429 is added by hand. The two branch-listing calls at the end (the branch heads the poll compares, VS.1) are copied from discover-ok, recorded through the App the same day.",
+  "clock": 1792774686.0,
+  "calls": [
+    {
+      "method": "POST",
+      "url": "https://api.github.com/app/installations/12345678/access_tokens",
+      "status": 201,
+      "headers": {},
+      "body": {
+        "token": "recorded-placeholder",
+        "expires_at": "2026-10-23T17:58:06Z",
+        "permissions": {
+          "metadata": "read",
+          "contents": "read",
+          "actions": "read",
+          "pull_requests": "write",
+          "checks": "write"
+        },
+        "repository_selection": "selected"
+      }
+    },
+    {
+      "method": "GET",
+      "url": "https://api.github.com/installation/repositories?per_page=2",
+      "status": 200,
+      "headers": {},
+      "body": {
+        "total_count": 1,
+        "repositories": [
+          {
+            "id": 1431003704,
+            "node_id": "R_kgDOVUtiOA",
+            "name": "whitehats-proving-ground",
+            "full_name": "deva-ghb/whitehats-proving-ground",
+            "private": true,
+            "owner": {
+              "login": "deva-ghb",
+              "id": 99424738,
+              "node_id": "U_kgDOBe0Z4g",
+              "avatar_url": "https://avatars.githubusercontent.com/u/99424738?v=4",
+              "gravatar_id": "",
+              "url": "https://api.github.com/users/deva-ghb",
+              "html_url": "https://github.com/deva-ghb",
+              "followers_url": "https://api.github.com/users/deva-ghb/followers",
+              "following_url": "https://api.github.com/users/deva-ghb/following{/other_user}",
+              "gists_url": "https://api.github.com/users/deva-ghb/gists{/gist_id}",
+              "starred_url": "https://api.github.com/users/deva-ghb/starred{/owner}{/repo}",
+              "subscriptions_url": "https://api.github.com/users/deva-ghb/subscriptions",
+              "organizations_url": "https://api.github.com/users/deva-ghb/orgs",
+              "repos_url": "https://api.github.com/users/deva-ghb/repos",
+              "events_url": "https://api.github.com/users/deva-ghb/events{/privacy}",
+              "received_events_url": "https://api.github.com/users/deva-ghb/received_events",
+              "type": "User",
+              "user_view_type": "public",
+              "site_admin": false
+            },
+            "html_url": "https://github.com/deva-ghb/whitehats-proving-ground",
+            "description": null,
+            "fork": false,
+            "url": "https://api.github.com/repos/deva-ghb/whitehats-proving-ground",
+            "forks_url": "https://api.github.com/repos/deva-ghb/whitehats-proving-ground/forks",
+            "keys_url": "https://api.github.com/repos/deva-ghb/whitehats-proving-ground/keys{/key_id}",
+            "collaborators_url": "https://api.github.com/repos/deva-ghb/whitehats-proving-ground/collaborators{/collaborator}",
+            "teams_url": "https://api.github.com/repos/deva-ghb/whitehats-proving-ground/teams",
+            "hooks_url": "https://api.github.com/repos/deva-ghb/whitehats-proving-ground/hooks",
+            "issue_events_url": "https://api.github.com/repos/deva-ghb/whitehats-proving-ground/issues/events{/number}",
+            "events_url": "https://api.github.com/repos/deva-ghb/whitehats-proving-ground/events",
+            "assignees_url": "https://api.github.com/repos/deva-ghb/whitehats-proving-ground/assignees{/user}",
+            "branches_url": "https://api.github.com/repos/deva-ghb/whitehats-proving-ground/branches{/branch}",
+            "tags_url": "https://api.github.com/repos/deva-ghb/whitehats-proving-ground/tags",
+            "blobs_url": "https://api.github.com/repos/deva-ghb/whitehats-proving-ground/git/blobs{/sha}",
+            "git_tags_url": "https://api.github.com/repos/deva-ghb/whitehats-proving-ground/git/tags{/sha}",
+            "git_refs_url": "https://api.github.com/repos/deva-ghb/whitehats-proving-ground/git/refs{/sha}",
+            "trees_url": "https://api.github.com/repos/deva-ghb/whitehats-proving-ground/git/trees{/sha}",
+            "statuses_url": "https://api.github.com/repos/deva-ghb/whitehats-proving-ground/statuses/{sha}",
+            "languages_url": "https://api.github.com/repos/deva-ghb/whitehats-proving-ground/languages",
+            "stargazers_url": "https://api.github.com/repos/deva-ghb/whitehats-proving-ground/stargazers",
+            "contributors_url": "https://api.github.com/repos/deva-ghb/whitehats-proving-ground/contributors",
+            "subscribers_url": "https://api.github.com/repos/deva-ghb/whitehats-proving-ground/subscribers",
+            "subscription_url": "https://api.github.com/repos/deva-ghb/whitehats-proving-ground/subscription",
+            "commits_url": "https://api.github.com/repos/deva-ghb/whitehats-proving-ground/commits{/sha}",
+            "git_commits_url": "https://api.github.com/repos/deva-ghb/whitehats-proving-ground/git/commits{/sha}",
+            "comments_url": "https://api.github.com/repos/deva-ghb/whitehats-proving-ground/comments{/number}",
+            "issue_comment_url": "https://api.github.com/repos/deva-ghb/whitehats-proving-ground/issues/comments{/number}",
+            "contents_url": "https://api.github.com/repos/deva-ghb/whitehats-proving-ground/contents/{+path}",
+            "compare_url": "https://api.github.com/repos/deva-ghb/whitehats-proving-ground/compare/{base}...{head}",
+            "merges_url": "https://api.github.com/repos/deva-ghb/whitehats-proving-ground/merges",
+            "archive_url": "https://api.github.com/repos/deva-ghb/whitehats-proving-ground/{archive_format}{/ref}",
+            "downloads_url": "https://api.github.com/repos/deva-ghb/whitehats-proving-ground/downloads",
+            "issues_url": "https://api.github.com/repos/deva-ghb/whitehats-proving-ground/issues{/number}",
+            "pulls_url": "https://api.github.com/repos/deva-ghb/whitehats-proving-ground/pulls{/number}",
+            "milestones_url": "https://api.github.com/repos/deva-ghb/whitehats-proving-ground/milestones{/number}",
+            "notifications_url": "https://api.github.com/repos/deva-ghb/whitehats-proving-ground/notifications{?since,all,participating}",
+            "labels_url": "https://api.github.com/repos/deva-ghb/whitehats-proving-ground/labels{/name}",
+            "releases_url": "https://api.github.com/repos/deva-ghb/whitehats-proving-ground/releases{/id}",
+            "deployments_url": "https://api.github.com/repos/deva-ghb/whitehats-proving-ground/deployments",
+            "created_at": "2026-10-23T12:14:04Z",
+            "updated_at": "2026-10-23T16:53:47Z",
+            "pushed_at": "2026-10-23T20:50:02Z",
+            "git_url": "git://github.com/deva-ghb/whitehats-proving-ground.git",
+            "ssh_url": "git@github.com:deva-ghb/whitehats-proving-ground.git",
+            "clone_url": "https://github.com/deva-ghb/whitehats-proving-ground.git",
+            "svn_url": "https://github.com/deva-ghb/whitehats-proving-ground",
+            "homepage": null,
+            "size": 54,
+            "stargazers_count": 0,
+            "watchers_count": 0,
+            "language": "Python",
+            "has_issues": true,
+            "has_projects": true,
+            "has_downloads": false,
+            "has_wiki": false,
+            "has_pages": false,
+            "has_discussions": false,
+            "forks_count": 0,
+            "mirror_url": null,
+            "archived": false,
+            "disabled": false,
+            "open_issues_count": 0,
+            "license": null,
+            "allow_forking": true,
+            "is_template": false,
+            "web_commit_signoff_required": false,
+            "has_pull_requests": true,
+            "pull_request_creation_policy": "all",
+            "topics": [],
+            "visibility": "private",
+            "forks": 0,
+            "open_issues": 0,
+            "watchers": 0,
+            "default_branch": "main",
+            "permissions": {
+              "admin": true,
+              "maintain": true,
+              "push": true,
+              "triage": true,
+              "pull": true
+            },
+            "allow_squash_merge": true,
+            "allow_merge_commit": true,
+            "allow_rebase_merge": true,
+            "allow_auto_merge": false,
+            "delete_branch_on_merge": false,
+            "allow_update_branch": false,
+            "use_squash_pr_title_as_default": false,
+            "squash_merge_commit_message": "COMMIT_MESSAGES",
+            "squash_merge_commit_title": "COMMIT_OR_PR_TITLE",
+            "merge_commit_message": "PR_TITLE",
+            "merge_commit_title": "MERGE_MESSAGE",
+            "network_count": 0,
+            "subscribers_count": 0
+          }
+        ]
+      }
+    },
+    {
+      "method": "GET",
+      "url": "https://api.github.com/repos/deva-ghb/whitehats-proving-ground/commits?sha=main&since=2026-10-23T10%3A58%3A06Z&per_page=2",
+      "status": 429,
+      "headers": {
+        "retry-after": "1"
+      },
+      "body": {
+        "message": "You have exceeded a secondary rate limit."
+      }
+    },
+    {
+      "method": "GET",
+      "url": "https://api.github.com/repos/deva-ghb/whitehats-proving-ground/commits?sha=main&since=2026-10-23T10%3A58%3A06Z&per_page=2",
+      "status": 200,
+      "headers": {
+        "link": "<https://api.github.com/repos/deva-ghb/whitehats-proving-ground/commits?sha=main&since=2026-10-23T10%3A58%3A06Z&per_page=2&page=2>; rel=\"next\""
+      },
+      "body": [
+        {
+          "sha": "357599dfb314e0405a0965438af7745f01c3cc00",
+          "commit": {
+            "message": "PG.1.3: The two services, clean\n\nCo-authored-by: Cursor <cursoragent@cursor.com>",
+            "author": {
+              "name": "deva-ghb",
+              "email": "deva.macha@gytworkz.com",
+              "date": "2026-10-23T16:53:06Z"
+            },
+            "committer": {
+              "date": "2026-10-23T16:53:06Z"
+            }
+          }
+        },
+        {
+          "sha": "31c594bee17c6de6e6ef23c7808f02567196cbd5",
+          "commit": {
+            "message": "PG.1.2: include the payments-worker image repository\n\nThe builder boundary now allows ECR in ap-southeast-2, so the plan creates the private repository. The function stays a zip until an image is pushed.\n\nCo-authored-by: Cursor <cursoragent@cursor.com>",
+            "author": {
+              "name": "deva-ghb",
+              "email": "deva.macha@gytworkz.com",
+              "date": "2026-10-23T15:09:05Z"
+            },
+            "committer": {
+              "date": "2026-10-23T15:09:05Z"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "url": "https://api.github.com/repos/deva-ghb/whitehats-proving-ground/commits?sha=main&since=2026-10-23T10%3A58%3A06Z&per_page=2&page=2",
+      "status": 200,
+      "headers": {},
+      "body": [
+        {
+          "sha": "7f3f5336ffca2e5af74f759ce7f0c7e67f746bcb",
+          "commit": {
+            "message": "PG.1.2: Repo, state and skeleton\n\nThe estate plans as creates only. Buckets are created with the project tag before Terraform, because the builder denies an untagged CreateBucket and the AWS provider tags after create.\n\nCo-authored-by: Cursor <cursoragent@cursor.com>",
+            "author": {
+              "name": "deva-ghb",
+              "email": "deva.macha@gytworkz.com",
+              "date": "2026-10-23T12:11:32Z"
+            },
+            "committer": {
+              "date": "2026-10-23T12:11:32Z"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "url": "https://api.github.com/repos/deva-ghb/whitehats-proving-ground/branches?per_page=2",
+      "status": 200,
+      "headers": {
+        "link": "<https://api.github.com/repositories/1431003704/branches?per_page=2&page=2>; rel=\"next\", <https://api.github.com/repositories/1431003704/branches?per_page=2&page=2>; rel=\"last\"",
+        "x-ratelimit-remaining": "4940",
+        "x-ratelimit-reset": "1793033231"
+      },
+      "body": [
+        {
+          "name": "claude-1c/PG.1.2",
+          "commit": {
+            "sha": "26b14c1dcd0d9b9d879670a247aaf8b50a4d36d9",
+            "url": "https://api.github.com/repos/deva-ghb/whitehats-proving-ground/commits/26b14c1dcd0d9b9d879670a247aaf8b50a4d36d9"
+          },
+          "protected": false
+        },
+        {
+          "name": "claude-1c/R-044",
+          "commit": {
+            "sha": "e77fdf5b1b05f75a38fa2937fefc86f5388e8805",
+            "url": "https://api.github.com/repos/deva-ghb/whitehats-proving-ground/commits/e77fdf5b1b05f75a38fa2937fefc86f5388e8805"
+          },
+          "protected": false
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "url": "https://api.github.com/repositories/1431003704/branches?per_page=2&page=2",
+      "status": 200,
+      "headers": {
+        "link": "<https://api.github.com/repositories/1431003704/branches?per_page=2&page=1>; rel=\"prev\", <https://api.github.com/repositories/1431003704/branches?per_page=2&page=1>; rel=\"first\"",
+        "x-ratelimit-remaining": "4939",
+        "x-ratelimit-reset": "1793033231"
+      },
+      "body": [
+        {
+          "name": "main",
+          "commit": {
+            "sha": "58d7dc787d3aea48e584737fa88f43d752913de8",
+            "url": "https://api.github.com/repos/deva-ghb/whitehats-proving-ground/commits/58d7dc787d3aea48e584737fa88f43d752913de8"
+          },
+          "protected": false
+        }
+      ]
+    }
+  ]
+}

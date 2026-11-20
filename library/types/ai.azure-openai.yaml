@@ -1,0 +1,45 @@
+id: ai.azure-openai
+version: 1
+family: ai
+display_name: Azure OpenAI
+aliases: [azure openai, aoai, openai, gpt, llm]
+vendors: [Microsoft, OpenAI]
+icon: ai.azure-openai.svg
+properties:
+  - key: resource_name
+    tier: required
+    type: string
+  - key: models
+    tier: required
+    type: list
+  - key: data_sent
+    tier: recommended
+    type: string
+  - key: content_filters
+    tier: recommended
+    type: boolean
+  - key: key_auth_disabled
+    tier: recommended
+    type: boolean
+  - key: tools_exposed
+    tier: optional
+    type: list
+  - key: callers
+    tier: derived
+    type: list
+  - key: resource_id
+    tier: derived
+    type: string
+edges:
+  allowed_out: [emits_telemetry_to, reads, depends_on, contained_in]
+  allowed_in: [calls, depends_on]
+connection_test:
+  kind: azure_api
+  description: "List deployments with the Reader role, expect 200"
+whitehat_modes: [ai]
+default_sense_points:
+  - mode: ai
+    reason: "PHI in prompts and stolen keys used to run the company's quota"
+attack_techniques: [T1496.004, T1552.001, T1078.004]
+importers: [azure_resource_graph, bicep]
+deploy_guide_template: guides/ai.azure-openai.md

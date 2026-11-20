@@ -1,0 +1,33 @@
+id: generic.endpoints
+version: 1
+family: endpoints
+display_name: Generic device or person
+aliases: [device, person, user group, other endpoint]
+vendors: []
+icon: generic.endpoints.svg
+generic: true
+properties:
+  - key: what_is_this
+    tier: required
+    type: string
+  - key: vendor
+    tier: recommended
+    type: string
+  - key: vendor_url
+    tier: optional
+    type: url
+  - key: credential
+    tier: secret
+    type: string
+    scopes_hint: [the least access this component allows for reading its configuration]
+edges:
+  allowed_out: [calls, publishes_to, consumes_from, reads, writes, deploys_from, built_by, pushes_image_to, runs_on, runs_as, contained_in, routes_through, authenticates_via, stores_secret_in, emits_telemetry_to, replicates_to, backs_up_to, depends_on, peers_with, syncs_with]
+  allowed_in: [calls, publishes_to, consumes_from, reads, writes, deploys_from, built_by, pushes_image_to, runs_on, runs_as, contained_in, routes_through, authenticates_via, stores_secret_in, emits_telemetry_to, replicates_to, backs_up_to, depends_on, peers_with, syncs_with]
+connection_test:
+  kind: manual
+  description: A person confirms what this is until a proper type replaces it
+whitehat_modes: [iac]
+default_sense_points: []
+attack_techniques: [T1566]
+importers: [manual]
+deploy_guide_template: guides/generic.endpoints.md

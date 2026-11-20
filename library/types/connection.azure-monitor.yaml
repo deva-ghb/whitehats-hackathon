@@ -1,0 +1,22 @@
+id: connection.azure-monitor
+version: 1
+family: boundaries
+display_name: Azure Monitor connection
+aliases: [azure-monitor connection, azure-monitor source]
+vendors: [Microsoft]
+icon: connection.azure-monitor.svg
+properties:
+  - key: connector
+    tier: required
+    type: string
+edges:
+  allowed_out: [depends_on, contained_in]
+  allowed_in: [contained_in, depends_on]
+connection_test:
+  kind: http
+  description: "Sign in with the client secret and run the query against the workspace"
+whitehat_modes: [telemetry]
+default_sense_points: []
+attack_techniques: [T1070, T1078.004]
+importers: [connector]
+deploy_guide_template: guides/connection.azure-monitor.md

@@ -1,0 +1,30 @@
+id: boundary.aws-region
+version: 1
+family: boundaries
+display_name: AWS region
+aliases: [region, aws region, ap-southeast-2, us-east-1]
+vendors: [Amazon Web Services]
+icon: boundary.aws-region.svg
+properties:
+  - key: region
+    tier: required
+    type: string
+  - key: opted_in
+    tier: recommended
+    type: boolean
+  - key: enabled_services
+    tier: derived
+    type: list
+edges:
+  allowed_out: [emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [contained_in, depends_on]
+connection_test:
+  kind: aws_api
+  description: "Call ec2:DescribeRegions with the read-only role, expect the region to be listed as enabled"
+whitehat_modes: [iac]
+default_sense_points:
+  - mode: iac
+    reason: Resources in a region nobody uses are a classic hiding place
+attack_techniques: [T1535, T1578.002]
+importers: [aws_config, aws_resource_explorer, terraform_aws_provider]
+deploy_guide_template: guides/boundary.aws-region.md

@@ -1,0 +1,34 @@
+id: ai.phoenix
+version: 1
+family: ai
+display_name: Arize Phoenix (LLM tracing)
+aliases: [phoenix, arize, llm tracing, openinference]
+vendors: [Arize]
+icon: ai.phoenix.svg
+properties:
+  - key: host
+    tier: required
+    type: url
+  - key: project
+    tier: required
+    type: string
+  - key: retention_days
+    tier: recommended
+    type: number
+  - key: credential
+    tier: secret
+    type: string
+    scopes_hint: [API key with read access]
+edges:
+  allowed_out: [emits_telemetry_to, writes, depends_on, contained_in]
+  allowed_in: [emits_telemetry_to, depends_on]
+connection_test:
+  kind: http
+  description: "Read one span with the API key, expect 200"
+whitehat_modes: [ai, telemetry]
+default_sense_points:
+  - mode: ai
+    reason: Prompts and tool calls show injection attempts and personal data leaking
+attack_techniques: [T1213, T1552.001]
+importers: [manual]
+deploy_guide_template: guides/ai.phoenix.md

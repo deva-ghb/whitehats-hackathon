@@ -1,0 +1,33 @@
+id: control.aws-budgets
+version: 1
+family: security_controls
+display_name: AWS Budgets alarm
+aliases: [budget, aws budgets, cost alarm, billing alert]
+vendors: [Amazon Web Services]
+icon: control.aws-budgets.svg
+properties:
+  - key: budget_name
+    tier: required
+    type: string
+  - key: limit_usd
+    tier: required
+    type: number
+  - key: alert_thresholds
+    tier: recommended
+    type: list
+  - key: alert_email
+    tier: recommended
+    type: string
+edges:
+  allowed_out: [emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [emits_telemetry_to, depends_on]
+connection_test:
+  kind: aws_api
+  description: "Call budgets:DescribeBudget with a role that may read budgets, expect 200"
+whitehat_modes: [iac]
+default_sense_points:
+  - mode: iac
+    reason: A sudden jump in spend is often the first sign of stolen keys mining or a model being abused
+attack_techniques: [T1496, T1496.004]
+importers: [aws_budgets_api, terraform_aws_provider]
+deploy_guide_template: guides/control.aws-budgets.md

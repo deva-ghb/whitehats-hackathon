@@ -1,0 +1,55 @@
+id: repo.github
+version: 1
+family: code_and_delivery
+display_name: GitHub repository
+aliases: [github, gh repo, git repo, repository]
+vendors: [GitHub]
+icon: repo.github.svg
+properties:
+  - key: url
+    tier: required
+    type: url
+  - key: auth_method
+    tier: required
+    type: enum
+    values: [github_app, fine_grained_token, deploy_key]
+  - key: default_branch
+    tier: recommended
+    type: string
+  - key: branch_protection
+    tier: recommended
+    type: boolean
+  - key: branches_to_watch
+    tier: optional
+    type: list
+  - key: monorepo_paths
+    tier: optional
+    type: list
+  - key: codeowners
+    tier: recommended
+    type: boolean
+  - key: branches
+    tier: derived
+    type: list
+  - key: dependency_manifests
+    tier: derived
+    type: list
+  - key: credential
+    tier: secret
+    type: string
+    scopes_hint: ["contents:read", "metadata:read", "pull_requests:write only for comments", "checks:write"]
+edges:
+  allowed_out: [built_by, emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [deploys_from, depends_on]
+connection_test:
+  kind: github_api
+  description: "Read the default branch with the GitHub App installation token, expect 200"
+whitehat_modes: [code, supply_chain, secrets]
+default_sense_points:
+  - mode: code
+    reason: Source of every service deployed from this repo
+  - mode: secrets
+    reason: Secrets committed in history stay usable until rotated
+attack_techniques: [T1195.002, T1213.003, T1552.001]
+importers: [github_api, terraform_github_provider]
+deploy_guide_template: guides/repo.github.md

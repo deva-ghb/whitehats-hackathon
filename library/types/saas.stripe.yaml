@@ -1,0 +1,44 @@
+id: saas.stripe
+version: 1
+family: saas
+display_name: Stripe
+aliases: [stripe, payments, card payments, stripe connect]
+vendors: [Stripe]
+icon: saas.stripe.svg
+properties:
+  - key: account_id
+    tier: required
+    type: string
+  - key: mode
+    tier: required
+    type: enum
+    values: [live, test]
+  - key: webhooks_in
+    tier: recommended
+    type: list
+  - key: webhook_signatures_verified
+    tier: recommended
+    type: boolean
+  - key: data_shared
+    tier: recommended
+    type: string
+  - key: integrations
+    tier: recommended
+    type: list
+  - key: credential
+    tier: secret
+    type: string
+    scopes_hint: [restricted key with read-only scopes]
+edges:
+  allowed_out: [calls, syncs_with, emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [calls, syncs_with, depends_on]
+connection_test:
+  kind: http
+  description: "Call /v1/account with the restricted key, expect 200"
+whitehat_modes: [saas]
+default_sense_points:
+  - mode: saas
+    reason: Over-scoped keys and webhook handlers that do not check the signature
+attack_techniques: [T1657, T1552.001, T1199, T1565]
+importers: [stripe_api]
+deploy_guide_template: guides/saas.stripe.md

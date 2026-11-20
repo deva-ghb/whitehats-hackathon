@@ -1,0 +1,668 @@
+{
+  "schema_version": 1,
+  "clone": "proving-ground",
+  "environment": "prod",
+  "library_version": "2026.10",
+  "version": {
+    "number": 1,
+    "author": "proving-ground",
+    "reason": "The estate in checklist section 3.1, before PG.1 builds it",
+    "created_at": "2026-10-23T00:00:00Z"
+  },
+  "groups": [
+    {
+      "id": "g_account",
+      "type": "boundary.aws-account@1",
+      "name": "proving-ground account",
+      "kind": "account",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "proving-ground"
+      }
+    },
+    {
+      "id": "g_region",
+      "type": "boundary.aws-region@1",
+      "name": "ap-southeast-2",
+      "kind": "region",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "proving-ground"
+      },
+      "parent": "g_account",
+      "properties": {
+        "region": "ap-southeast-2"
+      }
+    }
+  ],
+  "access_paths": [
+    {
+      "id": "ap_runner",
+      "name": "customer-hosted Runner with pg-whitehats-readonly",
+      "kind": "customer-hosted-runner",
+      "environment": "prod",
+      "credential": "cr_readonly"
+    },
+    {
+      "id": "ap_public",
+      "name": "public GitHub API",
+      "kind": "public-api",
+      "environment": "shared"
+    }
+  ],
+  "credential_refs": [
+    {
+      "id": "cr_readonly",
+      "vault_uri": "vault://tenant/proving-ground/aws-readonly",
+      "purpose": "Read-only role pg-whitehats-readonly"
+    },
+    {
+      "id": "cr_github",
+      "vault_uri": "vault://tenant/proving-ground/github-app",
+      "purpose": "GitHub App for repo reads"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "n_customers_people",
+      "type": "endpoint.customer@1",
+      "name": "simulated customers",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "proving-ground"
+      },
+      "location": "g_region",
+      "access_path": "ap_public",
+      "notes": "Synthetic only: 500 customers from a fixed Faker seed, driven by the traffic simulator",
+      "properties": {
+        "count_estimate": 500,
+        "channels": [
+          "web"
+        ]
+      }
+    },
+    {
+      "id": "n_http_api",
+      "type": "edge.api-gateway@1",
+      "name": "shop HTTP API",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "proving-ground"
+      },
+      "location": "g_region",
+      "access_path": "ap_runner",
+      "criticality": "high",
+      "properties": {
+        "api_type": "http",
+        "region": "ap-southeast-2",
+        "authorizer": "lambda",
+        "throttling_rps": 10,
+        "access_logging": true
+      }
+    },
+    {
+      "id": "n_gatekeeper",
+      "type": "service.function@2",
+      "name": "gatekeeper",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "proving-ground"
+      },
+      "location": "g_region",
+      "access_path": "ap_runner",
+      "criticality": "high",
+      "notes": "Checks PG_API_TOKEN on every route",
+      "properties": {
+        "platform": "aws_lambda",
+        "runtime": "python 3.12",
+        "trigger": "authorizer",
+        "package_type": "zip"
+      }
+    },
+    {
+      "id": "n_shop_api",
+      "type": "service.function@2",
+      "name": "shop-api",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "proving-ground"
+      },
+      "location": "g_region",
+      "access_path": "ap_runner",
+      "criticality": "high",
+      "data_classification": [
+        "PII",
+        "financial"
+      ],
+      "properties": {
+        "platform": "aws_lambda",
+        "runtime": "python 3.12",
+        "trigger": "http",
+        "package_type": "zip",
+        "memory_mb": 256
+      }
+    },
+    {
+      "id": "n_payments_worker",
+      "type": "service.function@2",
+      "name": "payments-worker",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "proving-ground"
+      },
+      "location": "g_region",
+      "access_path": "ap_runner",
+      "criticality": "high",
+      "data_classification": [
+        "financial"
+      ],
+      "properties": {
+        "platform": "aws_lambda",
+        "runtime": "python 3.12",
+        "trigger": "queue",
+        "package_type": "image"
+      }
+    },
+    {
+      "id": "n_ecr",
+      "type": "delivery.ecr@1",
+      "name": "payments-worker images",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "proving-ground"
+      },
+      "location": "g_region",
+      "access_path": "ap_runner",
+      "properties": {
+        "region": "ap-southeast-2"
+      }
+    },
+    {
+      "id": "n_jobs",
+      "type": "messaging.sqs@1",
+      "name": "payment-jobs",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "proving-ground"
+      },
+      "location": "g_region",
+      "access_path": "ap_runner",
+      "properties": {
+        "queue_name": "payment-jobs",
+        "region": "ap-southeast-2",
+        "dlq": "payment-jobs-dlq"
+      }
+    },
+    {
+      "id": "n_dlq",
+      "type": "messaging.sqs@1",
+      "name": "payment-jobs-dlq",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "proving-ground"
+      },
+      "location": "g_region",
+      "access_path": "ap_runner",
+      "properties": {
+        "queue_name": "payment-jobs-dlq",
+        "region": "ap-southeast-2"
+      }
+    },
+    {
+      "id": "n_customers",
+      "type": "data.dynamodb@1",
+      "name": "customers",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "proving-ground"
+      },
+      "location": "g_region",
+      "access_path": "ap_runner",
+      "criticality": "crown-jewel",
+      "data_classification": [
+        "PII"
+      ],
+      "properties": {
+        "table_name": "customers",
+        "region": "ap-southeast-2"
+      }
+    },
+    {
+      "id": "n_orders",
+      "type": "data.dynamodb@1",
+      "name": "orders",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "proving-ground"
+      },
+      "location": "g_region",
+      "access_path": "ap_runner",
+      "criticality": "crown-jewel",
+      "data_classification": [
+        "PII",
+        "financial"
+      ],
+      "properties": {
+        "table_name": "orders",
+        "region": "ap-southeast-2"
+      }
+    },
+    {
+      "id": "n_receipts",
+      "type": "data.s3@1",
+      "name": "receipts",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "proving-ground"
+      },
+      "location": "g_region",
+      "access_path": "ap_runner",
+      "criticality": "high",
+      "data_classification": [
+        "PII",
+        "financial"
+      ],
+      "properties": {
+        "region": "ap-southeast-2",
+        "public_access_block": true,
+        "encryption": "sse_s3",
+        "versioning": true
+      }
+    },
+    {
+      "id": "n_webhook_secret",
+      "type": "identity.ssm-parameter-store@1",
+      "name": "webhook signing secret",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "proving-ground"
+      },
+      "location": "g_region",
+      "access_path": "ap_runner",
+      "data_classification": [
+        "secret"
+      ],
+      "properties": {
+        "parameter_path": "/pg/payments",
+        "region": "ap-southeast-2",
+        "type": "secure_string"
+      }
+    },
+    {
+      "id": "n_logs",
+      "type": "observability.cloudwatch@1",
+      "name": "service log groups",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "proving-ground"
+      },
+      "location": "g_region",
+      "access_path": "ap_runner",
+      "properties": {
+        "log_groups": [
+          "/aws/lambda/shop-api",
+          "/aws/lambda/payments-worker",
+          "/aws/lambda/gatekeeper"
+        ],
+        "region": "ap-southeast-2",
+        "signals": [
+          "logs"
+        ],
+        "retention_days": 3
+      }
+    },
+    {
+      "id": "n_trail",
+      "type": "observability.cloudtrail@1",
+      "name": "proving-ground trail",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "proving-ground"
+      },
+      "location": "g_region",
+      "access_path": "ap_runner",
+      "properties": {
+        "multi_region": false,
+        "destination_bucket": "cloudtrail logs"
+      }
+    },
+    {
+      "id": "n_trail_bucket",
+      "type": "data.s3@1",
+      "name": "cloudtrail logs",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "proving-ground"
+      },
+      "location": "g_region",
+      "access_path": "ap_runner",
+      "data_classification": [
+        "internal"
+      ],
+      "properties": {
+        "region": "ap-southeast-2",
+        "lifecycle_days": 7
+      }
+    },
+    {
+      "id": "n_role_shop",
+      "type": "identity.iam-role@1",
+      "name": "shop-api role",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "proving-ground"
+      },
+      "location": "g_region",
+      "access_path": "ap_runner",
+      "properties": {
+        "role_name": "shop-api"
+      }
+    },
+    {
+      "id": "n_role_worker",
+      "type": "identity.iam-role@1",
+      "name": "payments-worker role",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "proving-ground"
+      },
+      "location": "g_region",
+      "access_path": "ap_runner",
+      "properties": {
+        "role_name": "payments-worker"
+      }
+    },
+    {
+      "id": "n_role_gate",
+      "type": "identity.iam-role@1",
+      "name": "gatekeeper role",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "proving-ground"
+      },
+      "location": "g_region",
+      "access_path": "ap_runner",
+      "properties": {
+        "role_name": "gatekeeper"
+      }
+    },
+    {
+      "id": "n_deployer",
+      "type": "identity.iam-role@1",
+      "name": "pg-deployer",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "proving-ground"
+      },
+      "location": "g_region",
+      "access_path": "ap_runner",
+      "properties": {
+        "role_name": "pg-deployer",
+        "trusted_by": [
+          "GitHub Actions OIDC, main branch"
+        ]
+      }
+    },
+    {
+      "id": "n_readonly",
+      "type": "identity.iam-role@1",
+      "name": "pg-whitehats-readonly",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "proving-ground"
+      },
+      "location": "g_region",
+      "access_path": "ap_runner",
+      "properties": {
+        "role_name": "pg-whitehats-readonly"
+      }
+    },
+    {
+      "id": "n_repo",
+      "type": "repo.github@1",
+      "name": "whitehats-proving-ground",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "proving-ground"
+      },
+      "location": "g_account",
+      "access_path": "ap_public",
+      "credential": "cr_github",
+      "properties": {
+        "url": "https://github.com/deva-ghb/whitehats-proving-ground",
+        "auth_method": "github_app",
+        "default_branch": "main"
+      }
+    },
+    {
+      "id": "n_actions",
+      "type": "delivery.github-actions@1",
+      "name": "deploy workflow",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "proving-ground"
+      },
+      "location": "g_account",
+      "access_path": "ap_public",
+      "credential": "cr_github",
+      "properties": {
+        "repository": "https://github.com/deva-ghb/whitehats-proving-ground",
+        "cloud_auth": "oidc"
+      }
+    },
+    {
+      "id": "n_terraform",
+      "type": "delivery.terraform@1",
+      "name": "proving-ground Terraform",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "proving-ground"
+      },
+      "location": "g_account",
+      "access_path": "ap_runner",
+      "properties": {
+        "backend": "s3",
+        "workspace": "default",
+        "state_locking": true,
+        "cloud_auth": "oidc"
+      }
+    },
+    {
+      "id": "n_budget",
+      "type": "control.aws-budgets@1",
+      "name": "monthly budget",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "proving-ground"
+      },
+      "location": "g_account",
+      "access_path": "ap_runner",
+      "properties": {
+        "budget_name": "proving-ground",
+        "limit_usd": 20,
+        "alert_thresholds": [
+          "50 percent",
+          "100 percent"
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "n_customers_people",
+      "to": "n_http_api",
+      "type": "calls"
+    },
+    {
+      "from": "n_shop_api",
+      "to": "n_http_api",
+      "type": "routes_through"
+    },
+    {
+      "from": "n_http_api",
+      "to": "n_gatekeeper",
+      "type": "calls"
+    },
+    {
+      "from": "n_shop_api",
+      "to": "n_customers",
+      "type": "reads"
+    },
+    {
+      "from": "n_shop_api",
+      "to": "n_orders",
+      "type": "writes"
+    },
+    {
+      "from": "n_shop_api",
+      "to": "n_receipts",
+      "type": "writes"
+    },
+    {
+      "from": "n_shop_api",
+      "to": "n_jobs",
+      "type": "publishes_to"
+    },
+    {
+      "from": "n_shop_api",
+      "to": "n_webhook_secret",
+      "type": "stores_secret_in"
+    },
+    {
+      "from": "n_payments_worker",
+      "to": "n_jobs",
+      "type": "consumes_from"
+    },
+    {
+      "from": "n_payments_worker",
+      "to": "n_orders",
+      "type": "writes"
+    },
+    {
+      "from": "n_payments_worker",
+      "to": "n_ecr",
+      "type": "reads"
+    },
+    {
+      "from": "n_jobs",
+      "to": "n_dlq",
+      "type": "depends_on"
+    },
+    {
+      "from": "n_shop_api",
+      "to": "n_role_shop",
+      "type": "runs_as"
+    },
+    {
+      "from": "n_payments_worker",
+      "to": "n_role_worker",
+      "type": "runs_as"
+    },
+    {
+      "from": "n_gatekeeper",
+      "to": "n_role_gate",
+      "type": "runs_as"
+    },
+    {
+      "from": "n_shop_api",
+      "to": "n_logs",
+      "type": "emits_telemetry_to"
+    },
+    {
+      "from": "n_payments_worker",
+      "to": "n_logs",
+      "type": "emits_telemetry_to"
+    },
+    {
+      "from": "n_gatekeeper",
+      "to": "n_logs",
+      "type": "emits_telemetry_to"
+    },
+    {
+      "from": "n_http_api",
+      "to": "n_logs",
+      "type": "emits_telemetry_to"
+    },
+    {
+      "from": "g_account",
+      "to": "n_trail",
+      "type": "emits_telemetry_to"
+    },
+    {
+      "from": "n_trail",
+      "to": "n_trail_bucket",
+      "type": "writes"
+    },
+    {
+      "from": "g_account",
+      "to": "n_budget",
+      "type": "emits_telemetry_to"
+    },
+    {
+      "from": "n_shop_api",
+      "to": "n_repo",
+      "type": "deploys_from"
+    },
+    {
+      "from": "n_payments_worker",
+      "to": "n_repo",
+      "type": "deploys_from"
+    },
+    {
+      "from": "n_gatekeeper",
+      "to": "n_repo",
+      "type": "deploys_from"
+    },
+    {
+      "from": "n_repo",
+      "to": "n_actions",
+      "type": "built_by"
+    },
+    {
+      "from": "n_actions",
+      "to": "n_ecr",
+      "type": "pushes_image_to"
+    },
+    {
+      "from": "n_actions",
+      "to": "n_deployer",
+      "type": "authenticates_via"
+    },
+    {
+      "from": "n_terraform",
+      "to": "n_repo",
+      "type": "deploys_from"
+    },
+    {
+      "from": "n_terraform",
+      "to": "n_deployer",
+      "type": "authenticates_via"
+    }
+  ]
+}

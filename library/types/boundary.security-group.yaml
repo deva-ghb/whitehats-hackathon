@@ -1,0 +1,37 @@
+id: boundary.security-group
+version: 1
+family: boundaries
+display_name: Security group or network security group
+aliases: [security group, sg, nsg, network security group, firewall rules]
+vendors: [Amazon Web Services, Microsoft]
+icon: boundary.security-group.svg
+properties:
+  - key: cloud
+    tier: required
+    type: enum
+    values: [aws, azure]
+  - key: group_name
+    tier: recommended
+    type: string
+  - key: allows_internet_ingress
+    tier: recommended
+    type: boolean
+  - key: inbound_rules
+    tier: derived
+    type: list
+  - key: outbound_rules
+    tier: derived
+    type: list
+edges:
+  allowed_out: [emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [contained_in, depends_on]
+connection_test:
+  kind: cloud_api
+  description: "Read the rules through the read-only role (ec2:DescribeSecurityGroupRules or Microsoft.Network/networkSecurityGroups/read), expect 200"
+whitehat_modes: [network, iac]
+default_sense_points:
+  - mode: iac
+    reason: A rule open to 0.0.0.0/0 on an admin port is a direct way in
+attack_techniques: [T1686.001, T1133, T1046]
+importers: [aws_config, azure_resource_graph, terraform_aws_provider, terraform_azurerm_provider]
+deploy_guide_template: guides/boundary.security-group.md

@@ -1,0 +1,39 @@
+id: messaging.eventbridge
+version: 1
+family: messaging
+display_name: Amazon EventBridge bus
+aliases: [eventbridge, event bus, cloudwatch events]
+vendors: [Amazon Web Services]
+icon: messaging.eventbridge.svg
+properties:
+  - key: bus_name
+    tier: required
+    type: string
+  - key: region
+    tier: required
+    type: string
+  - key: rules
+    tier: derived
+    type: list
+  - key: targets
+    tier: derived
+    type: list
+  - key: resource_policy
+    tier: derived
+    type: string
+  - key: arn
+    tier: derived
+    type: string
+edges:
+  allowed_out: [publishes_to, emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [publishes_to, consumes_from, depends_on]
+connection_test:
+  kind: aws_api
+  description: "Call events:DescribeEventBus with the read-only role, expect 200"
+whitehat_modes: [messaging, iac]
+default_sense_points:
+  - mode: messaging
+    reason: A rule that forwards events to another account leaks them
+attack_techniques: [T1537, T1565, T1546]
+importers: [aws_config, terraform_aws_provider]
+deploy_guide_template: guides/messaging.eventbridge.md

@@ -1,0 +1,45 @@
+id: data.blob
+version: 1
+family: data
+display_name: Azure Blob Storage
+aliases: [blob, storage account, azure storage, object storage]
+vendors: [Microsoft]
+icon: data.blob.svg
+properties:
+  - key: account_name
+    tier: required
+    type: string
+  - key: container
+    tier: recommended
+    type: string
+  - key: allow_blob_public_access
+    tier: recommended
+    type: boolean
+  - key: shared_key_access
+    tier: recommended
+    type: boolean
+  - key: versioning
+    tier: recommended
+    type: boolean
+  - key: soft_delete
+    tier: recommended
+    type: boolean
+  - key: logging
+    tier: recommended
+    type: boolean
+  - key: resource_id
+    tier: derived
+    type: string
+edges:
+  allowed_out: [publishes_to, replicates_to, backs_up_to, emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [reads, writes, replicates_to, backs_up_to, depends_on]
+connection_test:
+  kind: azure_api
+  description: "Read the storage account with the Reader role, expect 200; never read blobs"
+whitehat_modes: [data, iac]
+default_sense_points:
+  - mode: data
+    reason: "Bulk downloads, SAS links and public containers on PHI storage"
+attack_techniques: [T1530, T1619, T1537, T1485, T1486]
+importers: [azure_resource_graph, bicep, terraform_azurerm_provider]
+deploy_guide_template: guides/data.blob.md

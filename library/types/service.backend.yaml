@@ -1,0 +1,74 @@
+id: service.backend
+version: 1
+family: services
+display_name: Backend service or API
+aliases: [api, backend, microservice, service, rest api, grpc service]
+vendors: []
+icon: service.backend.svg
+properties:
+  - key: kind
+    tier: required
+    type: enum
+    values: [api, worker, job, monolith, bff]
+  - key: runtime
+    tier: required
+    type: string
+  - key: exposure
+    tier: required
+    type: enum
+    values: [public, partner, internal, private]
+  - key: tech_stack
+    tier: recommended
+    type: list
+  - key: endpoints
+    tier: recommended
+    type: list
+  - key: auth_model
+    tier: recommended
+    type: enum
+    values: [none, api_key, oauth2_oidc, mtls, session_cookie]
+  - key: config_sources
+    tier: recommended
+    type: list
+  - key: openapi_url
+    tier: recommended
+    type: url
+  - key: deploy_cadence
+    tier: optional
+    type: string
+  - key: health_url
+    tier: optional
+    type: url
+  - key: sbom
+    tier: derived
+    type: string
+  - key: packages
+    tier: optional
+    type: list
+  - key: base_image
+    tier: optional
+    type: string
+  - key: code_repo
+    tier: optional
+    type: string
+  - key: code_folder
+    tier: optional
+    type: string
+  - key: direct_dependencies
+    tier: optional
+    type: list
+edges:
+  allowed_out: [calls, publishes_to, consumes_from, reads, writes, deploys_from, runs_on, runs_as, routes_through, authenticates_via, stores_secret_in, emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [calls, depends_on]
+connection_test:
+  kind: http
+  description: "Call the health URL from the access path, expect 200"
+whitehat_modes: [code, supply_chain, secrets, telemetry, pentest, memory]
+default_sense_points:
+  - mode: code
+    reason: Business logic and input handling live here
+  - mode: telemetry
+    reason: Its logs show auth failures and errors as they happen
+attack_techniques: [T1190, T1059, T1552.001, T1528]
+importers: [kubernetes_api, repo_scan, openapi, docker_compose]
+deploy_guide_template: guides/service.backend.md

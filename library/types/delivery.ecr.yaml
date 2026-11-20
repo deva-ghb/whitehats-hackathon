@@ -1,0 +1,43 @@
+id: delivery.ecr
+version: 1
+family: code_and_delivery
+display_name: Amazon ECR repository
+aliases: [ecr, container registry, docker registry]
+vendors: [Amazon Web Services]
+icon: delivery.ecr.svg
+properties:
+  - key: repository_name
+    tier: required
+    type: string
+  - key: region
+    tier: required
+    type: string
+  - key: scan_on_push
+    tier: recommended
+    type: boolean
+  - key: tag_immutability
+    tier: recommended
+    type: boolean
+  - key: cross_account_pull
+    tier: recommended
+    type: boolean
+  - key: arn
+    tier: derived
+    type: string
+  - key: credential
+    tier: secret
+    type: string
+    scopes_hint: ["ecr:GetAuthorizationToken", "ecr:BatchGetImage", "ecr:GetDownloadUrlForLayer"]
+edges:
+  allowed_out: [replicates_to, emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [pushes_image_to, reads, depends_on]
+connection_test:
+  kind: aws_api
+  description: "Call ecr:DescribeImages with the read-only role, expect 200"
+whitehat_modes: [supply_chain]
+default_sense_points:
+  - mode: supply_chain
+    reason: "Every image that runs comes from here; mutable tags let an image change under the same name"
+attack_techniques: [T1525, T1610, T1195.002]
+importers: [aws_config, terraform_aws_provider]
+deploy_guide_template: guides/delivery.ecr.md

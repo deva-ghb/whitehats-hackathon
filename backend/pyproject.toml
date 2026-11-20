@@ -1,0 +1,54 @@
+[project]
+name = "whitehats-platform"
+version = "1.0.0"
+description = "WhiteHats platform API: posture, incidents, approvals, secure onboarding, collectors, log and network analysis, model gateway."
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi>=0.115",
+  "uvicorn[standard]>=0.30",
+  "sqlalchemy>=2.0.30",
+  "pydantic>=2.7",
+  "pyjwt>=2.8",
+  "cryptography>=42",
+  "httpx>=0.27",
+  "psutil>=5.9",
+  "pyyaml>=6.0",
+  "boto3>=1.35",
+  "dnspython>=2.6",
+  "segno>=1.6",
+  "whitehats-library",
+  "python-hcl2>=8.1.4",
+  "jsonschema>=4.26",
+  "packaging>=24",
+  "botocore>=1.43.113",
+  "psycopg[binary]>=3.2",
+  "google-auth>=2.30",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "moto[logs,server]>=5.2.4",
+    "pgserver>=0.1.4",
+    "openapi-spec-validator>=0.9.0",
+]
+
+[tool.uv]
+package = false
+
+[tool.uv.sources]
+whitehats-library = { path = "../library", editable = true }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+# Any new warning fails the suite. FastAPI's TestClient still wraps httpx; that one is about the
+# library, not this code.
+filterwarnings = ["error", "ignore:Using `httpx` with `starlette.testclient`"]
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint.flake8-bugbear]
+# FastAPI's dependency injection is declared in argument defaults by design.
+extend-immutable-calls = ["fastapi.Depends", "fastapi.Query", "fastapi.Header", "fastapi.Body", "app.permissions.allow"]

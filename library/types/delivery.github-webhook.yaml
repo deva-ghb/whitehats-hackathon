@@ -1,0 +1,28 @@
+id: delivery.github-webhook
+version: 1
+family: code_and_delivery
+display_name: GitHub push listener
+aliases: [github webhook, push webhook, webhook listener]
+vendors: [GitHub]
+icon: delivery.github-webhook.svg
+properties:
+  - key: path
+    tier: required
+    type: string
+  - key: events
+    tier: recommended
+    type: list
+  - key: signed
+    tier: recommended
+    type: boolean
+edges:
+  allowed_out: [depends_on, contained_in]
+  allowed_in: [contained_in, depends_on, calls]
+connection_test:
+  kind: http
+  description: "A delivery signed with the webhook secret is accepted, and one signed with another secret is refused"
+whitehat_modes: [code, supply_chain]
+default_sense_points: []
+attack_techniques: [T1195.002]
+importers: [connector]
+deploy_guide_template: guides/delivery.github-webhook.md

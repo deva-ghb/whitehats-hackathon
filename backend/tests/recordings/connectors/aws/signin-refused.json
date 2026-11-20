@@ -1,0 +1,21 @@
+{
+  "about": "Recorded from a real AWS account on 2026-10-24: asking to assume a role this caller may not assume. Account ids are replaced.",
+  "clock": 1792828306.0,
+  "calls": [
+    {
+      "service": "sts",
+      "method": "assume_role",
+      "params": {
+        "RoleArn": "arn:aws:iam::111122223333:role/whitehats-reader",
+        "RoleSessionName": "whitehats-reader",
+        "ExternalId": "recorded-external-id"
+      },
+      "region": "ap-southeast-2",
+      "error": {
+        "code": "AccessDenied",
+        "message": "User: arn:aws:sts::111122223333:assumed-role/pg-whitehats-readonly/botocore-session-1792828304 is not authorized to perform: sts:AssumeRole on resource: arn:aws:iam::111122223333:role/whitehats-reader",
+        "status": 403
+      }
+    }
+  ]
+}

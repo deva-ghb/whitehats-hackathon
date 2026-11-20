@@ -1,0 +1,44 @@
+id: observability.cloudwatch
+version: 1
+family: observability
+display_name: Amazon CloudWatch Logs
+aliases: [cloudwatch, cloudwatch logs, log group, cw logs]
+vendors: [Amazon Web Services]
+icon: observability.cloudwatch.svg
+properties:
+  - key: log_groups
+    tier: required
+    type: list
+  - key: region
+    tier: required
+    type: string
+  - key: signals
+    tier: required
+    type: list
+  - key: retention_days
+    tier: recommended
+    type: number
+  - key: read_method
+    tier: recommended
+    type: enum
+    values: [filter_log_events, subscription_filter]
+  - key: volume_estimate
+    tier: optional
+    type: string
+  - key: credential
+    tier: secret
+    type: string
+    scopes_hint: ["logs:FilterLogEvents", "logs:DescribeLogGroups"]
+edges:
+  allowed_out: [emits_telemetry_to, writes, depends_on, contained_in]
+  allowed_in: [emits_telemetry_to, depends_on]
+connection_test:
+  kind: aws_api
+  description: "Call logs:FilterLogEvents on one group with limit 1, expect 200"
+whitehat_modes: [telemetry]
+default_sense_points:
+  - mode: telemetry
+    reason: "Application logs show auth failures, errors and odd log shapes"
+attack_techniques: [T1685.002, T1070]
+importers: [aws_config, terraform_aws_provider]
+deploy_guide_template: guides/observability.cloudwatch.md

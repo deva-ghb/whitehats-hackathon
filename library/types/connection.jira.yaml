@@ -1,0 +1,22 @@
+id: connection.jira
+version: 1
+family: boundaries
+display_name: Jira connection
+aliases: [jira connection, jira source]
+vendors: [Atlassian]
+icon: connection.jira.svg
+properties:
+  - key: connector
+    tier: required
+    type: string
+edges:
+  allowed_out: [depends_on, contained_in]
+  allowed_in: [contained_in, depends_on]
+connection_test:
+  kind: http
+  description: "Read the project with the API token"
+whitehat_modes: [saas]
+default_sense_points: []
+attack_techniques: [T1213]
+importers: [connector]
+deploy_guide_template: guides/connection.jira.md

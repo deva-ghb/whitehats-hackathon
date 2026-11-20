@@ -1,0 +1,42 @@
+id: edge.front-door
+version: 1
+family: network
+display_name: Azure Front Door
+aliases: [front door, afd, azure cdn]
+vendors: [Microsoft]
+icon: edge.front-door.svg
+properties:
+  - key: profile_name
+    tier: required
+    type: string
+  - key: waf_policy
+    tier: recommended
+    type: string
+  - key: waf_mode
+    tier: recommended
+    type: enum
+    values: [prevention, detection, "off"]
+  - key: https_only
+    tier: recommended
+    type: boolean
+  - key: endpoints
+    tier: derived
+    type: list
+  - key: resource_id
+    tier: derived
+    type: string
+edges:
+  allowed_out: [calls, routes_through, authenticates_via, emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [calls, routes_through, depends_on]
+connection_test:
+  kind: azure_api
+  description: "Read the Front Door profile with the Reader role, expect 200"
+whitehat_modes: [network, iac]
+default_sense_points:
+  - mode: network
+    reason: First place an attack against the public apps shows up
+  - mode: iac
+    reason: A WAF in detection mode blocks nothing
+attack_techniques: [T1190, T1498, T1499.003, T1090.004]
+importers: [azure_resource_graph, bicep, terraform_azurerm_provider]
+deploy_guide_template: guides/edge.front-door.md

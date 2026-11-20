@@ -1,0 +1,118 @@
+# What people type into the node library search, and the type they mean (checklist P1.2).
+# The expected type must be in the top 3 for at least 95 of these 100 queries.
+# Written before the search was built, from the user's side; do not tune a query to make it pass.
+# kind: name | alias | vendor | misspelling | arn | azure | context
+# context (optional): cloud (aws | azure | gcp), inside (a type id), from (the type being dragged from)
+
+queries:
+  # --- names and aliases (35)
+  - {q: "s3", expect: data.s3, kind: alias}
+  - {q: "s3 bucket", expect: data.s3, kind: alias}
+  - {q: "dynamodb table", expect: data.dynamodb, kind: name}
+  - {q: "aurora postgres", expect: data.aurora-postgres, kind: alias}
+  - {q: "rds", expect: data.aurora-postgres, kind: alias}
+  - {q: "lambda", expect: service.function, kind: alias}
+  - {q: "azure function", expect: service.function, kind: alias}
+  - {q: "sqs queue", expect: messaging.sqs, kind: name}
+  - {q: "sns topic", expect: messaging.sns, kind: name}
+  - {q: "kafka", expect: messaging.msk, kind: alias}
+  - {q: "event bridge", expect: messaging.eventbridge, kind: alias}
+  - {q: "service bus", expect: messaging.service-bus, kind: alias}
+  - {q: "event hub", expect: messaging.event-hubs, kind: alias}
+  - {q: "key vault", expect: identity.key-vault, kind: alias}
+  - {q: "kms key", expect: identity.kms, kind: name}
+  - {q: "secrets manager", expect: identity.secrets-manager, kind: alias}
+  - {q: "parameter store", expect: identity.ssm-parameter-store, kind: alias}
+  - {q: "iam role", expect: identity.iam-role, kind: alias}
+  - {q: "azure ad", expect: identity.entra, kind: alias}
+  - {q: "managed identity", expect: identity.managed-identity, kind: alias}
+  - {q: "b2c", expect: identity.entra-external, kind: alias}
+  - {q: "user pool", expect: identity.cognito, kind: alias}
+  - {q: "load balancer", expect: edge.alb, kind: alias}
+  - {q: "cdn", expect: edge.cloudfront, kind: alias}
+  - {q: "front door", expect: edge.front-door, kind: alias}
+  - {q: "api management", expect: edge.apim, kind: alias}
+  - {q: "hosted zone", expect: edge.route53, kind: alias}
+  - {q: "vnet", expect: boundary.vpc, kind: alias}
+  - {q: "private subnet", expect: boundary.subnet, kind: alias}
+  - {q: "resource group", expect: boundary.resource-group, kind: alias}
+  - {q: "cloudtrail", expect: observability.cloudtrail, kind: alias}
+  - {q: "log group", expect: observability.cloudwatch, kind: alias}
+  - {q: "vpc flow logs", expect: observability.vpc-flow-logs, kind: alias}
+  - {q: "github actions", expect: delivery.github-actions, kind: alias}
+  - {q: "container registry", expect: delivery.ecr, kind: alias}
+
+  # --- vendor names and plain descriptions (12)
+  - {q: "amazon queue", expect: messaging.sqs, kind: vendor}
+  - {q: "microsoft sql", expect: data.azure-sql, kind: vendor}
+  - {q: "hashicorp", expect: delivery.terraform, kind: vendor}
+  - {q: "atlassian pipelines", expect: delivery.bitbucket-pipelines, kind: vendor}
+  - {q: "atlassian", expect: repo.bitbucket, kind: vendor}
+  - {q: "twilio email", expect: saas.sendgrid, kind: vendor}
+  - {q: "intuit", expect: saas.quickbooks, kind: vendor}
+  - {q: "okta sso", expect: identity.okta, kind: vendor}
+  - {q: "card payments", expect: saas.stripe, kind: alias}
+  - {q: "bank linking", expect: saas.plaid, kind: alias}
+  - {q: "kyc", expect: saas.persona, kind: alias}
+  - {q: "llm tracing", expect: ai.langfuse, kind: alias}
+
+  # --- misspellings (25)
+  - {q: "dynamdb", expect: data.dynamodb, kind: misspelling}
+  - {q: "dynamo db", expect: data.dynamodb, kind: misspelling}
+  - {q: "elastcache", expect: data.elasticache, kind: misspelling}
+  - {q: "cloudfrnt", expect: edge.cloudfront, kind: misspelling}
+  - {q: "sendgird", expect: saas.sendgrid, kind: misspelling}
+  - {q: "quickbook", expect: saas.quickbooks, kind: misspelling}
+  - {q: "gaurdduty", expect: control.guardduty, kind: misspelling}
+  - {q: "cosmo db", expect: data.cosmos, kind: misspelling}
+  - {q: "evnt grid", expect: messaging.event-grid, kind: misspelling}
+  - {q: "postgress", expect: data.aurora-postgres, kind: misspelling}
+  - {q: "bitbukcet", expect: repo.bitbucket, kind: misspelling}
+  - {q: "terrafrom", expect: delivery.terraform, kind: misspelling}
+  - {q: "lamda", expect: service.function, kind: misspelling}
+  - {q: "secrets manger", expect: identity.secrets-manager, kind: misspelling}
+  - {q: "cognitio", expect: identity.cognito, kind: misspelling}
+  - {q: "redsift", expect: data.redshift, kind: misspelling}
+  - {q: "datadgo", expect: observability.datadog, kind: misspelling}
+  - {q: "sentinal", expect: observability.sentinel, kind: misspelling}
+  - {q: "kubernetis", expect: boundary.eks, kind: misspelling}
+  - {q: "cloud watch", expect: observability.cloudwatch, kind: misspelling}
+  - {q: "app insight", expect: observability.app-insights, kind: misspelling}
+  - {q: "keyvault", expect: identity.key-vault, kind: misspelling}
+  - {q: "api gatway", expect: edge.api-gateway, kind: misspelling}
+  - {q: "stripe conect", expect: saas.stripe, kind: misspelling}
+  - {q: "langfuze", expect: ai.langfuse, kind: misspelling}
+
+  # --- pasted AWS ARNs (16)
+  - {q: "arn:aws:s3:::acme-lab-reports", expect: data.s3, kind: arn}
+  - {q: "arn:aws:dynamodb:ap-southeast-2:111122223333:table/orders", expect: data.dynamodb, kind: arn}
+  - {q: "arn:aws:lambda:ap-southeast-2:111122223333:function:payments-webhook", expect: service.function, kind: arn}
+  - {q: "arn:aws:sqs:us-east-1:111122223333:order-events", expect: messaging.sqs, kind: arn}
+  - {q: "arn:aws:sns:us-east-1:111122223333:alerts", expect: messaging.sns, kind: arn}
+  - {q: "arn:aws:iam::111122223333:role/whitehats-reader", expect: identity.iam-role, kind: arn}
+  - {q: "arn:aws:kms:ap-southeast-2:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890ab", expect: identity.kms, kind: arn}
+  - {q: "arn:aws:secretsmanager:ap-southeast-2:111122223333:secret:prod/db-AbCdEf", expect: identity.secrets-manager, kind: arn}
+  - {q: "arn:aws:rds:ap-southeast-2:111122223333:cluster:orders-db", expect: data.aurora-postgres, kind: arn}
+  - {q: "arn:aws:elasticache:ap-southeast-2:111122223333:cluster:sessions", expect: data.elasticache, kind: arn}
+  - {q: "arn:aws:ecr:ap-southeast-2:111122223333:repository/orders-api", expect: delivery.ecr, kind: arn}
+  - {q: "arn:aws:eks:ap-southeast-2:111122223333:cluster/prod", expect: boundary.eks, kind: arn}
+  - {q: "arn:aws:logs:ap-southeast-2:111122223333:log-group:/aws/lambda/payments", expect: observability.cloudwatch, kind: arn}
+  - {q: "arn:aws:elasticloadbalancing:ap-southeast-2:111122223333:loadbalancer/app/orders/50dc6c495c0c9188", expect: edge.alb, kind: arn}
+  - {q: "arn:aws:ssm:ap-southeast-2:111122223333:parameter/prod/db-url", expect: identity.ssm-parameter-store, kind: arn}
+  - {q: "arn:aws:cognito-idp:ap-southeast-2:111122223333:userpool/ap-southeast-2_AbCdEf", expect: identity.cognito, kind: arn}
+
+  # --- pasted Azure resource ids (8)
+  - {q: "/subscriptions/0000/resourceGroups/rg-prod/providers/Microsoft.Storage/storageAccounts/labreports", expect: data.blob, kind: azure}
+  - {q: "/subscriptions/0000/resourceGroups/rg-prod/providers/Microsoft.KeyVault/vaults/kv-prod", expect: identity.key-vault, kind: azure}
+  - {q: "/subscriptions/0000/resourceGroups/rg-prod/providers/Microsoft.Sql/servers/sql-prod/databases/appointments", expect: data.azure-sql, kind: azure}
+  - {q: "/subscriptions/0000/resourceGroups/rg-prod/providers/Microsoft.DocumentDB/databaseAccounts/wearables", expect: data.cosmos, kind: azure}
+  - {q: "/subscriptions/0000/resourceGroups/rg-prod/providers/Microsoft.Web/sites/booking-func", expect: service.function, kind: azure}
+  - {q: "/subscriptions/0000/resourceGroups/rg-prod/providers/Microsoft.ContainerService/managedClusters/aks-prod", expect: boundary.aks, kind: azure}
+  - {q: "/subscriptions/0000/resourceGroups/rg-prod/providers/Microsoft.ServiceBus/namespaces/sb-prod", expect: messaging.service-bus, kind: azure}
+  - {q: "/subscriptions/0000/resourceGroups/rg-prod", expect: boundary.resource-group, kind: azure}
+
+  # --- context changes what ranks first (4)
+  - {q: "kubernetes", expect: boundary.aks, kind: context, context: {cloud: azure}}
+  - {q: "kubernetes", expect: boundary.eks, kind: context, context: {cloud: aws}}
+  - {q: "redis", expect: data.redis, kind: context, context: {cloud: azure}}
+  - {q: "dns", expect: edge.azure-dns, kind: context, context: {cloud: azure}}

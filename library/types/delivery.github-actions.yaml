@@ -1,0 +1,50 @@
+id: delivery.github-actions
+version: 1
+family: code_and_delivery
+display_name: GitHub Actions workflows
+aliases: [github actions, gha, workflows, ci]
+vendors: [GitHub]
+icon: delivery.github-actions.svg
+properties:
+  - key: repository
+    tier: required
+    type: url
+  - key: cloud_auth
+    tier: recommended
+    type: enum
+    values: [oidc, stored_keys, none]
+  - key: actions_pinned_to_sha
+    tier: recommended
+    type: boolean
+  - key: default_token_permissions
+    tier: recommended
+    type: enum
+    values: [read, write]
+  - key: self_hosted_runners
+    tier: recommended
+    type: boolean
+  - key: workflows
+    tier: derived
+    type: list
+  - key: secret_names
+    tier: derived
+    type: list
+  - key: credential
+    tier: secret
+    type: string
+    scopes_hint: ["actions:read", "contents:read"]
+edges:
+  allowed_out: [pushes_image_to, authenticates_via, runs_as, stores_secret_in, writes, calls, emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [built_by, depends_on]
+connection_test:
+  kind: github_api
+  description: "List workflow runs with the GitHub App, expect 200"
+whitehat_modes: [supply_chain, identity, secrets]
+default_sense_points:
+  - mode: identity
+    reason: The OIDC trust decides which branches can act as the cloud role
+  - mode: supply_chain
+    reason: "Unpinned third-party actions run with the pipeline's secrets"
+attack_techniques: [T1195.002, T1072, T1078.004, T1552.001]
+importers: [github_api, repo_scan]
+deploy_guide_template: guides/delivery.github-actions.md

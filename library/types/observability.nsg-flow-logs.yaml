@@ -1,0 +1,30 @@
+id: observability.nsg-flow-logs
+version: 1
+family: observability
+display_name: Azure network flow logs
+aliases: [nsg flow logs, vnet flow logs, flow logs, traffic analytics]
+vendors: [Microsoft]
+icon: observability.nsg-flow-logs.svg
+properties:
+  - key: storage_account
+    tier: required
+    type: string
+  - key: traffic_analytics
+    tier: recommended
+    type: boolean
+  - key: retention_days
+    tier: recommended
+    type: number
+edges:
+  allowed_out: [emits_telemetry_to, writes, depends_on, contained_in]
+  allowed_in: [emits_telemetry_to, depends_on]
+connection_test:
+  kind: azure_api
+  description: "List flow log blobs with Storage Blob Data Reader, expect 200"
+whitehat_modes: [network]
+default_sense_points:
+  - mode: network
+    reason: "Unexpected egress, lateral movement and exposed ports"
+attack_techniques: [T1685.002, T1046, T1048]
+importers: [azure_resource_graph, bicep]
+deploy_guide_template: guides/observability.nsg-flow-logs.md

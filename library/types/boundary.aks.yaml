@@ -1,0 +1,49 @@
+id: boundary.aks
+version: 1
+family: boundaries
+display_name: Azure Kubernetes Service cluster
+aliases: [aks, kubernetes, k8s, azure kubernetes]
+vendors: [Microsoft]
+icon: boundary.aks.svg
+properties:
+  - key: cluster_name
+    tier: required
+    type: string
+  - key: location
+    tier: required
+    type: string
+  - key: kubernetes_version
+    tier: recommended
+    type: string
+  - key: api_server_access
+    tier: recommended
+    type: enum
+    values: [public, private, authorized_ranges]
+  - key: entra_integration
+    tier: recommended
+    type: boolean
+  - key: workload_identity
+    tier: derived
+    type: boolean
+  - key: resource_id
+    tier: derived
+    type: string
+  - key: credential
+    tier: secret
+    type: string
+    scopes_hint: [Azure Kubernetes Service Cluster User Role, Kubernetes view ClusterRole]
+edges:
+  allowed_out: [runs_as, emits_telemetry_to, authenticates_via, depends_on, contained_in]
+  allowed_in: [contained_in, runs_on, depends_on]
+connection_test:
+  kind: azure_api
+  description: "Read the managed cluster, then list namespaces with the view role, expect 200"
+whitehat_modes: [iac, identity, telemetry]
+default_sense_points:
+  - mode: identity
+    reason: Who can reach the API server and which pods use which managed identity
+  - mode: telemetry
+    reason: kube-audit diagnostic logs show exec into pods and role changes
+attack_techniques: [T1610, T1609, T1613, T1552.007, T1098.006]
+importers: [azure_resource_graph, kubernetes_api, bicep, helm]
+deploy_guide_template: guides/boundary.aks.md

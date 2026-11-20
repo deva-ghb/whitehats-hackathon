@@ -1,0 +1,124 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+  Read-only role for WhiteHats. The Runner assumes it with the external id.
+  It reads the configuration of every service through AWS's own SecurityAudit policy (maintained by AWS as services
+  are added), so WhiteHats can check the account's live settings, and reads CloudTrail and CloudWatch.
+  It can pull container images to scan them.
+  It cannot read S3 objects, DynamoDB items, SQS messages, parameter values or secrets.
+
+Parameters:
+  RoleName:
+    Type: String
+    Default: whitehats-readonly
+    Description: Name of the role WhiteHats assumes. Letters, numbers and the characters +=,.@_- only.
+  TrustedPrincipal:
+    Type: String
+    Description: ARN of the WhiteHats runner allowed to assume this role, for example arn:aws:iam::111122223333:root.
+  ExternalId:
+    Type: String
+    NoEcho: true
+    MinLength: 8
+    Description: The value the runner must send when it assumes the role. This is not an AWS access key.
+
+Resources:
+  ReadOnlyRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Ref RoleName
+      Description: WhiteHats read-only. No object, item or message reads.
+      MaxSessionDuration: 3600
+      # AWS's managed policy for security audits: the configuration of every service, never the data in it. One grant
+      # covers the settings WhiteHats checks (a public bucket, logging switched off, an open firewall, an unencrypted
+      # disk...) as AWS adds services, so the role never has to grow check by check. The deny below still applies.
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/SecurityAudit
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: !Ref TrustedPrincipal
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals:
+                sts:ExternalId: !Ref ExternalId
+      Policies:
+        - PolicyName: whitehats-read-only
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Sid: ReadConfiguration
+                Effect: Allow
+                Resource: "*"
+                Action:
+                  - tag:GetResources
+                  - iam:GetRole
+                  - iam:ListRolePolicies
+                  - iam:GetRolePolicy
+                  - iam:ListAttachedRolePolicies
+                  - lambda:ListFunctions
+                  - lambda:GetFunction
+                  - dynamodb:ListTables
+                  - dynamodb:DescribeTable
+                  - s3:GetBucketLocation
+                  - sqs:ListQueues
+                  - sqs:GetQueueAttributes
+                  - ec2:DescribeInstances
+                  - ec2:DescribeVpcs
+                  - ec2:DescribeSecurityGroups
+                  - ec2:DescribeNetworkInterfaces
+                  - ec2:DescribeFlowLogs
+                  - guardduty:ListDetectors
+                  - guardduty:ListFindings
+                  - guardduty:GetFindings
+                  - securityhub:DescribeHub
+                  - securityhub:GetFindings
+                  - rds:DescribeDBInstances
+                  - rds:DescribeDBClusters
+                  - cloudtrail:LookupEvents
+                  - logs:FilterLogEvents
+              # Container images are pulled to scan them for known weaknesses (WhiteHats VS.5c): a pull token and
+              # the reads of an image's layers. Nothing can be pushed or deleted.
+              - Sid: PullImagesToScan
+                Effect: Allow
+                Resource: "*"
+                Action:
+                  - ecr:GetAuthorizationToken
+                  - ecr:BatchGetImage
+                  - ecr:GetDownloadUrlForLayer
+                  - ecr:BatchCheckLayerAvailability
+              # apigateway:GET covers every API Gateway read, including exported definitions and keys,
+              # so it is limited to the list of HTTP and WebSocket APIs.
+              - Sid: ListApis
+                Effect: Allow
+                Action: apigateway:GET
+                Resource:
+                  - arn:aws:apigateway:*::/apis
+                  - arn:aws:apigateway:*::/apis/*
+              - Sid: NeverReadData
+                Effect: Deny
+                Resource: "*"
+                Action:
+                  - s3:GetObject
+                  - s3:GetObjectVersion
+                  - s3:GetObjectAcl
+                  - s3:GetObjectVersionAcl
+                  - s3:GetObjectAttributes
+                  - s3:GetObjectTagging
+                  - dynamodb:GetItem
+                  - dynamodb:BatchGetItem
+                  - dynamodb:Query
+                  - dynamodb:Scan
+                  - dynamodb:PartiQLSelect
+                  - sqs:ReceiveMessage
+                  - sqs:DeleteMessage
+                  - ssm:GetParameter
+                  - ssm:GetParameters
+                  - ssm:GetParametersByPath
+                  - secretsmanager:GetSecretValue
+                  - kms:Decrypt
+
+Outputs:
+  RoleArn:
+    Description: Give this ARN to WhiteHats, with the external id.
+    Value: !GetAtt ReadOnlyRole.Arn

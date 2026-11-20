@@ -1,0 +1,711 @@
+{
+  "about": "Recorded from moto, the AWS simulator, on 2026-11-11. Shapes are AWS's; the data is invented.",
+  "clock": 1794409947.0,
+  "calls": [
+    {
+      "service": "sts",
+      "method": "assume_role",
+      "params": {
+        "RoleArn": "arn:aws:iam::111122223333:role/whitehats-reader",
+        "RoleSessionName": "whitehats-reader",
+        "ExternalId": "recorded-external-id"
+      },
+      "region": "ap-southeast-2",
+      "response": {
+        "Credentials": {
+          "AccessKeyId": "recorded-placeholder",
+          "SecretAccessKey": "recorded-placeholder",
+          "SessionToken": "recorded-placeholder",
+          "Expiration": "2030-01-01T00:00:00Z"
+        },
+        "AssumedRoleUser": {
+          "AssumedRoleId": "AROARZPUZDIKCSUFNGKKZ:whitehats-reader",
+          "Arn": "arn:aws:sts::111122223333:assumed-role/whitehats-reader/whitehats-reader"
+        },
+        "PackedPolicySize": 6
+      }
+    },
+    {
+      "service": "resourcegroupstaggingapi",
+      "method": "get_resources",
+      "params": {
+        "ResourcesPerPage": 2,
+        "TagFilters": [
+          {
+            "Key": "project",
+            "Values": [
+              "whitehats-proving-ground"
+            ]
+          }
+        ]
+      },
+      "region": "ap-southeast-2",
+      "response": {
+        "PaginationToken": "09dc0c30-7c71-4255-aa4c-d9a7d0f2be1c",
+        "ResourceTagMappingList": [
+          {
+            "ResourceARN": "arn:aws:s3:::pg-receipts",
+            "Tags": [
+              {
+                "Key": "project",
+                "Value": "whitehats-proving-ground"
+              }
+            ]
+          },
+          {
+            "ResourceARN": "arn:aws:s3:::pg-trail",
+            "Tags": [
+              {
+                "Key": "project",
+                "Value": "whitehats-proving-ground"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "service": "resourcegroupstaggingapi",
+      "method": "get_resources",
+      "params": {
+        "ResourcesPerPage": 2,
+        "TagFilters": [
+          {
+            "Key": "project",
+            "Values": [
+              "whitehats-proving-ground"
+            ]
+          }
+        ],
+        "PaginationToken": "09dc0c30-7c71-4255-aa4c-d9a7d0f2be1c"
+      },
+      "region": "ap-southeast-2",
+      "response": {
+        "PaginationToken": "9a5dc24b-20e8-4c30-9d1d-1db58a29b309",
+        "ResourceTagMappingList": [
+          {
+            "ResourceARN": "arn:aws:s3:::pg-state",
+            "Tags": [
+              {
+                "Key": "project",
+                "Value": "whitehats-proving-ground"
+              }
+            ]
+          },
+          {
+            "ResourceARN": "arn:aws:lambda:ap-southeast-2:111122223333:function:shop-api",
+            "Tags": [
+              {
+                "Key": "project",
+                "Value": "whitehats-proving-ground"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "service": "resourcegroupstaggingapi",
+      "method": "get_resources",
+      "params": {
+        "ResourcesPerPage": 2,
+        "TagFilters": [
+          {
+            "Key": "project",
+            "Values": [
+              "whitehats-proving-ground"
+            ]
+          }
+        ],
+        "PaginationToken": "9a5dc24b-20e8-4c30-9d1d-1db58a29b309"
+      },
+      "region": "ap-southeast-2",
+      "response": {
+        "PaginationToken": "ebcf3c0d-939e-48ab-b484-33e3ed7b52ce",
+        "ResourceTagMappingList": [
+          {
+            "ResourceARN": "arn:aws:logs:ap-southeast-2:111122223333:log-group:/aws/lambda/shop-api",
+            "Tags": [
+              {
+                "Key": "project",
+                "Value": "whitehats-proving-ground"
+              }
+            ]
+          },
+          {
+            "ResourceARN": "arn:aws:dynamodb:ap-southeast-2:111122223333:table/orders",
+            "Tags": [
+              {
+                "Key": "project",
+                "Value": "whitehats-proving-ground"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "service": "resourcegroupstaggingapi",
+      "method": "get_resources",
+      "params": {
+        "ResourcesPerPage": 2,
+        "TagFilters": [
+          {
+            "Key": "project",
+            "Values": [
+              "whitehats-proving-ground"
+            ]
+          }
+        ],
+        "PaginationToken": "ebcf3c0d-939e-48ab-b484-33e3ed7b52ce"
+      },
+      "region": "ap-southeast-2",
+      "response": {
+        "ResourceTagMappingList": [
+          {
+            "ResourceARN": "arn:aws:sqs:ap-southeast-2:111122223333:payment-jobs",
+            "Tags": [
+              {
+                "Key": "project",
+                "Value": "whitehats-proving-ground"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "service": "resourcegroupstaggingapi",
+      "method": "get_resources",
+      "params": {
+        "ResourcesPerPage": 2,
+        "TagFilters": [
+          {
+            "Key": "project",
+            "Values": [
+              "whitehats-proving-ground"
+            ]
+          }
+        ]
+      },
+      "region": "us-west-2",
+      "response": {
+        "PaginationToken": "aaa3f739-5859-42c7-8b55-9afe6756bf8c",
+        "ResourceTagMappingList": [
+          {
+            "ResourceARN": "arn:aws:s3:::pg-receipts",
+            "Tags": [
+              {
+                "Key": "project",
+                "Value": "whitehats-proving-ground"
+              }
+            ]
+          },
+          {
+            "ResourceARN": "arn:aws:s3:::pg-trail",
+            "Tags": [
+              {
+                "Key": "project",
+                "Value": "whitehats-proving-ground"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "service": "resourcegroupstaggingapi",
+      "method": "get_resources",
+      "params": {
+        "ResourcesPerPage": 2,
+        "TagFilters": [
+          {
+            "Key": "project",
+            "Values": [
+              "whitehats-proving-ground"
+            ]
+          }
+        ],
+        "PaginationToken": "aaa3f739-5859-42c7-8b55-9afe6756bf8c"
+      },
+      "region": "us-west-2",
+      "response": {
+        "PaginationToken": "087ae4fd-217f-4bfc-a3a2-ca880073a3b1",
+        "ResourceTagMappingList": [
+          {
+            "ResourceARN": "arn:aws:s3:::pg-state",
+            "Tags": [
+              {
+                "Key": "project",
+                "Value": "whitehats-proving-ground"
+              }
+            ]
+          },
+          {
+            "ResourceARN": "arn:aws:ec2:us-west-2:111122223333:instance/i-1deb64b7a4c5bd8fd",
+            "Tags": [
+              {
+                "Key": "project",
+                "Value": "whitehats-proving-ground"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "service": "resourcegroupstaggingapi",
+      "method": "get_resources",
+      "params": {
+        "ResourcesPerPage": 2,
+        "TagFilters": [
+          {
+            "Key": "project",
+            "Values": [
+              "whitehats-proving-ground"
+            ]
+          }
+        ],
+        "PaginationToken": "087ae4fd-217f-4bfc-a3a2-ca880073a3b1"
+      },
+      "region": "us-west-2",
+      "response": {
+        "PaginationToken": "f7ca8628-1c34-4d66-aabc-917b1b8183a5",
+        "ResourceTagMappingList": [
+          {
+            "ResourceARN": "arn:aws:ec2:us-west-2:111122223333:security-group/sg-458ba0a6d875decd5",
+            "Tags": [
+              {
+                "Key": "project",
+                "Value": "whitehats-proving-ground"
+              }
+            ]
+          },
+          {
+            "ResourceARN": "arn:aws:ec2:us-west-2:111122223333:vpc/vpc-bdf3f163ce468ef4d",
+            "Tags": [
+              {
+                "Key": "project",
+                "Value": "whitehats-proving-ground"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "service": "resourcegroupstaggingapi",
+      "method": "get_resources",
+      "params": {
+        "ResourcesPerPage": 2,
+        "TagFilters": [
+          {
+            "Key": "project",
+            "Values": [
+              "whitehats-proving-ground"
+            ]
+          }
+        ],
+        "PaginationToken": "f7ca8628-1c34-4d66-aabc-917b1b8183a5"
+      },
+      "region": "us-west-2",
+      "response": {
+        "ResourceTagMappingList": [
+          {
+            "ResourceARN": "arn:aws:rds:us-west-2:111122223333:db:orders-db",
+            "Tags": [
+              {
+                "Key": "project",
+                "Value": "whitehats-proving-ground"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "service": "s3",
+      "method": "get_bucket_location",
+      "params": {
+        "Bucket": "pg-receipts"
+      },
+      "region": "ap-southeast-2",
+      "response": {
+        "LocationConstraint": "ap-southeast-2"
+      }
+    },
+    {
+      "service": "s3",
+      "method": "get_bucket_location",
+      "params": {
+        "Bucket": "pg-trail"
+      },
+      "region": "ap-southeast-2",
+      "response": {
+        "LocationConstraint": "ap-southeast-2"
+      }
+    },
+    {
+      "service": "s3",
+      "method": "get_bucket_location",
+      "params": {
+        "Bucket": "pg-state"
+      },
+      "region": "ap-southeast-2",
+      "response": {
+        "LocationConstraint": "ap-southeast-2"
+      }
+    },
+    {
+      "service": "lambda",
+      "method": "list_functions",
+      "params": {
+        "MaxItems": 2
+      },
+      "region": "ap-southeast-2",
+      "response": {
+        "Functions": [
+          {
+            "FunctionName": "shop-api",
+            "FunctionArn": "arn:aws:lambda:ap-southeast-2:111122223333:function:shop-api",
+            "Runtime": "python3.12",
+            "Role": "arn:aws:iam::111122223333:role/pg-shop",
+            "Handler": "app.handler",
+            "CodeSize": 11,
+            "Description": "",
+            "Timeout": 3,
+            "MemorySize": 128,
+            "LastModified": "2026-11-11T15:12:28.233527000Z",
+            "CodeSha256": "QJeIkjairybCkwM/65ZMTPEYwCJODQY/7AqJ6dBWnvI=",
+            "Version": "$LATEST",
+            "TracingConfig": {
+              "Mode": "PassThrough"
+            },
+            "Layers": [],
+            "State": "Active",
+            "LastUpdateStatus": "Successful",
+            "PackageType": "Zip",
+            "Architectures": [
+              "x86_64"
+            ],
+            "EphemeralStorage": {
+              "Size": 512
+            },
+            "SnapStart": {
+              "ApplyOn": "None",
+              "OptimizationStatus": "Off"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "service": "dynamodb",
+      "method": "describe_table",
+      "params": {
+        "TableName": "orders"
+      },
+      "region": "ap-southeast-2",
+      "response": {
+        "Table": {
+          "AttributeDefinitions": [
+            {
+              "AttributeName": "id",
+              "AttributeType": "S"
+            }
+          ],
+          "TableName": "orders",
+          "KeySchema": [
+            {
+              "AttributeName": "id",
+              "KeyType": "HASH"
+            }
+          ],
+          "TableStatus": "ACTIVE",
+          "CreationDateTime": "2026-11-11T20:42:28.266000+05:30",
+          "ProvisionedThroughput": {
+            "NumberOfDecreasesToday": 1,
+            "ReadCapacityUnits": 0,
+            "WriteCapacityUnits": 0
+          },
+          "TableSizeBytes": 0,
+          "ItemCount": 0,
+          "TableArn": "arn:aws:dynamodb:ap-southeast-2:111122223333:table/orders",
+          "BillingModeSummary": {
+            "BillingMode": "PAY_PER_REQUEST"
+          },
+          "LocalSecondaryIndexes": [],
+          "GlobalSecondaryIndexes": [],
+          "DeletionProtectionEnabled": false,
+          "WarmThroughput": {
+            "ReadUnitsPerSecond": 12000,
+            "WriteUnitsPerSecond": 4000,
+            "Status": "ACTIVE"
+          }
+        }
+      }
+    },
+    {
+      "service": "sqs",
+      "method": "get_queue_attributes",
+      "params": {
+        "QueueUrl": "https://sqs.ap-southeast-2.amazonaws.com/111122223333/payment-jobs",
+        "AttributeNames": [
+          "All"
+        ]
+      },
+      "region": "ap-southeast-2",
+      "response": {
+        "Attributes": {
+          "ApproximateNumberOfMessages": "0",
+          "ApproximateNumberOfMessagesDelayed": "0",
+          "ApproximateNumberOfMessagesNotVisible": "0",
+          "CreatedTimestamp": "1794409948.292164",
+          "DelaySeconds": "0",
+          "LastModifiedTimestamp": "1794409948.292164",
+          "MaximumMessageSize": "1048576",
+          "MessageRetentionPeriod": "345600",
+          "QueueArn": "arn:aws:sqs:ap-southeast-2:111122223333:payment-jobs",
+          "ReceiveMessageWaitTimeSeconds": "0",
+          "VisibilityTimeout": "30",
+          "SqsManagedSseEnabled": "true"
+        }
+      }
+    },
+    {
+      "service": "ec2",
+      "method": "describe_instances",
+      "params": {
+        "InstanceIds": [
+          "i-1deb64b7a4c5bd8fd"
+        ]
+      },
+      "region": "us-west-2",
+      "response": {
+        "Reservations": [
+          {
+            "ReservationId": "r-d4376831ec5b5c674",
+            "OwnerId": "111122223333",
+            "Groups": [],
+            "Instances": [
+              {
+                "Architecture": "x86_64",
+                "BlockDeviceMappings": [
+                  {
+                    "DeviceName": "/dev/sda1",
+                    "Ebs": {
+                      "AttachTime": "2026-11-11T15:12:29+00:00",
+                      "DeleteOnTermination": true,
+                      "Status": "attached",
+                      "VolumeId": "vol-6d971e8e3defa56a5"
+                    }
+                  }
+                ],
+                "ClientToken": "84889ca7-3de3-4d08-927c-71fe792d0b09",
+                "EbsOptimized": false,
+                "Hypervisor": "xen",
+                "NetworkInterfaces": [
+                  {
+                    "Association": {},
+                    "Attachment": {
+                      "AttachTime": "2026-11-11T15:12:29+00:00",
+                      "AttachmentId": "eni-attach-3161713c31f496a16",
+                      "DeleteOnTermination": false,
+                      "DeviceIndex": 0,
+                      "Status": "attached",
+                      "NetworkCardIndex": 0
+                    },
+                    "Description": "Primary network interface",
+                    "Groups": [
+                      {
+                        "GroupId": "sg-25a84df91621e8c0a",
+                        "GroupName": "default"
+                      }
+                    ],
+                    "Ipv6Addresses": [],
+                    "MacAddress": "02:00:00:db:34:97",
+                    "NetworkInterfaceId": "eni-f45f54ac335737ff4",
+                    "OwnerId": "111122223333",
+                    "PrivateIpAddress": "10.20.1.4",
+                    "PrivateIpAddresses": [
+                      {
+                        "Primary": true,
+                        "PrivateIpAddress": "10.20.1.4"
+                      }
+                    ],
+                    "SourceDestCheck": true,
+                    "Status": "in-use",
+                    "SubnetId": "subnet-ae1c032270a8da634",
+                    "VpcId": "vpc-bdf3f163ce468ef4d",
+                    "InterfaceType": "interface"
+                  }
+                ],
+                "RootDeviceName": "/dev/sda1",
+                "RootDeviceType": "ebs",
+                "SecurityGroups": [],
+                "SourceDestCheck": true,
+                "SriovNetSupport": "simple",
+                "StateReason": {
+                  "Code": "",
+                  "Message": ""
+                },
+                "Tags": [
+                  {
+                    "Key": "project",
+                    "Value": "whitehats-proving-ground"
+                  }
+                ],
+                "VirtualizationType": "hvm",
+                "HibernationOptions": {},
+                "MetadataOptions": {
+                  "State": "applied",
+                  "HttpTokens": "optional",
+                  "HttpPutResponseHopLimit": 1,
+                  "HttpEndpoint": "enabled",
+                  "HttpProtocolIpv6": "disabled",
+                  "InstanceMetadataTags": "disabled"
+                },
+                "InstanceId": "i-1deb64b7a4c5bd8fd",
+                "ImageId": "ami-03cf127a",
+                "State": {
+                  "Code": 16,
+                  "Name": "running"
+                },
+                "PrivateDnsName": "ip-10-20-1-4.us-west-2.compute.internal",
+                "StateTransitionReason": "",
+                "AmiLaunchIndex": 0,
+                "ProductCodes": [],
+                "InstanceType": "t4g.nano",
+                "LaunchTime": "2026-11-11T15:12:29+00:00",
+                "Placement": {
+                  "GroupName": "",
+                  "Tenancy": "default",
+                  "AvailabilityZone": "us-west-2b"
+                },
+                "Platform": "windows",
+                "Monitoring": {
+                  "State": "disabled"
+                },
+                "SubnetId": "subnet-ae1c032270a8da634",
+                "VpcId": "vpc-bdf3f163ce468ef4d",
+                "PrivateIpAddress": "10.20.1.4"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "service": "ec2",
+      "method": "describe_vpcs",
+      "params": {
+        "VpcIds": [
+          "vpc-bdf3f163ce468ef4d"
+        ]
+      },
+      "region": "us-west-2",
+      "response": {
+        "Vpcs": [
+          {
+            "OwnerId": "111122223333",
+            "InstanceTenancy": "default",
+            "Ipv6CidrBlockAssociationSet": [],
+            "CidrBlockAssociationSet": [
+              {
+                "AssociationId": "vpc-cidr-assoc-cb855a95855d3c172",
+                "CidrBlock": "10.20.0.0/16",
+                "CidrBlockState": {
+                  "State": "associated"
+                }
+              }
+            ],
+            "IsDefault": false,
+            "Tags": [
+              {
+                "Key": "project",
+                "Value": "whitehats-proving-ground"
+              }
+            ],
+            "VpcId": "vpc-bdf3f163ce468ef4d",
+            "State": "available",
+            "CidrBlock": "10.20.0.0/16",
+            "DhcpOptionsId": "default"
+          }
+        ]
+      }
+    },
+    {
+      "service": "rds",
+      "method": "describe_db_instances",
+      "params": {
+        "DBInstanceIdentifier": "orders-db"
+      },
+      "region": "us-west-2",
+      "response": {
+        "DBInstances": [
+          {
+            "DBInstanceIdentifier": "orders-db",
+            "DBInstanceClass": "db.t4g.micro",
+            "Engine": "postgres",
+            "DBInstanceStatus": "available",
+            "MasterUsername": "pgadmin",
+            "Endpoint": {
+              "Address": "orders-db.aaaaaaaaaa.us-west-2.rds.amazonaws.com",
+              "Port": 5432
+            },
+            "AllocatedStorage": 20,
+            "InstanceCreateTime": "2026-11-11T15:12:29.394308+00:00",
+            "PreferredBackupWindow": "13:14-13:44",
+            "BackupRetentionPeriod": 1,
+            "DBSecurityGroups": [],
+            "VpcSecurityGroups": [
+              {
+                "VpcSecurityGroupId": "sg-2651bf5bb8064b4a6",
+                "Status": "active"
+              }
+            ],
+            "DBParameterGroups": [
+              {
+                "DBParameterGroupName": "default.postgres9.3",
+                "ParameterApplyStatus": "in-sync"
+              }
+            ],
+            "AvailabilityZone": "us-west-2a",
+            "PreferredMaintenanceWindow": "wed:06:38-wed:07:08",
+            "LatestRestorableTime": "2026-11-11T15:12:29.824994+00:00",
+            "MultiAZ": false,
+            "EngineVersion": "9.3.3",
+            "AutoMinorVersionUpgrade": true,
+            "ReadReplicaDBInstanceIdentifiers": [],
+            "LicenseModel": "general-public-license",
+            "OptionGroupMemberships": [
+              {
+                "OptionGroupName": "default:postgres-9-3",
+                "Status": "in-sync"
+              }
+            ],
+            "StorageType": "gp2",
+            "DbInstancePort": 5432,
+            "StorageEncrypted": false,
+            "DbiResourceId": "db-M5ENSHXFPU6XHZ4G4ZEI5QIO2U",
+            "CACertificateIdentifier": "rds-ca-default",
+            "DomainMemberships": [],
+            "CopyTagsToSnapshot": false,
+            "MonitoringInterval": 0,
+            "DBInstanceArn": "arn:aws:rds:us-west-2:111122223333:db:orders-db",
+            "IAMDatabaseAuthenticationEnabled": false,
+            "EnabledCloudwatchLogsExports": [],
+            "DeletionProtection": false,
+            "AssociatedRoles": [],
+            "TagList": [
+              {
+                "Key": "project",
+                "Value": "whitehats-proving-ground"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

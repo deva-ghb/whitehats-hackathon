@@ -1,0 +1,34 @@
+id: messaging.event-grid
+version: 1
+family: messaging
+display_name: Azure Event Grid
+aliases: [event grid, events, blob events]
+vendors: [Microsoft]
+icon: messaging.event-grid.svg
+properties:
+  - key: topic_name
+    tier: required
+    type: string
+  - key: topic_kind
+    tier: recommended
+    type: enum
+    values: [system, custom, domain]
+  - key: subscriptions
+    tier: derived
+    type: list
+  - key: resource_id
+    tier: derived
+    type: string
+edges:
+  allowed_out: [publishes_to, emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [publishes_to, consumes_from, depends_on]
+connection_test:
+  kind: azure_api
+  description: "Read the topic with the Reader role, expect 200"
+whitehat_modes: [messaging]
+default_sense_points:
+  - mode: messaging
+    reason: A subscription to an outside webhook copies every event out
+attack_techniques: [T1537, T1565]
+importers: [azure_resource_graph, bicep]
+deploy_guide_template: guides/messaging.event-grid.md

@@ -1,0 +1,71 @@
+id: service.function
+version: 2
+family: services
+display_name: Serverless function
+aliases: [lambda, azure function, cloud function, function, serverless]
+vendors: [Amazon Web Services, Microsoft, Google Cloud]
+icon: service.function.svg
+properties:
+  - key: platform
+    tier: required
+    type: enum
+    values: [aws_lambda, azure_functions, gcp_cloud_functions]
+  - key: runtime
+    tier: required
+    type: string
+  - key: package_type
+    tier: recommended
+    type: enum
+    values: [zip, image]
+  - key: trigger
+    tier: recommended
+    type: enum
+    values: [http, queue, schedule, event, authorizer]
+  - key: memory_mb
+    tier: recommended
+    type: number
+  - key: environment_variables
+    tier: recommended
+    type: list
+  - key: reserved_concurrency
+    tier: optional
+    type: number
+  - key: region
+    tier: optional
+    type: string
+  - key: execution_role
+    tier: derived
+    type: string
+  - key: packages
+    tier: optional
+    type: list
+  - key: base_image
+    tier: optional
+    type: string
+  - key: code_repo
+    tier: optional
+    type: string
+  - key: code_folder
+    tier: optional
+    type: string
+  - key: direct_dependencies
+    tier: optional
+    type: list
+  - key: image
+    tier: optional
+    type: string
+edges:
+  allowed_out: [calls, publishes_to, consumes_from, reads, writes, deploys_from, runs_on, runs_as, routes_through, authenticates_via, stores_secret_in, emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [calls, depends_on]
+connection_test:
+  kind: cloud_api
+  description: "Read the function configuration with the read-only role, expect the runtime"
+whitehat_modes: [code, supply_chain, secrets, telemetry, identity]
+default_sense_points:
+  - mode: secrets
+    reason: Secrets pasted into environment variables are visible to anyone who can read the function
+  - mode: identity
+    reason: The execution role decides how far a compromised function can reach
+attack_techniques: [T1648, T1190, T1552.001]
+importers: [aws_config, azure_resource_graph, terraform_aws_provider, repo_scan]
+deploy_guide_template: guides/service.function.md

@@ -1,0 +1,51 @@
+id: compute.vm
+version: 1
+family: compute
+display_name: Virtual machine
+aliases: [vm, virtual machine, ec2, ec2 instance, azure vm, server, instance]
+vendors: [Amazon Web Services, Microsoft, Google Cloud]
+icon: compute.vm.svg
+properties:
+  - key: cloud
+    tier: required
+    type: enum
+    values: [aws, azure, gcp, on_prem]
+  - key: size
+    tier: required
+    type: string
+  - key: os
+    tier: recommended
+    type: string
+  - key: public_ip
+    tier: recommended
+    type: boolean
+  - key: password_auth
+    tier: recommended
+    type: boolean
+  - key: disk_encryption
+    tier: recommended
+    type: boolean
+  - key: managed_by_edr
+    tier: recommended
+    type: boolean
+  - key: region
+    tier: optional
+    type: string
+  - key: instance_profile
+    tier: derived
+    type: string
+edges:
+  allowed_out: [runs_as, routes_through, emits_telemetry_to, authenticates_via, depends_on, contained_in]
+  allowed_in: [runs_on, depends_on]
+connection_test:
+  kind: cloud_api
+  description: "Describe the instance through the read-only role, expect it to be listed"
+whitehat_modes: [network, identity, telemetry, memory]
+default_sense_points:
+  - mode: network
+    reason: An admin VM with a public address is the first thing scanners find
+  - mode: identity
+    reason: Its instance role or managed identity is reachable from the metadata service
+attack_techniques: [T1078, T1021.004, T1552.005, T1578.002]
+importers: [aws_config, azure_resource_graph, terraform_aws_provider, terraform_azurerm_provider]
+deploy_guide_template: guides/compute.vm.md

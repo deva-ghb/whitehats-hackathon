@@ -1,0 +1,43 @@
+id: edge.apim
+version: 1
+family: network
+display_name: Azure API Management
+aliases: [apim, api management, azure api gateway]
+vendors: [Microsoft]
+icon: edge.apim.svg
+properties:
+  - key: service_name
+    tier: required
+    type: string
+  - key: tier
+    tier: recommended
+    type: enum
+    values: [consumption, developer, basic, standard, premium]
+  - key: virtual_network
+    tier: recommended
+    type: enum
+    values: [none, external, internal]
+  - key: subscription_keys_required
+    tier: recommended
+    type: boolean
+  - key: apis
+    tier: derived
+    type: list
+  - key: resource_id
+    tier: derived
+    type: string
+edges:
+  allowed_out: [calls, routes_through, authenticates_via, emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [calls, routes_through, depends_on]
+connection_test:
+  kind: azure_api
+  description: "Read the API Management service with the Reader role, expect 200"
+whitehat_modes: [network, iac, pentest]
+default_sense_points:
+  - mode: iac
+    reason: APIs without a subscription key or token check are open
+  - mode: network
+    reason: Gateway logs show scanning and auth failures
+attack_techniques: [T1190, T1499.003, T1550.001]
+importers: [azure_resource_graph, bicep, openapi]
+deploy_guide_template: guides/edge.apim.md

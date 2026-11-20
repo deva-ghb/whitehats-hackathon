@@ -1,0 +1,46 @@
+id: observability.cloudtrail
+version: 1
+family: observability
+display_name: AWS CloudTrail
+aliases: [cloudtrail, audit trail, trail]
+vendors: [Amazon Web Services]
+icon: observability.cloudtrail.svg
+properties:
+  - key: trail_name
+    tier: required
+    type: string
+  - key: multi_region
+    tier: recommended
+    type: boolean
+  - key: log_file_validation
+    tier: recommended
+    type: boolean
+  - key: data_events
+    tier: recommended
+    type: boolean
+  - key: destination_bucket
+    tier: recommended
+    type: string
+  - key: cloudwatch_log_group
+    tier: optional
+    type: string
+  - key: arn
+    tier: derived
+    type: string
+  - key: credential
+    tier: secret
+    type: string
+    scopes_hint: ["cloudtrail:LookupEvents", "cloudtrail:GetTrailStatus"]
+edges:
+  allowed_out: [emits_telemetry_to, writes, depends_on, contained_in]
+  allowed_in: [emits_telemetry_to, depends_on]
+connection_test:
+  kind: aws_api
+  description: "Call cloudtrail:GetTrailStatus with the read-only role, expect IsLogging true"
+whitehat_modes: [identity, telemetry]
+default_sense_points:
+  - mode: identity
+    reason: "Every API call: who changed IAM, who stopped logging, who read the data"
+attack_techniques: [T1685.002, T1070, T1078.004]
+importers: [aws_config, terraform_aws_provider]
+deploy_guide_template: guides/observability.cloudtrail.md

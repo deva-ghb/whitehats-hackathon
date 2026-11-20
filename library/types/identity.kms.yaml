@@ -1,0 +1,39 @@
+id: identity.kms
+version: 1
+family: identity
+display_name: AWS KMS key
+aliases: [kms, encryption key, cmk, customer managed key]
+vendors: [Amazon Web Services]
+icon: identity.kms.svg
+properties:
+  - key: key_alias
+    tier: required
+    type: string
+  - key: region
+    tier: required
+    type: string
+  - key: rotation_enabled
+    tier: recommended
+    type: boolean
+  - key: key_policy
+    tier: derived
+    type: string
+  - key: grants
+    tier: derived
+    type: list
+  - key: arn
+    tier: derived
+    type: string
+edges:
+  allowed_out: [emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [reads, depends_on]
+connection_test:
+  kind: aws_api
+  description: "Call kms:DescribeKey with the read-only role, expect 200"
+whitehat_modes: [identity, data]
+default_sense_points:
+  - mode: identity
+    reason: Scheduling key deletion or loosening the key policy destroys or exposes the data it protects
+attack_techniques: [T1486, T1485]
+importers: [aws_config, terraform_aws_provider]
+deploy_guide_template: guides/identity.kms.md

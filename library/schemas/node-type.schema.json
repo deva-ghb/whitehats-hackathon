@@ -1,0 +1,136 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://whitehats.local/schemas/node-type.schema.json",
+  "title": "NodeType",
+  "description": "One versioned node type. attack_techniques is required (decision C6a). Edge names, ATT&CK ids and the guide file are checked by library.validate, not by this schema, so each list lives in one place.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "version",
+    "family",
+    "display_name",
+    "aliases",
+    "vendors",
+    "icon",
+    "properties",
+    "edges",
+    "connection_test",
+    "whitehat_modes",
+    "default_sense_points",
+    "attack_techniques",
+    "importers",
+    "deploy_guide_template"
+  ],
+  "properties": {
+    "id": {"type": "string", "pattern": "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)+$"},
+    "version": {"type": "integer", "minimum": 1},
+    "family": {
+      "enum": [
+        "boundaries",
+        "network",
+        "compute",
+        "services",
+        "code_and_delivery",
+        "messaging",
+        "data",
+        "identity",
+        "observability",
+        "saas",
+        "ai",
+        "endpoints",
+        "security_controls",
+        "annotations",
+        "whitehats"
+      ]
+    },
+    "display_name": {"type": "string", "minLength": 1},
+    "aliases": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "vendors": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "icon": {"type": "string", "minLength": 1},
+    "generic": {
+      "type": "boolean",
+      "description": "A Generic type (design 9.4): one per family, free-form properties, never counted as a resolved node."
+    },
+    "properties": {"type": "array", "items": {"$ref": "#/$defs/property"}},
+    "edges": {"$ref": "#/$defs/edges"},
+    "connection_test": {"$ref": "#/$defs/connectionTest"},
+    "whitehat_modes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/mode"}
+    },
+    "default_sense_points": {"type": "array", "items": {"$ref": "#/$defs/sensePoint"}},
+    "attack_techniques": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "pattern": "^T[0-9]{4}(\\.[0-9]{3})?$"}
+    },
+    "importers": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "deploy_guide_template": {"type": "string", "minLength": 1}
+  },
+  "$defs": {
+    "mode": {
+      "enum": [
+        "code",
+        "supply_chain",
+        "secrets",
+        "iac",
+        "network",
+        "identity",
+        "telemetry",
+        "memory",
+        "pentest",
+        "data",
+        "messaging",
+        "ai",
+        "saas"
+      ]
+    },
+    "property": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "tier", "type"],
+      "properties": {
+        "key": {"type": "string", "pattern": "^[a-z][a-z0-9_]{0,40}$"},
+        "tier": {"enum": ["required", "recommended", "optional", "secret", "derived"]},
+        "type": {"enum": ["string", "number", "boolean", "enum", "url", "list"]},
+        "values": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "scopes_hint": {"type": "array", "items": {"type": "string", "minLength": 1}}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"type": {"const": "enum"}}, "required": ["type"]},
+          "then": {"required": ["values"]}
+        }
+      ]
+    },
+    "edges": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["allowed_out", "allowed_in"],
+      "properties": {
+        "allowed_out": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "allowed_in": {"type": "array", "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "connectionTest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "description"],
+      "properties": {
+        "kind": {"type": "string", "minLength": 1},
+        "description": {"type": "string", "minLength": 1}
+      }
+    },
+    "sensePoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "reason"],
+      "properties": {
+        "mode": {"$ref": "#/$defs/mode"},
+        "reason": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

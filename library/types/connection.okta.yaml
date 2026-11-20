@@ -1,0 +1,22 @@
+id: connection.okta
+version: 1
+family: boundaries
+display_name: Okta connection
+aliases: [okta connection, okta source]
+vendors: [Okta]
+icon: connection.okta.svg
+properties:
+  - key: connector
+    tier: required
+    type: string
+edges:
+  allowed_out: [depends_on, contained_in]
+  allowed_in: [contained_in, depends_on]
+connection_test:
+  kind: http
+  description: "Read /api/v1/org with the read-only token, expect 200"
+whitehat_modes: [identity]
+default_sense_points: []
+attack_techniques: [T1078.004, T1098]
+importers: [connector]
+deploy_guide_template: guides/connection.okta.md

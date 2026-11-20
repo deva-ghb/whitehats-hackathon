@@ -1,0 +1,45 @@
+id: messaging.msk
+version: 1
+family: messaging
+display_name: Amazon MSK (Kafka)
+aliases: [msk, kafka, managed kafka, stream]
+vendors: [Amazon Web Services, Apache]
+icon: messaging.msk.svg
+properties:
+  - key: cluster_name
+    tier: required
+    type: string
+  - key: region
+    tier: required
+    type: string
+  - key: client_auth
+    tier: recommended
+    type: enum
+    values: [iam, sasl_scram, mtls, unauthenticated]
+  - key: encryption_in_transit
+    tier: recommended
+    type: enum
+    values: [tls, tls_plaintext, plaintext]
+  - key: topics
+    tier: derived
+    type: list
+  - key: arn
+    tier: derived
+    type: string
+  - key: credential
+    tier: secret
+    type: string
+    scopes_hint: ["kafka:DescribeClusterV2", "kafka-cluster:DescribeTopic"]
+edges:
+  allowed_out: [emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [publishes_to, consumes_from, depends_on]
+connection_test:
+  kind: aws_api
+  description: "Call kafka:DescribeClusterV2 with the read-only role, expect 200; never consume records"
+whitehat_modes: [messaging, network]
+default_sense_points:
+  - mode: messaging
+    reason: Unauthenticated or plaintext listeners expose every event
+attack_techniques: [T1565, T1040, T1020]
+importers: [aws_config, terraform_aws_provider]
+deploy_guide_template: guides/messaging.msk.md

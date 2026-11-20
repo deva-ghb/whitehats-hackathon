@@ -1,0 +1,35 @@
+id: observability.datadog
+version: 1
+family: observability
+display_name: Datadog
+aliases: [datadog, dd, apm, observability]
+vendors: [Datadog]
+icon: observability.datadog.svg
+properties:
+  - key: site
+    tier: required
+    type: enum
+    values: [us1, us3, us5, eu1, ap1]
+  - key: signals
+    tier: required
+    type: list
+  - key: retention_days
+    tier: recommended
+    type: number
+  - key: credential
+    tier: secret
+    type: string
+    scopes_hint: [logs_read_data, apm_read]
+edges:
+  allowed_out: [emits_telemetry_to, writes, depends_on, contained_in]
+  allowed_in: [emits_telemetry_to, depends_on]
+connection_test:
+  kind: http
+  description: "Call /api/v1/validate with the application key, expect valid true"
+whitehat_modes: [telemetry]
+default_sense_points:
+  - mode: telemetry
+    reason: Many teams send their best logs here rather than to the cloud provider
+attack_techniques: [T1685.002, T1552.001]
+importers: [datadog_api]
+deploy_guide_template: guides/observability.datadog.md

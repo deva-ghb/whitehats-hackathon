@@ -1,0 +1,22 @@
+id: connection.aws
+version: 1
+family: boundaries
+display_name: AWS connection
+aliases: [aws connection, aws source]
+vendors: [Amazon Web Services]
+icon: connection.aws.svg
+properties:
+  - key: connector
+    tier: required
+    type: string
+edges:
+  allowed_out: [depends_on, contained_in]
+  allowed_in: [contained_in, depends_on]
+connection_test:
+  kind: aws_api
+  description: "Assume the read-only role with the external id and call sts:GetCallerIdentity"
+whitehat_modes: [identity, iac]
+default_sense_points: []
+attack_techniques: [T1078.004, T1580]
+importers: [connector]
+deploy_guide_template: guides/connection.aws.md

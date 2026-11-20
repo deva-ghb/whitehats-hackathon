@@ -1,0 +1,35 @@
+id: saas.quickbooks
+version: 1
+family: saas
+display_name: QuickBooks Online
+aliases: [quickbooks, qbo, intuit, accounting]
+vendors: [Intuit]
+icon: saas.quickbooks.svg
+properties:
+  - key: realm_id
+    tier: required
+    type: string
+  - key: integration_type
+    tier: recommended
+    type: enum
+    values: [oauth_app, connector]
+  - key: data_shared
+    tier: recommended
+    type: string
+  - key: credential
+    tier: secret
+    type: string
+    scopes_hint: [com.intuit.quickbooks.accounting read]
+edges:
+  allowed_out: [calls, syncs_with, emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [calls, syncs_with, depends_on]
+connection_test:
+  kind: http
+  description: "Read CompanyInfo with the OAuth token, expect 200"
+whitehat_modes: [saas]
+default_sense_points:
+  - mode: saas
+    reason: A bookkeeping sync with write access can change the books
+attack_techniques: [T1657, T1199, T1528]
+importers: [manual]
+deploy_guide_template: guides/saas.quickbooks.md

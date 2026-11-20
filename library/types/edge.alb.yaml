@@ -1,0 +1,43 @@
+id: edge.alb
+version: 1
+family: network
+display_name: Application Load Balancer
+aliases: [alb, load balancer, elb, application load balancer]
+vendors: [Amazon Web Services]
+icon: edge.alb.svg
+properties:
+  - key: load_balancer_name
+    tier: required
+    type: string
+  - key: region
+    tier: required
+    type: string
+  - key: scheme
+    tier: required
+    type: enum
+    values: [internet_facing, internal]
+  - key: https_listener_only
+    tier: recommended
+    type: boolean
+  - key: access_logs
+    tier: recommended
+    type: boolean
+  - key: waf
+    tier: recommended
+    type: boolean
+  - key: arn
+    tier: derived
+    type: string
+edges:
+  allowed_out: [calls, routes_through, authenticates_via, emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [calls, routes_through, depends_on]
+connection_test:
+  kind: aws_api
+  description: "Call elasticloadbalancing:DescribeLoadBalancers with the read-only role, expect the name"
+whitehat_modes: [network, iac]
+default_sense_points:
+  - mode: network
+    reason: Access logs show what reaches the services behind it
+attack_techniques: [T1190, T1499.002, T1557]
+importers: [aws_config, terraform_aws_provider]
+deploy_guide_template: guides/edge.alb.md

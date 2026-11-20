@@ -1,0 +1,1151 @@
+{
+  "schema_version": 1,
+  "clone": "fintech",
+  "environment": "prod",
+  "library_version": "2026.10",
+  "version": {
+    "number": 1,
+    "author": "template",
+    "reason": "Initial estate from design section 15",
+    "created_at": "2026-10-22T00:00:00Z"
+  },
+  "groups": [
+    {
+      "id": "g_org",
+      "type": "boundary.aws-organization@1",
+      "name": "AWS Organization",
+      "kind": "organisation",
+      "environment": "shared",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      }
+    },
+    {
+      "id": "g_acct_prod",
+      "type": "boundary.aws-account@1",
+      "name": "account prod",
+      "kind": "account",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "parent": "g_org"
+    },
+    {
+      "id": "g_acct_staging",
+      "type": "boundary.aws-account@1",
+      "name": "account staging",
+      "kind": "account",
+      "environment": "staging",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "parent": "g_org"
+    },
+    {
+      "id": "g_acct_security",
+      "type": "boundary.aws-account@1",
+      "name": "account security",
+      "kind": "account",
+      "environment": "shared",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "parent": "g_org"
+    },
+    {
+      "id": "g_acct_shared",
+      "type": "boundary.aws-account@1",
+      "name": "account shared-services",
+      "kind": "account",
+      "environment": "shared",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "parent": "g_org"
+    },
+    {
+      "id": "g_vpc_prod",
+      "type": "boundary.vpc@1",
+      "name": "prod VPC",
+      "kind": "vpc",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "parent": "g_acct_prod"
+    },
+    {
+      "id": "g_vpc_staging",
+      "type": "boundary.vpc@1",
+      "name": "staging VPC",
+      "kind": "vpc",
+      "environment": "staging",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "parent": "g_acct_staging"
+    },
+    {
+      "id": "g_subnet_prod",
+      "type": "boundary.subnet@1",
+      "name": "prod private subnet",
+      "kind": "subnet",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "parent": "g_vpc_prod"
+    },
+    {
+      "id": "g_eks",
+      "type": "boundary.eks@1",
+      "name": "prod EKS cluster",
+      "kind": "cluster",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "parent": "g_subnet_prod"
+    }
+  ],
+  "access_paths": [
+    {
+      "id": "ap_staging_vpn",
+      "name": "AWS Client VPN to staging",
+      "kind": "vpn-client",
+      "environment": "staging",
+      "client": "openvpn",
+      "routes": [
+        "10.2.0.0/16"
+      ],
+      "credential": "cr_vpn"
+    },
+    {
+      "id": "ap_prod_runner",
+      "name": "customer-hosted Runner for prod",
+      "kind": "customer-hosted-runner",
+      "environment": "prod"
+    },
+    {
+      "id": "ap_public",
+      "name": "public APIs for SaaS",
+      "kind": "public-api",
+      "environment": "shared"
+    }
+  ],
+  "credential_refs": [
+    {
+      "id": "cr_github",
+      "vault_uri": "vault://tenant/fintech/github-app",
+      "purpose": "GitHub App for repo reads"
+    },
+    {
+      "id": "cr_stripe",
+      "vault_uri": "vault://tenant/fintech/stripe",
+      "purpose": "Stripe restricted key"
+    },
+    {
+      "id": "cr_okta",
+      "vault_uri": "vault://tenant/fintech/okta",
+      "purpose": "Okta read-only for staff SSO"
+    },
+    {
+      "id": "cr_plaid",
+      "vault_uri": "vault://tenant/fintech/plaid",
+      "purpose": "Plaid for bank linking"
+    },
+    {
+      "id": "cr_vpn",
+      "vault_uri": "vault://tenant/fintech/client-vpn",
+      "purpose": "AWS Client VPN profile for staging"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "n_r53",
+      "type": "edge.route53@1",
+      "name": "Route 53",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "location": "g_acct_prod",
+      "access_path": "ap_public"
+    },
+    {
+      "id": "n_cf",
+      "type": "edge.cloudfront@1",
+      "name": "CloudFront",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "location": "g_acct_prod",
+      "access_path": "ap_public",
+      "properties": {
+        "waf": true
+      }
+    },
+    {
+      "id": "n_apigw",
+      "type": "edge.api-gateway@1",
+      "name": "API Gateway",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "location": "g_acct_prod",
+      "access_path": "ap_prod_runner"
+    },
+    {
+      "id": "n_alb",
+      "type": "edge.alb@1",
+      "name": "ALB",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "location": "g_vpc_prod",
+      "access_path": "ap_prod_runner"
+    },
+    {
+      "id": "n_accounts",
+      "type": "service.backend@1",
+      "name": "accounts-api",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "location": "g_eks",
+      "access_path": "ap_prod_runner",
+      "criticality": "high",
+      "data_classification": [
+        "PII"
+      ],
+      "properties": {
+        "runtime": "python 3.12"
+      }
+    },
+    {
+      "id": "n_payments",
+      "type": "service.backend@1",
+      "name": "payments-api",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "location": "g_eks",
+      "access_path": "ap_prod_runner",
+      "criticality": "high",
+      "data_classification": [
+        "PCI"
+      ],
+      "compliance_scope": [
+        "PCI DSS"
+      ],
+      "properties": {
+        "runtime": "node 20",
+        "exposure": "public"
+      }
+    },
+    {
+      "id": "n_ledger",
+      "type": "service.backend@1",
+      "name": "ledger-service",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "location": "g_eks",
+      "access_path": "ap_prod_runner",
+      "criticality": "crown-jewel",
+      "data_classification": [
+        "financial"
+      ],
+      "compliance_scope": [
+        "SOC 2"
+      ]
+    },
+    {
+      "id": "n_kyc",
+      "type": "service.backend@1",
+      "name": "kyc-service",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "location": "g_eks",
+      "access_path": "ap_prod_runner",
+      "criticality": "high",
+      "data_classification": [
+        "PII"
+      ]
+    },
+    {
+      "id": "n_web",
+      "type": "service.frontend@1",
+      "name": "web-app",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "location": "g_eks",
+      "access_path": "ap_prod_runner",
+      "properties": {
+        "runtime": "node 20"
+      }
+    },
+    {
+      "id": "n_webhooks",
+      "type": "service.function@2",
+      "name": "webhook-handlers",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "location": "g_acct_prod",
+      "access_path": "ap_prod_runner"
+    },
+    {
+      "id": "n_recon",
+      "type": "service.function@2",
+      "name": "reconciliation-job",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "location": "g_acct_prod",
+      "access_path": "ap_prod_runner"
+    },
+    {
+      "id": "n_backoffice",
+      "type": "service.worker@1",
+      "name": "back-office",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "location": "g_acct_prod",
+      "access_path": "ap_prod_runner"
+    },
+    {
+      "id": "n_aurora",
+      "type": "data.aurora-postgres@1",
+      "name": "Aurora Postgres",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "location": "g_subnet_prod",
+      "access_path": "ap_prod_runner",
+      "criticality": "crown-jewel",
+      "data_classification": [
+        "financial",
+        "PCI"
+      ],
+      "compliance_scope": [
+        "PCI DSS",
+        "SOC 2"
+      ],
+      "properties": {
+        "engine": "aurora-postgresql"
+      }
+    },
+    {
+      "id": "n_dynamo",
+      "type": "data.dynamodb@1",
+      "name": "DynamoDB sessions",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "location": "g_acct_prod",
+      "access_path": "ap_prod_runner"
+    },
+    {
+      "id": "n_redis",
+      "type": "data.elasticache@1",
+      "name": "ElastiCache Redis",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "location": "g_subnet_prod",
+      "access_path": "ap_prod_runner"
+    },
+    {
+      "id": "n_s3_stmt",
+      "type": "data.s3@1",
+      "name": "S3 statements",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "location": "g_acct_prod",
+      "access_path": "ap_prod_runner",
+      "data_classification": [
+        "financial"
+      ]
+    },
+    {
+      "id": "n_s3_kyc",
+      "type": "data.s3@1",
+      "name": "S3 KYC documents",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "location": "g_acct_prod",
+      "access_path": "ap_prod_runner",
+      "criticality": "high",
+      "data_classification": [
+        "PII"
+      ]
+    },
+    {
+      "id": "n_redshift",
+      "type": "data.redshift@1",
+      "name": "Redshift",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "location": "g_subnet_prod",
+      "access_path": "ap_prod_runner",
+      "data_classification": [
+        "financial"
+      ]
+    },
+    {
+      "id": "n_sqs",
+      "type": "messaging.sqs@1",
+      "name": "SQS payment jobs",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "location": "g_acct_prod",
+      "access_path": "ap_prod_runner"
+    },
+    {
+      "id": "n_sns",
+      "type": "messaging.sns@1",
+      "name": "SNS notifications",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "location": "g_acct_prod",
+      "access_path": "ap_prod_runner"
+    },
+    {
+      "id": "n_eb",
+      "type": "messaging.eventbridge@1",
+      "name": "EventBridge",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "location": "g_acct_prod",
+      "access_path": "ap_prod_runner"
+    },
+    {
+      "id": "n_msk",
+      "type": "messaging.msk@1",
+      "name": "MSK Kafka",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "location": "g_subnet_prod",
+      "access_path": "ap_prod_runner"
+    },
+    {
+      "id": "n_okta",
+      "type": "identity.okta@1",
+      "name": "Okta",
+      "environment": "shared",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "access_path": "ap_public",
+      "credential": "cr_okta"
+    },
+    {
+      "id": "n_cognito",
+      "type": "identity.cognito@1",
+      "name": "Cognito",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "location": "g_acct_prod",
+      "access_path": "ap_prod_runner"
+    },
+    {
+      "id": "n_iam",
+      "type": "identity.iam-role@1",
+      "name": "IAM roles",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "location": "g_acct_prod",
+      "access_path": "ap_prod_runner"
+    },
+    {
+      "id": "n_secrets",
+      "type": "identity.secrets-manager@1",
+      "name": "Secrets Manager",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "location": "g_acct_prod",
+      "access_path": "ap_prod_runner",
+      "criticality": "high"
+    },
+    {
+      "id": "n_kms",
+      "type": "identity.kms@1",
+      "name": "KMS",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "location": "g_acct_prod",
+      "access_path": "ap_prod_runner",
+      "criticality": "high"
+    },
+    {
+      "id": "n_repo_payments",
+      "type": "repo.github@1",
+      "name": "repo payments-api",
+      "environment": "shared",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "access_path": "ap_public",
+      "credential": "cr_github"
+    },
+    {
+      "id": "n_repo_accounts",
+      "type": "repo.github@1",
+      "name": "repo accounts-api",
+      "environment": "shared",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "access_path": "ap_public",
+      "credential": "cr_github"
+    },
+    {
+      "id": "n_repo_ledger",
+      "type": "repo.github@1",
+      "name": "repo ledger-service",
+      "environment": "shared",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "access_path": "ap_public",
+      "credential": "cr_github"
+    },
+    {
+      "id": "n_repo_kyc",
+      "type": "repo.github@1",
+      "name": "repo kyc-service",
+      "environment": "shared",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "access_path": "ap_public",
+      "credential": "cr_github"
+    },
+    {
+      "id": "n_repo_web",
+      "type": "repo.github@1",
+      "name": "repo web-app",
+      "environment": "shared",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "access_path": "ap_public",
+      "credential": "cr_github"
+    },
+    {
+      "id": "n_repo_webhooks",
+      "type": "repo.github@1",
+      "name": "repo webhook-handlers",
+      "environment": "shared",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "access_path": "ap_public",
+      "credential": "cr_github"
+    },
+    {
+      "id": "n_repo_recon",
+      "type": "repo.github@1",
+      "name": "repo reconciliation-job",
+      "environment": "shared",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "access_path": "ap_public",
+      "credential": "cr_github"
+    },
+    {
+      "id": "n_repo_backoffice",
+      "type": "repo.github@1",
+      "name": "repo back-office",
+      "environment": "shared",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "access_path": "ap_public",
+      "credential": "cr_github"
+    },
+    {
+      "id": "n_gha",
+      "type": "delivery.github-actions@1",
+      "name": "GitHub Actions",
+      "environment": "shared",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "access_path": "ap_public",
+      "credential": "cr_github"
+    },
+    {
+      "id": "n_ecr",
+      "type": "delivery.ecr@1",
+      "name": "ECR",
+      "environment": "shared",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "location": "g_acct_shared",
+      "access_path": "ap_prod_runner"
+    },
+    {
+      "id": "n_tfc",
+      "type": "delivery.terraform@1",
+      "name": "Terraform Cloud",
+      "environment": "shared",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "access_path": "ap_public",
+      "properties": {
+        "backend": "terraform_cloud"
+      }
+    },
+    {
+      "id": "n_cw",
+      "type": "observability.cloudwatch@1",
+      "name": "CloudWatch Logs",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "location": "g_acct_prod",
+      "access_path": "ap_prod_runner"
+    },
+    {
+      "id": "n_trail",
+      "type": "observability.cloudtrail@1",
+      "name": "CloudTrail",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "location": "g_acct_security",
+      "access_path": "ap_prod_runner"
+    },
+    {
+      "id": "n_flow",
+      "type": "observability.vpc-flow-logs@1",
+      "name": "VPC Flow Logs",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "location": "g_vpc_prod",
+      "access_path": "ap_prod_runner"
+    },
+    {
+      "id": "n_gd",
+      "type": "control.guardduty@1",
+      "name": "GuardDuty",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "location": "g_acct_security",
+      "access_path": "ap_prod_runner"
+    },
+    {
+      "id": "n_datadog",
+      "type": "observability.datadog@1",
+      "name": "Datadog",
+      "environment": "shared",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "access_path": "ap_public"
+    },
+    {
+      "id": "n_stripe",
+      "type": "saas.stripe@1",
+      "name": "Stripe",
+      "environment": "shared",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "access_path": "ap_public",
+      "credential": "cr_stripe"
+    },
+    {
+      "id": "n_plaid",
+      "type": "saas.plaid@1",
+      "name": "Plaid",
+      "environment": "shared",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "access_path": "ap_public",
+      "credential": "cr_plaid"
+    },
+    {
+      "id": "n_qbo",
+      "type": "saas.quickbooks@1",
+      "name": "QuickBooks Online",
+      "environment": "shared",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "access_path": "ap_public"
+    },
+    {
+      "id": "n_persona",
+      "type": "saas.persona@1",
+      "name": "Persona",
+      "environment": "shared",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "access_path": "ap_public"
+    },
+    {
+      "id": "n_twilio",
+      "type": "saas.twilio@1",
+      "name": "Twilio",
+      "environment": "shared",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "access_path": "ap_public"
+    },
+    {
+      "id": "n_segment",
+      "type": "saas.segment@1",
+      "name": "Segment",
+      "environment": "shared",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "access_path": "ap_public"
+    },
+    {
+      "id": "n_bedrock",
+      "type": "ai.bedrock@1",
+      "name": "Bedrock",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "location": "g_acct_prod",
+      "access_path": "ap_prod_runner"
+    },
+    {
+      "id": "n_phoenix",
+      "type": "ai.phoenix@1",
+      "name": "Phoenix",
+      "environment": "shared",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-b"
+      },
+      "access_path": "ap_public"
+    }
+  ],
+  "edges": [
+    {
+      "from": "n_cf",
+      "to": "n_r53",
+      "type": "depends_on"
+    },
+    {
+      "from": "n_web",
+      "to": "n_cf",
+      "type": "routes_through"
+    },
+    {
+      "from": "n_apigw",
+      "to": "n_cf",
+      "type": "routes_through"
+    },
+    {
+      "from": "n_alb",
+      "to": "n_apigw",
+      "type": "routes_through"
+    },
+    {
+      "from": "n_accounts",
+      "to": "n_alb",
+      "type": "routes_through"
+    },
+    {
+      "from": "n_payments",
+      "to": "n_ledger",
+      "type": "calls"
+    },
+    {
+      "from": "n_payments",
+      "to": "n_sqs",
+      "type": "publishes_to"
+    },
+    {
+      "from": "n_recon",
+      "to": "n_sqs",
+      "type": "consumes_from"
+    },
+    {
+      "from": "n_ledger",
+      "to": "n_aurora",
+      "type": "writes"
+    },
+    {
+      "from": "n_ledger",
+      "to": "n_msk",
+      "type": "publishes_to"
+    },
+    {
+      "from": "n_ledger",
+      "to": "n_eb",
+      "type": "publishes_to"
+    },
+    {
+      "from": "n_accounts",
+      "to": "n_dynamo",
+      "type": "reads"
+    },
+    {
+      "from": "n_accounts",
+      "to": "n_redis",
+      "type": "reads"
+    },
+    {
+      "from": "n_webhooks",
+      "to": "n_payments",
+      "type": "calls"
+    },
+    {
+      "from": "n_payments",
+      "to": "n_stripe",
+      "type": "depends_on"
+    },
+    {
+      "from": "n_accounts",
+      "to": "n_plaid",
+      "type": "depends_on"
+    },
+    {
+      "from": "n_backoffice",
+      "to": "n_qbo",
+      "type": "calls"
+    },
+    {
+      "from": "n_kyc",
+      "to": "n_persona",
+      "type": "depends_on"
+    },
+    {
+      "from": "n_kyc",
+      "to": "n_s3_kyc",
+      "type": "writes"
+    },
+    {
+      "from": "n_ledger",
+      "to": "n_s3_stmt",
+      "type": "writes"
+    },
+    {
+      "from": "n_recon",
+      "to": "n_redshift",
+      "type": "writes"
+    },
+    {
+      "from": "n_payments",
+      "to": "n_sns",
+      "type": "publishes_to"
+    },
+    {
+      "from": "n_payments",
+      "to": "n_iam",
+      "type": "runs_as"
+    },
+    {
+      "from": "n_payments",
+      "to": "n_cw",
+      "type": "emits_telemetry_to"
+    },
+    {
+      "from": "n_payments",
+      "to": "n_datadog",
+      "type": "emits_telemetry_to"
+    },
+    {
+      "from": "n_web",
+      "to": "n_cognito",
+      "type": "authenticates_via"
+    },
+    {
+      "from": "n_backoffice",
+      "to": "n_okta",
+      "type": "authenticates_via"
+    },
+    {
+      "from": "n_payments",
+      "to": "n_secrets",
+      "type": "stores_secret_in"
+    },
+    {
+      "from": "n_payments",
+      "to": "n_kms",
+      "type": "depends_on"
+    },
+    {
+      "from": "n_gha",
+      "to": "n_iam",
+      "type": "authenticates_via"
+    },
+    {
+      "from": "n_accounts",
+      "to": "n_bedrock",
+      "type": "calls"
+    },
+    {
+      "from": "n_bedrock",
+      "to": "n_phoenix",
+      "type": "emits_telemetry_to"
+    },
+    {
+      "from": "n_payments",
+      "to": "n_twilio",
+      "type": "depends_on"
+    },
+    {
+      "from": "n_web",
+      "to": "n_segment",
+      "type": "depends_on"
+    },
+    {
+      "from": "g_vpc_prod",
+      "to": "n_flow",
+      "type": "emits_telemetry_to"
+    },
+    {
+      "from": "g_acct_prod",
+      "to": "n_trail",
+      "type": "emits_telemetry_to"
+    },
+    {
+      "from": "g_acct_prod",
+      "to": "n_gd",
+      "type": "emits_telemetry_to"
+    },
+    {
+      "from": "n_gha",
+      "to": "n_ecr",
+      "type": "pushes_image_to"
+    },
+    {
+      "from": "n_tfc",
+      "to": "g_acct_prod",
+      "type": "depends_on"
+    },
+    {
+      "from": "n_payments",
+      "to": "n_repo_payments",
+      "type": "deploys_from",
+      "properties": {
+        "branch": "main",
+        "path": "/"
+      }
+    },
+    {
+      "from": "n_accounts",
+      "to": "n_repo_accounts",
+      "type": "deploys_from",
+      "properties": {
+        "branch": "main",
+        "path": "/"
+      }
+    },
+    {
+      "from": "n_ledger",
+      "to": "n_repo_ledger",
+      "type": "deploys_from",
+      "properties": {
+        "branch": "main",
+        "path": "/"
+      }
+    },
+    {
+      "from": "n_kyc",
+      "to": "n_repo_kyc",
+      "type": "deploys_from",
+      "properties": {
+        "branch": "main",
+        "path": "/"
+      }
+    },
+    {
+      "from": "n_web",
+      "to": "n_repo_web",
+      "type": "deploys_from",
+      "properties": {
+        "branch": "main",
+        "path": "/"
+      }
+    },
+    {
+      "from": "n_webhooks",
+      "to": "n_repo_webhooks",
+      "type": "deploys_from",
+      "properties": {
+        "branch": "main",
+        "path": "/"
+      }
+    },
+    {
+      "from": "n_recon",
+      "to": "n_repo_recon",
+      "type": "deploys_from",
+      "properties": {
+        "branch": "main",
+        "path": "/"
+      }
+    },
+    {
+      "from": "n_backoffice",
+      "to": "n_repo_backoffice",
+      "type": "deploys_from",
+      "properties": {
+        "branch": "main",
+        "path": "/"
+      }
+    },
+    {
+      "from": "n_repo_payments",
+      "to": "n_gha",
+      "type": "built_by"
+    },
+    {
+      "from": "n_repo_accounts",
+      "to": "n_gha",
+      "type": "built_by"
+    },
+    {
+      "from": "n_repo_ledger",
+      "to": "n_gha",
+      "type": "built_by"
+    },
+    {
+      "from": "n_repo_kyc",
+      "to": "n_gha",
+      "type": "built_by"
+    },
+    {
+      "from": "n_repo_web",
+      "to": "n_gha",
+      "type": "built_by"
+    },
+    {
+      "from": "n_repo_webhooks",
+      "to": "n_gha",
+      "type": "built_by"
+    },
+    {
+      "from": "n_repo_recon",
+      "to": "n_gha",
+      "type": "built_by"
+    },
+    {
+      "from": "n_repo_backoffice",
+      "to": "n_gha",
+      "type": "built_by"
+    }
+  ]
+}

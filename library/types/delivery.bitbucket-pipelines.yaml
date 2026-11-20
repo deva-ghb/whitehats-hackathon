@@ -1,0 +1,46 @@
+id: delivery.bitbucket-pipelines
+version: 1
+family: code_and_delivery
+display_name: Bitbucket Pipelines
+aliases: [bitbucket pipelines, pipelines, bb pipelines, ci]
+vendors: [Atlassian]
+icon: delivery.bitbucket-pipelines.svg
+properties:
+  - key: workspace
+    tier: required
+    type: string
+  - key: cloud_auth
+    tier: recommended
+    type: enum
+    values: [oidc, stored_keys, none]
+  - key: pipes_pinned
+    tier: recommended
+    type: boolean
+  - key: self_hosted_runners
+    tier: recommended
+    type: boolean
+  - key: pipelines
+    tier: derived
+    type: list
+  - key: variable_names
+    tier: derived
+    type: list
+  - key: credential
+    tier: secret
+    type: string
+    scopes_hint: ["pipeline:read", "repository:read"]
+edges:
+  allowed_out: [pushes_image_to, authenticates_via, runs_as, stores_secret_in, writes, calls, emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [built_by, depends_on]
+connection_test:
+  kind: http
+  description: "List recent pipelines with the access token, expect 200"
+whitehat_modes: [supply_chain, identity, secrets]
+default_sense_points:
+  - mode: supply_chain
+    reason: Pipes and images it pulls run with deployment variables
+  - mode: identity
+    reason: Stored cloud keys in repository variables
+attack_techniques: [T1195.002, T1072, T1078.004, T1552.001]
+importers: [bitbucket_api, repo_scan]
+deploy_guide_template: guides/delivery.bitbucket-pipelines.md

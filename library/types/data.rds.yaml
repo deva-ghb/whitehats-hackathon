@@ -1,0 +1,53 @@
+id: data.rds
+version: 1
+family: data
+display_name: Amazon RDS database instance
+aliases: [rds, postgres, mysql, mariadb, sql server on aws, database]
+vendors: [Amazon Web Services]
+icon: data.rds.svg
+properties:
+  - key: db_instance_identifier
+    tier: required
+    type: string
+  - key: region
+    tier: required
+    type: string
+  - key: engine
+    tier: required
+    type: enum
+    values: [postgres, mysql, mariadb, sqlserver, oracle]
+  - key: storage_encrypted
+    tier: recommended
+    type: boolean
+  - key: publicly_accessible
+    tier: recommended
+    type: boolean
+  - key: iam_auth
+    tier: recommended
+    type: boolean
+  - key: backup_retention_days
+    tier: recommended
+    type: number
+  - key: instance_class
+    tier: recommended
+    type: string
+  - key: arn
+    tier: derived
+    type: string
+  - key: credential
+    tier: secret
+    type: string
+    scopes_hint: ["rds:DescribeDBInstances", "rds:DescribeDBSnapshots"]
+edges:
+  allowed_out: [replicates_to, backs_up_to, emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [reads, writes, replicates_to, backs_up_to, depends_on]
+connection_test:
+  kind: aws_api
+  description: "Call rds:DescribeDBInstances with the read-only role, expect 200; never connect to the database"
+whitehat_modes: [data, iac]
+default_sense_points:
+  - mode: data
+    reason: "Who connects, from where, and whether snapshots are shared outside the account"
+attack_techniques: [T1078, T1213.006, T1565.001, T1485, T1537]
+importers: [aws_config, terraform_aws_provider]
+deploy_guide_template: guides/data.rds.md

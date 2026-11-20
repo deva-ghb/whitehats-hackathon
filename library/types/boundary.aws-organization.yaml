@@ -1,0 +1,37 @@
+id: boundary.aws-organization
+version: 1
+family: boundaries
+display_name: AWS Organization
+aliases: [aws org, organizations, control tower, landing zone]
+vendors: [Amazon Web Services]
+icon: boundary.aws-organization.svg
+properties:
+  - key: management_account_id
+    tier: required
+    type: string
+  - key: scps_enabled
+    tier: recommended
+    type: boolean
+  - key: organization_id
+    tier: derived
+    type: string
+  - key: member_account_count
+    tier: derived
+    type: number
+  - key: credential
+    tier: secret
+    type: string
+    scopes_hint: ["organizations:Describe*", "organizations:List*"]
+edges:
+  allowed_out: [emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [contained_in, depends_on]
+connection_test:
+  kind: aws_api
+  description: "Call organizations:DescribeOrganization with the read-only role, expect the organization id"
+whitehat_modes: [identity, iac]
+default_sense_points:
+  - mode: identity
+    reason: Service control policies and delegated admins decide what every account can do
+attack_techniques: [T1078.004, T1098.003, T1484.002, T1666]
+importers: [aws_organizations_api, terraform_aws_provider]
+deploy_guide_template: guides/boundary.aws-organization.md

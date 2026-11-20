@@ -1,0 +1,22 @@
+id: connection.github
+version: 1
+family: boundaries
+display_name: GitHub connection
+aliases: [github connection, github source]
+vendors: [GitHub]
+icon: connection.github.svg
+properties:
+  - key: connector
+    tier: required
+    type: string
+edges:
+  allowed_out: [depends_on, contained_in]
+  allowed_in: [contained_in, depends_on]
+connection_test:
+  kind: github_api
+  description: "Sign in as the WhiteHats GitHub App installation and read the repositories it can see"
+whitehat_modes: [code, supply_chain]
+default_sense_points: []
+attack_techniques: [T1195.002, T1213.003]
+importers: [connector]
+deploy_guide_template: guides/connection.github.md

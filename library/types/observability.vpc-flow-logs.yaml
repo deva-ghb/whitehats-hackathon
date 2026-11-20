@@ -1,0 +1,35 @@
+id: observability.vpc-flow-logs
+version: 1
+family: observability
+display_name: Amazon VPC Flow Logs
+aliases: [vpc flow logs, flow logs, netflow]
+vendors: [Amazon Web Services]
+icon: observability.vpc-flow-logs.svg
+properties:
+  - key: flow_log_id
+    tier: required
+    type: string
+  - key: destination
+    tier: required
+    type: enum
+    values: [cloudwatch_logs, s3, firehose]
+  - key: traffic_type
+    tier: recommended
+    type: enum
+    values: [all, accept, reject]
+  - key: retention_days
+    tier: recommended
+    type: number
+edges:
+  allowed_out: [emits_telemetry_to, writes, depends_on, contained_in]
+  allowed_in: [emits_telemetry_to, depends_on]
+connection_test:
+  kind: aws_api
+  description: "Call ec2:DescribeFlowLogs with the read-only role, expect status ACTIVE"
+whitehat_modes: [network]
+default_sense_points:
+  - mode: network
+    reason: "Unexpected egress, lateral movement and exposed ports"
+attack_techniques: [T1685.002, T1046, T1048]
+importers: [aws_config, terraform_aws_provider]
+deploy_guide_template: guides/observability.vpc-flow-logs.md

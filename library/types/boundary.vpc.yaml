@@ -1,0 +1,46 @@
+id: boundary.vpc
+version: 1
+family: boundaries
+display_name: Virtual network (VPC or VNet)
+aliases: [vpc, vnet, virtual network, hub vnet, spoke vnet, vpc network]
+vendors: [Amazon Web Services, Microsoft, Google Cloud]
+icon: boundary.vpc.svg
+properties:
+  - key: cloud
+    tier: required
+    type: enum
+    values: [aws, azure, gcp, on_prem]
+  - key: cidr
+    tier: required
+    type: list
+  - key: region
+    tier: required
+    type: string
+  - key: egress
+    tier: recommended
+    type: enum
+    values: [nat, firewall, proxy, none]
+  - key: flow_logs
+    tier: recommended
+    type: boolean
+  - key: route_tables
+    tier: derived
+    type: list
+  - key: peerings
+    tier: derived
+    type: list
+edges:
+  allowed_out: [emits_telemetry_to, peers_with, routes_through, depends_on, contained_in]
+  allowed_in: [contained_in, peers_with, depends_on]
+connection_test:
+  kind: cloud_api
+  description: "Describe the network through the read-only role (ec2:DescribeVpcs or Microsoft.Network/virtualNetworks/read), expect the CIDR to match"
+whitehat_modes: [network, iac]
+default_sense_points:
+  - mode: network
+    reason: Flow logs show unexpected egress and lateral movement
+  - mode: iac
+    reason: "Open security groups, missing flow logs and broad peering are configuration findings"
+attack_techniques: [T1046, T1048, T1572, T1686.001]
+importers: [aws_config, azure_resource_graph, terraform_aws_provider, terraform_azurerm_provider, bicep]
+deploy_guide_template: guides/boundary.vpc.md

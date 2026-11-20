@@ -1,0 +1,37 @@
+id: ai.langfuse
+version: 1
+family: ai
+display_name: Langfuse (LLM tracing)
+aliases: [langfuse, llm tracing, llm observability]
+vendors: [Langfuse]
+icon: ai.langfuse.svg
+properties:
+  - key: host
+    tier: required
+    type: url
+  - key: project
+    tier: required
+    type: string
+  - key: retention_days
+    tier: recommended
+    type: number
+  - key: masking
+    tier: recommended
+    type: boolean
+  - key: credential
+    tier: secret
+    type: string
+    scopes_hint: [public and secret key pair scoped to one project]
+edges:
+  allowed_out: [emits_telemetry_to, writes, depends_on, contained_in]
+  allowed_in: [emits_telemetry_to, depends_on]
+connection_test:
+  kind: http
+  description: "Read one trace with the project key pair, expect 200"
+whitehat_modes: [ai, telemetry]
+default_sense_points:
+  - mode: ai
+    reason: Prompts and tool calls show injection attempts and personal data leaking
+attack_techniques: [T1213, T1552.001]
+importers: [manual]
+deploy_guide_template: guides/ai.langfuse.md

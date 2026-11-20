@@ -1,0 +1,40 @@
+id: messaging.service-bus
+version: 1
+family: messaging
+display_name: Azure Service Bus
+aliases: [service bus, asb, queue, topic]
+vendors: [Microsoft]
+icon: messaging.service-bus.svg
+properties:
+  - key: namespace
+    tier: required
+    type: string
+  - key: local_auth_enabled
+    tier: recommended
+    type: boolean
+  - key: public_network_access
+    tier: recommended
+    type: boolean
+  - key: entities
+    tier: derived
+    type: list
+  - key: resource_id
+    tier: derived
+    type: string
+  - key: credential
+    tier: secret
+    type: string
+    scopes_hint: [Reader]
+edges:
+  allowed_out: [emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [publishes_to, consumes_from, depends_on]
+connection_test:
+  kind: azure_api
+  description: "Read the namespace with the Reader role, expect 200; never receive messages"
+whitehat_modes: [messaging]
+default_sense_points:
+  - mode: messaging
+    reason: Shared access keys with Send rights let anyone inject messages
+attack_techniques: [T1565, T1499.003]
+importers: [azure_resource_graph, bicep, terraform_azurerm_provider]
+deploy_guide_template: guides/messaging.service-bus.md

@@ -1,0 +1,47 @@
+id: data.dynamodb
+version: 1
+family: data
+display_name: Amazon DynamoDB table
+aliases: [dynamodb, dynamo, nosql, key value store]
+vendors: [Amazon Web Services]
+icon: data.dynamodb.svg
+properties:
+  - key: table_name
+    tier: required
+    type: string
+  - key: region
+    tier: required
+    type: string
+  - key: point_in_time_recovery
+    tier: recommended
+    type: boolean
+  - key: encryption
+    tier: recommended
+    type: enum
+    values: [aws_owned, aws_managed, customer_managed]
+  - key: deletion_protection
+    tier: recommended
+    type: boolean
+  - key: streams
+    tier: optional
+    type: boolean
+  - key: arn
+    tier: derived
+    type: string
+  - key: credential
+    tier: secret
+    type: string
+    scopes_hint: ["dynamodb:DescribeTable"]
+edges:
+  allowed_out: [publishes_to, replicates_to, backs_up_to, emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [reads, writes, replicates_to, backs_up_to, depends_on]
+connection_test:
+  kind: aws_api
+  description: "Call dynamodb:DescribeTable with the read-only role, expect 200; never read items"
+whitehat_modes: [data, iac]
+default_sense_points:
+  - mode: data
+    reason: Bulk reads and exports of customer records show up in CloudTrail data events
+attack_techniques: [T1530, T1565.001, T1485, T1078.004]
+importers: [aws_config, terraform_aws_provider]
+deploy_guide_template: guides/data.dynamodb.md

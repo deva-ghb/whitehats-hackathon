@@ -1,0 +1,34 @@
+id: boundary.corporate-network
+version: 1
+family: boundaries
+display_name: Corporate network (trust zone)
+aliases: [office network, on-prem network, firm network, trust zone, lan]
+vendors: []
+icon: boundary.corporate-network.svg
+properties:
+  - key: owner_org
+    tier: required
+    type: string
+  - key: cidr
+    tier: recommended
+    type: list
+  - key: remote_access
+    tier: recommended
+    type: enum
+    values: [vpn, ztna, none]
+  - key: vpn_product
+    tier: optional
+    type: string
+edges:
+  allowed_out: [emits_telemetry_to, peers_with, routes_through, depends_on, contained_in]
+  allowed_in: [contained_in, peers_with, depends_on]
+connection_test:
+  kind: manual
+  description: A person confirms the address ranges and who can join this network
+whitehat_modes: [network, identity]
+default_sense_points:
+  - mode: network
+    reason: Traffic from this zone into production is a trusted path an attacker can borrow
+attack_techniques: [T1133, T1199, T1046]
+importers: [drawio]
+deploy_guide_template: guides/boundary.corporate-network.md

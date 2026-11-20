@@ -1,0 +1,37 @@
+id: boundary.subscription
+version: 1
+family: boundaries
+display_name: Azure subscription
+aliases: [subscription, azure subscription, sub]
+vendors: [Microsoft]
+icon: boundary.subscription.svg
+properties:
+  - key: subscription_id
+    tier: required
+    type: string
+  - key: purpose
+    tier: recommended
+    type: enum
+    values: [prod, nonprod, shared, sandbox]
+  - key: management_group
+    tier: derived
+    type: string
+  - key: credential
+    tier: secret
+    type: string
+    scopes_hint: [Reader, Log Analytics Reader]
+edges:
+  allowed_out: [emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [contained_in, depends_on]
+connection_test:
+  kind: azure_api
+  description: "Read the subscription with the Reader role, expect state Enabled"
+whitehat_modes: [identity, iac]
+default_sense_points:
+  - mode: identity
+    reason: The Activity Log shows role assignments and resource changes
+  - mode: iac
+    reason: Defender for Cloud recommendations and policy compliance
+attack_techniques: [T1078.004, T1098.003, T1580, T1685.002]
+importers: [azure_resource_graph, bicep, terraform_azurerm_provider]
+deploy_guide_template: guides/boundary.subscription.md

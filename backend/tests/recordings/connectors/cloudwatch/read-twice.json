@@ -1,0 +1,151 @@
+{
+  "about": "Recorded from moto, the AWS simulator, on 2026-10-23. Shapes are AWS's; the data is invented.",
+  "clock": 1792756519.0,
+  "calls": [
+    {
+      "service": "sts",
+      "method": "assume_role",
+      "params": {
+        "RoleArn": "arn:aws:iam::111122223333:role/whitehats-reader",
+        "RoleSessionName": "whitehats-reader",
+        "ExternalId": "recorded-external-id"
+      },
+      "response": {
+        "Credentials": {
+          "AccessKeyId": "recorded-placeholder",
+          "SecretAccessKey": "recorded-placeholder",
+          "SessionToken": "recorded-placeholder",
+          "Expiration": "2030-01-01T00:00:00Z"
+        },
+        "AssumedRoleUser": {
+          "AssumedRoleId": "AROA3X42LBCDGG7FH58VT:whitehats-reader",
+          "Arn": "arn:aws:sts::111122223333:assumed-role/whitehats-reader/whitehats-reader"
+        },
+        "PackedPolicySize": 6
+      }
+    },
+    {
+      "service": "logs",
+      "method": "filter_log_events",
+      "params": {
+        "logGroupName": "cloudtrail",
+        "startTime": 1792752919000,
+        "limit": 2
+      },
+      "response": {
+        "events": [
+          {
+            "logStreamName": "s1",
+            "timestamp": 1792756459000,
+            "message": "{\"eventName\": \"StopLogging\", \"userIdentity\": {\"type\": \"IAMUser\", \"arn\": \"arn:aws:iam::1:user/mallory\"}}",
+            "ingestionTime": 1792756519182,
+            "eventId": "0"
+          },
+          {
+            "logStreamName": "s1",
+            "timestamp": 1792756459001,
+            "message": "{\"eventName\": \"ConsoleLogin\", \"userIdentity\": {\"type\": \"Root\", \"arn\": \"arn:aws:iam::1:root\"}, \"responseElements\": {\"ConsoleLogin\": \"Success\"}, \"sourceIPAddress\": \"203.0.113.5\"}",
+            "ingestionTime": 1792756519182,
+            "eventId": "1"
+          }
+        ],
+        "searchedLogStreams": [
+          {
+            "logStreamName": "s1",
+            "searchedCompletely": true
+          }
+        ],
+        "nextToken": "cloudtrail@s1@1"
+      }
+    },
+    {
+      "service": "logs",
+      "method": "filter_log_events",
+      "params": {
+        "logGroupName": "cloudtrail",
+        "startTime": 1792752919000,
+        "limit": 2,
+        "nextToken": "cloudtrail@s1@1"
+      },
+      "response": {
+        "events": [
+          {
+            "logStreamName": "s1",
+            "timestamp": 1792756459002,
+            "message": "{\"eventName\": \"CreateAccessKey\", \"userIdentity\": {\"type\": \"IAMUser\", \"arn\": \"arn:aws:iam::1:user/dev\"}}",
+            "ingestionTime": 1792756519182,
+            "eventId": "2"
+          }
+        ],
+        "searchedLogStreams": [
+          {
+            "logStreamName": "s1",
+            "searchedCompletely": true
+          }
+        ]
+      }
+    },
+    {
+      "service": "logs",
+      "method": "filter_log_events",
+      "params": {
+        "logGroupName": "/aws/lambda/payments",
+        "startTime": 1792752919000,
+        "limit": 2
+      },
+      "response": {
+        "events": [
+          {
+            "logStreamName": "s1",
+            "timestamp": 1792756459000,
+            "message": "{\"level\": \"error\", \"message\": \"payment provider timed out after 30s\"}",
+            "ingestionTime": 1792756519184,
+            "eventId": "3"
+          }
+        ],
+        "searchedLogStreams": [
+          {
+            "logStreamName": "s1",
+            "searchedCompletely": true
+          }
+        ]
+      }
+    },
+    {
+      "service": "logs",
+      "method": "filter_log_events",
+      "params": {
+        "logGroupName": "cloudtrail",
+        "startTime": 1792756459003,
+        "limit": 2
+      },
+      "response": {
+        "events": [],
+        "searchedLogStreams": [
+          {
+            "logStreamName": "s1",
+            "searchedCompletely": true
+          }
+        ]
+      }
+    },
+    {
+      "service": "logs",
+      "method": "filter_log_events",
+      "params": {
+        "logGroupName": "/aws/lambda/payments",
+        "startTime": 1792756459001,
+        "limit": 2
+      },
+      "response": {
+        "events": [],
+        "searchedLogStreams": [
+          {
+            "logStreamName": "s1",
+            "searchedCompletely": true
+          }
+        ]
+      }
+    }
+  ]
+}

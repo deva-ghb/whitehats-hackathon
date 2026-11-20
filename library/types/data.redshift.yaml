@@ -1,0 +1,39 @@
+id: data.redshift
+version: 1
+family: data
+display_name: Amazon Redshift
+aliases: [redshift, data warehouse, warehouse, analytics]
+vendors: [Amazon Web Services]
+icon: data.redshift.svg
+properties:
+  - key: cluster_identifier
+    tier: required
+    type: string
+  - key: region
+    tier: required
+    type: string
+  - key: publicly_accessible
+    tier: recommended
+    type: boolean
+  - key: encrypted
+    tier: recommended
+    type: boolean
+  - key: audit_logging
+    tier: recommended
+    type: boolean
+  - key: arn
+    tier: derived
+    type: string
+edges:
+  allowed_out: [replicates_to, backs_up_to, emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [reads, writes, replicates_to, backs_up_to, depends_on]
+connection_test:
+  kind: aws_api
+  description: "Call redshift:DescribeClusters with the read-only role, expect 200; never run queries"
+whitehat_modes: [data]
+default_sense_points:
+  - mode: data
+    reason: Analytics copies of production data are often the least protected
+attack_techniques: [T1530, T1213.006, T1537, T1078.004]
+importers: [aws_config, terraform_aws_provider]
+deploy_guide_template: guides/data.redshift.md

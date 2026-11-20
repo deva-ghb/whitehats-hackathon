@@ -1,0 +1,39 @@
+id: identity.key-vault
+version: 1
+family: identity
+display_name: Azure Key Vault
+aliases: [key vault, keyvault, akv, secret store]
+vendors: [Microsoft]
+icon: identity.key-vault.svg
+properties:
+  - key: vault_name
+    tier: required
+    type: string
+  - key: rbac_authorization
+    tier: recommended
+    type: boolean
+  - key: purge_protection
+    tier: recommended
+    type: boolean
+  - key: public_network_access
+    tier: recommended
+    type: boolean
+  - key: secret_names
+    tier: derived
+    type: list
+  - key: resource_id
+    tier: derived
+    type: string
+edges:
+  allowed_out: [emits_telemetry_to, replicates_to, backs_up_to, depends_on, contained_in]
+  allowed_in: [stores_secret_in, reads, depends_on]
+connection_test:
+  kind: azure_api
+  description: "Read the vault with the Reader role, expect 200; never read a secret value"
+whitehat_modes: [identity, secrets]
+default_sense_points:
+  - mode: secrets
+    reason: "Who reads which secret, and access policies broader than needed"
+attack_techniques: [T1555.006, T1078.004]
+importers: [azure_resource_graph, bicep, terraform_azurerm_provider]
+deploy_guide_template: guides/identity.key-vault.md

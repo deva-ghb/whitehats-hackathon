@@ -1,0 +1,36 @@
+id: data.search
+version: 1
+family: data
+display_name: Azure AI Search
+aliases: [ai search, cognitive search, search index, vector search]
+vendors: [Microsoft]
+icon: data.search.svg
+properties:
+  - key: service_name
+    tier: required
+    type: string
+  - key: api_key_auth
+    tier: recommended
+    type: boolean
+  - key: public_network_access
+    tier: recommended
+    type: boolean
+  - key: indexes
+    tier: derived
+    type: list
+  - key: resource_id
+    tier: derived
+    type: string
+edges:
+  allowed_out: [replicates_to, backs_up_to, emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [reads, writes, replicates_to, backs_up_to, depends_on]
+connection_test:
+  kind: azure_api
+  description: "Read the search service with the Reader role, expect 200"
+whitehat_modes: [data, ai]
+default_sense_points:
+  - mode: ai
+    reason: Content poisoned here flows straight into model answers
+attack_techniques: [T1213, T1565.001]
+importers: [azure_resource_graph, bicep]
+deploy_guide_template: guides/data.search.md

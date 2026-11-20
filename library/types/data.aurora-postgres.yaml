@@ -1,0 +1,53 @@
+id: data.aurora-postgres
+version: 1
+family: data
+display_name: Amazon Aurora PostgreSQL
+aliases: [aurora, postgres, postgresql, rds, aurora postgres]
+vendors: [Amazon Web Services]
+icon: data.aurora-postgres.svg
+properties:
+  - key: cluster_identifier
+    tier: required
+    type: string
+  - key: region
+    tier: required
+    type: string
+  - key: engine
+    tier: required
+    type: enum
+    values: [aurora-postgresql, aurora-mysql]
+  - key: storage_encrypted
+    tier: recommended
+    type: boolean
+  - key: publicly_accessible
+    tier: recommended
+    type: boolean
+  - key: iam_auth
+    tier: recommended
+    type: boolean
+  - key: audit_logging
+    tier: recommended
+    type: boolean
+  - key: backup_retention_days
+    tier: recommended
+    type: number
+  - key: arn
+    tier: derived
+    type: string
+  - key: credential
+    tier: secret
+    type: string
+    scopes_hint: ["rds:DescribeDBClusters", "rds:DescribeDBClusterSnapshots"]
+edges:
+  allowed_out: [replicates_to, backs_up_to, emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [reads, writes, replicates_to, backs_up_to, depends_on]
+connection_test:
+  kind: aws_api
+  description: "Call rds:DescribeDBClusters with the read-only role, expect 200; never connect to the database"
+whitehat_modes: [data, iac]
+default_sense_points:
+  - mode: data
+    reason: "Crown-jewel data: who connects, from where, and whether snapshots leave the account"
+attack_techniques: [T1078, T1213.006, T1565.001, T1485, T1537]
+importers: [aws_config, terraform_aws_provider]
+deploy_guide_template: guides/data.aurora-postgres.md

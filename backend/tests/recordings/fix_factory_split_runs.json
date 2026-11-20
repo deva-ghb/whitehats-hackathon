@@ -1,0 +1,1419 @@
+{
+  "about": "Real Fix Factory answers to GET /api/runs/<id> from the pull request line, recorded 2026-10-26 on the factory's test repo (factory/tests/split_repo): one fix across shop/, worker/ and terraform/. The agent is the scripted stand-in from factory/tests/test_pipeline.py and GitHub is the stand-in in factory/tests/fake_github.py, so the pull request links point at github.example. opened: three pull requests open, CI passed on each. merged: the same run after all three were merged. ci_failed: a second run whose CI on pull request #2 was made to fail.",
+  "opened": {
+    "run_id": "WH-INT-LOG-1-20261026143108364612",
+    "mode": "live",
+    "item": {
+      "id": "WH-INT-LOG-1",
+      "repo": "shop",
+      "title": "Errors are not logged with a request id",
+      "summary": "Both services swallow their error paths without a log line, and the log groups never expire.",
+      "severity": "high",
+      "source": "whitehats",
+      "reply_to": {},
+      "has_proof": true
+    },
+    "status": "verified",
+    "note": "",
+    "score": 85,
+    "score_parts": [
+      {
+        "label": "Proof passes after the fix",
+        "points": 40,
+        "max": 40
+      },
+      {
+        "label": "Project tests pass",
+        "points": 20,
+        "max": 20
+      },
+      {
+        "label": "No new scanner findings",
+        "points": 0,
+        "max": 15
+      },
+      {
+        "label": "Independent reviewer approves",
+        "points": 15,
+        "max": 15
+      },
+      {
+        "label": "Fixed on the first try",
+        "points": 10,
+        "max": 10
+      }
+    ],
+    "cost_usd": 0.07,
+    "seconds": 2.0,
+    "branch": "",
+    "delivered": "https://github.example/acme/shop/pull/1 https://github.example/acme/shop/pull/2 https://github.example/acme/shop/pull/3",
+    "verification": [
+      {
+        "check": "Proof of weakness, every piece applied",
+        "before": "failed",
+        "after": "passed"
+      },
+      {
+        "check": "Tests for shop-api",
+        "before": "passed",
+        "after": "passed"
+      },
+      {
+        "check": "Tests for payments-worker",
+        "before": "passed",
+        "after": "passed"
+      },
+      {
+        "check": "Tests for infrastructure",
+        "before": "passed",
+        "after": "passed"
+      },
+      {
+        "check": "All tests, every piece applied",
+        "before": "",
+        "after": "passed"
+      },
+      {
+        "check": "CI on pull request #1 (shop-api)",
+        "before": "",
+        "after": "passed"
+      },
+      {
+        "check": "CI on pull request #2 (payments-worker)",
+        "before": "",
+        "after": "passed"
+      },
+      {
+        "check": "CI on pull request #3 (infrastructure)",
+        "before": "",
+        "after": "passed"
+      }
+    ],
+    "triage": {
+      "in_scope": true,
+      "reason": "two services swallow errors and the log groups keep logs forever",
+      "pieces": [
+        {
+          "part": "infrastructure",
+          "plan": "set retention_in_days on both log groups"
+        },
+        {
+          "part": "payments-worker",
+          "plan": "log the refused job with its request id"
+        },
+        {
+          "part": "shop-api",
+          "plan": "log the refused order with its request id"
+        }
+      ]
+    },
+    "attempts": [],
+    "review": {
+      "approve": true,
+      "summary": "shop-api: logs the error path with the request id payments-worker: logs the error path with the request id infrastructure: logs the error path with the request id",
+      "concerns": []
+    },
+    "diff": "diff --git a/shop/orders.py b/shop/orders.py\nindex 2f318aa..f8a4242 100644\n--- a/shop/orders.py\n+++ b/shop/orders.py\n@@ -9,4 +9,5 @@ def place_order(request_id: str, payload: dict) -> dict:\n     try:\n         return {\"ok\": True, \"total\": payload[\"qty\"] * payload[\"price\"]}\n     except KeyError:\n+        log.error(\"order refused request_id=%s\", request_id)\n         return {\"ok\": False}\ndiff --git a/worker/jobs.py b/worker/jobs.py\nindex b62261b..98e609c 100644\n--- a/worker/jobs.py\n+++ b/worker/jobs.py\n@@ -9,4 +9,5 @@ def charge(request_id: str, job: dict) -> bool:\n     try:\n         return job[\"amount\"] > 0\n     except KeyError:\n+        log.error(\"job refused request_id=%s\", request_id)\n         return False\ndiff --git a/terraform/main.tf b/terraform/main.tf\nindex dc6a3f8..a980492 100644\n--- a/terraform/main.tf\n+++ b/terraform/main.tf\n@@ -1,7 +1,9 @@\n resource \"aws_cloudwatch_log_group\" \"shop\" {\n-  name = \"/whitehats-test/shop\"\n+  name              = \"/whitehats-test/shop\"\n+  retention_in_days = 30\n }\n \n resource \"aws_cloudwatch_log_group\" \"worker\" {\n-  name = \"/whitehats-test/worker\"\n+  name              = \"/whitehats-test/worker\"\n+  retention_in_days = 30\n }\n",
+    "pieces": [
+      {
+        "number": 1,
+        "total": 3,
+        "part": "shop-api",
+        "kind": "service",
+        "touches": "shop/",
+        "plan": "log the refused order with its request id",
+        "branch": "fix-factory/WH-INT-LOG-1-20261026143108364612/1-shop-api",
+        "proven": true,
+        "files": [
+          "shop/orders.py"
+        ],
+        "attempts": 1,
+        "tests": {
+          "before": "passed",
+          "after": "passed"
+        },
+        "review": {
+          "approve": true,
+          "concerns": [],
+          "summary": "logs the error path with the request id"
+        },
+        "diff": "diff --git a/shop/orders.py b/shop/orders.py\nindex 2f318aa..f8a4242 100644\n--- a/shop/orders.py\n+++ b/shop/orders.py\n@@ -9,4 +9,5 @@ def place_order(request_id: str, payload: dict) -> dict:\n     try:\n         return {\"ok\": True, \"total\": payload[\"qty\"] * payload[\"price\"]}\n     except KeyError:\n+        log.error(\"order refused request_id=%s\", request_id)\n         return {\"ok\": False}\n",
+        "pull_request": {
+          "number": 1,
+          "url": "https://github.example/acme/shop/pull/1",
+          "head_sha": "61396d1ff009e440d654ac827d6d113f943c9b19"
+        },
+        "ci": {
+          "state": "passed",
+          "checks": 1,
+          "failing": []
+        },
+        "merged": null
+      },
+      {
+        "number": 2,
+        "total": 3,
+        "part": "payments-worker",
+        "kind": "service",
+        "touches": "worker/",
+        "plan": "log the refused job with its request id",
+        "branch": "fix-factory/WH-INT-LOG-1-20261026143108364612/2-payments-worker",
+        "proven": true,
+        "files": [
+          "worker/jobs.py"
+        ],
+        "attempts": 1,
+        "tests": {
+          "before": "passed",
+          "after": "passed"
+        },
+        "review": {
+          "approve": true,
+          "concerns": [],
+          "summary": "logs the error path with the request id"
+        },
+        "diff": "diff --git a/worker/jobs.py b/worker/jobs.py\nindex b62261b..98e609c 100644\n--- a/worker/jobs.py\n+++ b/worker/jobs.py\n@@ -9,4 +9,5 @@ def charge(request_id: str, job: dict) -> bool:\n     try:\n         return job[\"amount\"] > 0\n     except KeyError:\n+        log.error(\"job refused request_id=%s\", request_id)\n         return False\n",
+        "pull_request": {
+          "number": 2,
+          "url": "https://github.example/acme/shop/pull/2",
+          "head_sha": "4f19820703a759bb857bf7046544e338fec4acdf"
+        },
+        "ci": {
+          "state": "passed",
+          "checks": 1,
+          "failing": []
+        },
+        "merged": null
+      },
+      {
+        "number": 3,
+        "total": 3,
+        "part": "infrastructure",
+        "kind": "infrastructure",
+        "touches": "terraform/",
+        "plan": "set retention_in_days on both log groups",
+        "branch": "fix-factory/WH-INT-LOG-1-20261026143108364612/3-infrastructure",
+        "proven": true,
+        "files": [
+          "terraform/main.tf"
+        ],
+        "attempts": 1,
+        "tests": {
+          "before": "passed",
+          "after": "passed"
+        },
+        "review": {
+          "approve": true,
+          "concerns": [],
+          "summary": "logs the error path with the request id"
+        },
+        "diff": "diff --git a/terraform/main.tf b/terraform/main.tf\nindex dc6a3f8..a980492 100644\n--- a/terraform/main.tf\n+++ b/terraform/main.tf\n@@ -1,7 +1,9 @@\n resource \"aws_cloudwatch_log_group\" \"shop\" {\n-  name = \"/whitehats-test/shop\"\n+  name              = \"/whitehats-test/shop\"\n+  retention_in_days = 30\n }\n \n resource \"aws_cloudwatch_log_group\" \"worker\" {\n-  name = \"/whitehats-test/worker\"\n+  name              = \"/whitehats-test/worker\"\n+  retention_in_days = 30\n }\n",
+        "pull_request": {
+          "number": 3,
+          "url": "https://github.example/acme/shop/pull/3",
+          "head_sha": "930996e98f924d7627f80045de2bdb4eb574c713"
+        },
+        "ci": {
+          "state": "passed",
+          "checks": 1,
+          "failing": []
+        },
+        "merged": null
+      }
+    ],
+    "order_rule": "Code first, one service at a time in the order the repo lists them; infrastructure last, so an infrastructure change never lands before the code it supports.",
+    "row": {
+      "id": "WH-INT-LOG-1-20261026143108364612",
+      "item_id": "WH-INT-LOG-1",
+      "repo": "shop",
+      "source": "whitehats",
+      "title": "Errors are not logged with a request id",
+      "status": "verified",
+      "score": 85,
+      "attempts": 3,
+      "cost_usd": 0.07,
+      "seconds": 2.0,
+      "delivered": "https://github.example/acme/shop/pull/1 https://github.example/acme/shop/pull/2 https://github.example/acme/shop/pull/3",
+      "started_at": "2026-10-26T14:31:08.364+00:00",
+      "finished_at": "2026-10-26T14:31:10.381+00:00",
+      "mode": "live",
+      "replay_of": null,
+      "approval": "pending",
+      "approved_at": null,
+      "merged": null
+    },
+    "events": [
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:08.395+00:00",
+        "stage": "intake",
+        "message": "Cloned shop into an isolated workspace to reproduce the weakness",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:08.395+00:00",
+        "stage": "reproduce",
+        "message": "Reproducing the weakness on the untouched code",
+        "level": "info"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:08.419+00:00",
+        "stage": "reproduce",
+        "message": "Weakness reproduced: silent error paths: ['req-shop-1', 'req-worker-1']; log groups without retention: 2",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:08.419+00:00",
+        "stage": "triage",
+        "message": "Reading the code to decide if the fix is in scope and which parts it touches",
+        "level": "info"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:08.420+00:00",
+        "stage": "triage",
+        "message": "In scope: two services swallow errors and the log groups keep logs forever",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:08.420+00:00",
+        "stage": "triage",
+        "message": "Split into 3 pull requests, in this order: 1. shop-api (code in shop/); 2. payments-worker (code in worker/); 3. infrastructure (infrastructure in terraform/).",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:08.420+00:00",
+        "stage": "triage",
+        "message": "Order rule: Code first, one service at a time in the order the repo lists them; infrastructure last, so an infrastructure change never lands before the code it supports.",
+        "level": "info"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:08.560+00:00",
+        "stage": "reproduce",
+        "message": "Piece 1 (shop-api): tests pass before any change",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:08.561+00:00",
+        "stage": "fix",
+        "message": "Piece 1 (shop-api), attempt 1: the agent is editing files in a sealed copy",
+        "level": "info"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:08.680+00:00",
+        "stage": "verify",
+        "message": "Piece 1 (shop-api), attempt 1 passed every check: changed shop/orders.py",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:08.846+00:00",
+        "stage": "reproduce",
+        "message": "Piece 2 (payments-worker): tests pass before any change",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:08.847+00:00",
+        "stage": "fix",
+        "message": "Piece 2 (payments-worker), attempt 1: the agent is editing files in a sealed copy",
+        "level": "info"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:08.968+00:00",
+        "stage": "verify",
+        "message": "Piece 2 (payments-worker), attempt 1 passed every check: changed worker/jobs.py",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:09.216+00:00",
+        "stage": "reproduce",
+        "message": "Piece 3 (infrastructure): tests pass before any change",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:09.216+00:00",
+        "stage": "fix",
+        "message": "Piece 3 (infrastructure), attempt 1: the agent is editing files in a sealed copy",
+        "level": "info"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:09.273+00:00",
+        "stage": "verify",
+        "message": "Piece 3 (infrastructure), attempt 1 passed every check: changed terraform/main.tf",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:09.310+00:00",
+        "stage": "verify",
+        "message": "Applying every piece in order to a fresh sealed copy and checking them together",
+        "level": "info"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:09.756+00:00",
+        "stage": "verify",
+        "message": "Together, in order: the proof passes and every test passes",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:09.757+00:00",
+        "stage": "review",
+        "message": "A separate reviewer is reading piece 1 (shop-api)",
+        "level": "info"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:09.757+00:00",
+        "stage": "review",
+        "message": "Piece 1 approved: logs the error path with the request id",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:09.758+00:00",
+        "stage": "review",
+        "message": "A separate reviewer is reading piece 2 (payments-worker)",
+        "level": "info"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:09.758+00:00",
+        "stage": "review",
+        "message": "Piece 2 approved: logs the error path with the request id",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:09.758+00:00",
+        "stage": "review",
+        "message": "A separate reviewer is reading piece 3 (infrastructure)",
+        "level": "info"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:09.758+00:00",
+        "stage": "review",
+        "message": "Piece 3 approved: logs the error path with the request id",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:09.974+00:00",
+        "stage": "deliver",
+        "message": "Pull request 1 of 3 opened for shop-api: #1 https://github.example/acme/shop/pull/1",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:10.177+00:00",
+        "stage": "deliver",
+        "message": "Pull request 2 of 3 opened for payments-worker: #2 https://github.example/acme/shop/pull/2",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:10.377+00:00",
+        "stage": "deliver",
+        "message": "Pull request 3 of 3 opened for infrastructure: #3 https://github.example/acme/shop/pull/3",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:10.378+00:00",
+        "stage": "verify",
+        "message": "Waiting for CI on #1, #2, #3",
+        "level": "info"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:10.380+00:00",
+        "stage": "verify",
+        "message": "CI passed on #1 (shop-api): 1 check",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:10.380+00:00",
+        "stage": "verify",
+        "message": "CI passed on #2 (payments-worker): 1 check",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:10.380+00:00",
+        "stage": "verify",
+        "message": "CI passed on #3 (infrastructure): 1 check",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:10.381+00:00",
+        "stage": "done",
+        "message": "verified, score 85/100",
+        "level": "ok"
+      }
+    ]
+  },
+  "merged": {
+    "run_id": "WH-INT-LOG-1-20261026143108364612",
+    "mode": "live",
+    "item": {
+      "id": "WH-INT-LOG-1",
+      "repo": "shop",
+      "title": "Errors are not logged with a request id",
+      "summary": "Both services swallow their error paths without a log line, and the log groups never expire.",
+      "severity": "high",
+      "source": "whitehats",
+      "reply_to": {},
+      "has_proof": true
+    },
+    "status": "verified",
+    "note": "",
+    "score": 85,
+    "score_parts": [
+      {
+        "label": "Proof passes after the fix",
+        "points": 40,
+        "max": 40
+      },
+      {
+        "label": "Project tests pass",
+        "points": 20,
+        "max": 20
+      },
+      {
+        "label": "No new scanner findings",
+        "points": 0,
+        "max": 15
+      },
+      {
+        "label": "Independent reviewer approves",
+        "points": 15,
+        "max": 15
+      },
+      {
+        "label": "Fixed on the first try",
+        "points": 10,
+        "max": 10
+      }
+    ],
+    "cost_usd": 0.07,
+    "seconds": 2.0,
+    "branch": "",
+    "delivered": "https://github.example/acme/shop/pull/1 https://github.example/acme/shop/pull/2 https://github.example/acme/shop/pull/3",
+    "verification": [
+      {
+        "check": "Proof of weakness, every piece applied",
+        "before": "failed",
+        "after": "passed"
+      },
+      {
+        "check": "Tests for shop-api",
+        "before": "passed",
+        "after": "passed"
+      },
+      {
+        "check": "Tests for payments-worker",
+        "before": "passed",
+        "after": "passed"
+      },
+      {
+        "check": "Tests for infrastructure",
+        "before": "passed",
+        "after": "passed"
+      },
+      {
+        "check": "All tests, every piece applied",
+        "before": "",
+        "after": "passed"
+      },
+      {
+        "check": "CI on pull request #1 (shop-api)",
+        "before": "",
+        "after": "passed"
+      },
+      {
+        "check": "CI on pull request #2 (payments-worker)",
+        "before": "",
+        "after": "passed"
+      },
+      {
+        "check": "CI on pull request #3 (infrastructure)",
+        "before": "",
+        "after": "passed"
+      }
+    ],
+    "triage": {
+      "in_scope": true,
+      "reason": "two services swallow errors and the log groups keep logs forever",
+      "pieces": [
+        {
+          "part": "infrastructure",
+          "plan": "set retention_in_days on both log groups"
+        },
+        {
+          "part": "payments-worker",
+          "plan": "log the refused job with its request id"
+        },
+        {
+          "part": "shop-api",
+          "plan": "log the refused order with its request id"
+        }
+      ]
+    },
+    "attempts": [],
+    "review": {
+      "approve": true,
+      "summary": "shop-api: logs the error path with the request id payments-worker: logs the error path with the request id infrastructure: logs the error path with the request id",
+      "concerns": []
+    },
+    "diff": "diff --git a/shop/orders.py b/shop/orders.py\nindex 2f318aa..f8a4242 100644\n--- a/shop/orders.py\n+++ b/shop/orders.py\n@@ -9,4 +9,5 @@ def place_order(request_id: str, payload: dict) -> dict:\n     try:\n         return {\"ok\": True, \"total\": payload[\"qty\"] * payload[\"price\"]}\n     except KeyError:\n+        log.error(\"order refused request_id=%s\", request_id)\n         return {\"ok\": False}\ndiff --git a/worker/jobs.py b/worker/jobs.py\nindex b62261b..98e609c 100644\n--- a/worker/jobs.py\n+++ b/worker/jobs.py\n@@ -9,4 +9,5 @@ def charge(request_id: str, job: dict) -> bool:\n     try:\n         return job[\"amount\"] > 0\n     except KeyError:\n+        log.error(\"job refused request_id=%s\", request_id)\n         return False\ndiff --git a/terraform/main.tf b/terraform/main.tf\nindex dc6a3f8..a980492 100644\n--- a/terraform/main.tf\n+++ b/terraform/main.tf\n@@ -1,7 +1,9 @@\n resource \"aws_cloudwatch_log_group\" \"shop\" {\n-  name = \"/whitehats-test/shop\"\n+  name              = \"/whitehats-test/shop\"\n+  retention_in_days = 30\n }\n \n resource \"aws_cloudwatch_log_group\" \"worker\" {\n-  name = \"/whitehats-test/worker\"\n+  name              = \"/whitehats-test/worker\"\n+  retention_in_days = 30\n }\n",
+    "pieces": [
+      {
+        "number": 1,
+        "total": 3,
+        "part": "shop-api",
+        "kind": "service",
+        "touches": "shop/",
+        "plan": "log the refused order with its request id",
+        "branch": "fix-factory/WH-INT-LOG-1-20261026143108364612/1-shop-api",
+        "proven": true,
+        "files": [
+          "shop/orders.py"
+        ],
+        "attempts": 1,
+        "tests": {
+          "before": "passed",
+          "after": "passed"
+        },
+        "review": {
+          "approve": true,
+          "concerns": [],
+          "summary": "logs the error path with the request id"
+        },
+        "diff": "diff --git a/shop/orders.py b/shop/orders.py\nindex 2f318aa..f8a4242 100644\n--- a/shop/orders.py\n+++ b/shop/orders.py\n@@ -9,4 +9,5 @@ def place_order(request_id: str, payload: dict) -> dict:\n     try:\n         return {\"ok\": True, \"total\": payload[\"qty\"] * payload[\"price\"]}\n     except KeyError:\n+        log.error(\"order refused request_id=%s\", request_id)\n         return {\"ok\": False}\n",
+        "pull_request": {
+          "number": 1,
+          "url": "https://github.example/acme/shop/pull/1",
+          "head_sha": "61396d1ff009e440d654ac827d6d113f943c9b19"
+        },
+        "ci": {
+          "state": "passed",
+          "checks": 1,
+          "failing": []
+        },
+        "merged": "1cb7d82bb6213df5c89b2ac847ea92345adc03e5"
+      },
+      {
+        "number": 2,
+        "total": 3,
+        "part": "payments-worker",
+        "kind": "service",
+        "touches": "worker/",
+        "plan": "log the refused job with its request id",
+        "branch": "fix-factory/WH-INT-LOG-1-20261026143108364612/2-payments-worker",
+        "proven": true,
+        "files": [
+          "worker/jobs.py"
+        ],
+        "attempts": 1,
+        "tests": {
+          "before": "passed",
+          "after": "passed"
+        },
+        "review": {
+          "approve": true,
+          "concerns": [],
+          "summary": "logs the error path with the request id"
+        },
+        "diff": "diff --git a/worker/jobs.py b/worker/jobs.py\nindex b62261b..98e609c 100644\n--- a/worker/jobs.py\n+++ b/worker/jobs.py\n@@ -9,4 +9,5 @@ def charge(request_id: str, job: dict) -> bool:\n     try:\n         return job[\"amount\"] > 0\n     except KeyError:\n+        log.error(\"job refused request_id=%s\", request_id)\n         return False\n",
+        "pull_request": {
+          "number": 2,
+          "url": "https://github.example/acme/shop/pull/2",
+          "head_sha": "4f19820703a759bb857bf7046544e338fec4acdf"
+        },
+        "ci": {
+          "state": "passed",
+          "checks": 1,
+          "failing": []
+        },
+        "merged": "99cc4a935d818c2426b3e7327a2f1179afc2081d"
+      },
+      {
+        "number": 3,
+        "total": 3,
+        "part": "infrastructure",
+        "kind": "infrastructure",
+        "touches": "terraform/",
+        "plan": "set retention_in_days on both log groups",
+        "branch": "fix-factory/WH-INT-LOG-1-20261026143108364612/3-infrastructure",
+        "proven": true,
+        "files": [
+          "terraform/main.tf"
+        ],
+        "attempts": 1,
+        "tests": {
+          "before": "passed",
+          "after": "passed"
+        },
+        "review": {
+          "approve": true,
+          "concerns": [],
+          "summary": "logs the error path with the request id"
+        },
+        "diff": "diff --git a/terraform/main.tf b/terraform/main.tf\nindex dc6a3f8..a980492 100644\n--- a/terraform/main.tf\n+++ b/terraform/main.tf\n@@ -1,7 +1,9 @@\n resource \"aws_cloudwatch_log_group\" \"shop\" {\n-  name = \"/whitehats-test/shop\"\n+  name              = \"/whitehats-test/shop\"\n+  retention_in_days = 30\n }\n \n resource \"aws_cloudwatch_log_group\" \"worker\" {\n-  name = \"/whitehats-test/worker\"\n+  name              = \"/whitehats-test/worker\"\n+  retention_in_days = 30\n }\n",
+        "pull_request": {
+          "number": 3,
+          "url": "https://github.example/acme/shop/pull/3",
+          "head_sha": "930996e98f924d7627f80045de2bdb4eb574c713"
+        },
+        "ci": {
+          "state": "passed",
+          "checks": 1,
+          "failing": []
+        },
+        "merged": "a186aa218a07fefce7815bdf0502477aa91c31c5"
+      }
+    ],
+    "order_rule": "Code first, one service at a time in the order the repo lists them; infrastructure last, so an infrastructure change never lands before the code it supports.",
+    "row": {
+      "id": "WH-INT-LOG-1-20261026143108364612",
+      "item_id": "WH-INT-LOG-1",
+      "repo": "shop",
+      "source": "whitehats",
+      "title": "Errors are not logged with a request id",
+      "status": "verified",
+      "score": 85,
+      "attempts": 3,
+      "cost_usd": 0.07,
+      "seconds": 2.0,
+      "delivered": "https://github.example/acme/shop/pull/1 https://github.example/acme/shop/pull/2 https://github.example/acme/shop/pull/3",
+      "started_at": "2026-10-26T14:31:08.364+00:00",
+      "finished_at": "2026-10-26T14:31:10.381+00:00",
+      "mode": "live",
+      "replay_of": null,
+      "approval": "approved",
+      "approved_at": "2026-10-26T14:31:10.638+00:00",
+      "merged": "1cb7d82bb6213df5c89b2ac847ea92345adc03e5,99cc4a935d818c2426b3e7327a2f1179afc2081d,a186aa218a07fefce7815bdf0502477aa91c31c5"
+    },
+    "events": [
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:08.395+00:00",
+        "stage": "intake",
+        "message": "Cloned shop into an isolated workspace to reproduce the weakness",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:08.395+00:00",
+        "stage": "reproduce",
+        "message": "Reproducing the weakness on the untouched code",
+        "level": "info"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:08.419+00:00",
+        "stage": "reproduce",
+        "message": "Weakness reproduced: silent error paths: ['req-shop-1', 'req-worker-1']; log groups without retention: 2",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:08.419+00:00",
+        "stage": "triage",
+        "message": "Reading the code to decide if the fix is in scope and which parts it touches",
+        "level": "info"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:08.420+00:00",
+        "stage": "triage",
+        "message": "In scope: two services swallow errors and the log groups keep logs forever",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:08.420+00:00",
+        "stage": "triage",
+        "message": "Split into 3 pull requests, in this order: 1. shop-api (code in shop/); 2. payments-worker (code in worker/); 3. infrastructure (infrastructure in terraform/).",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:08.420+00:00",
+        "stage": "triage",
+        "message": "Order rule: Code first, one service at a time in the order the repo lists them; infrastructure last, so an infrastructure change never lands before the code it supports.",
+        "level": "info"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:08.560+00:00",
+        "stage": "reproduce",
+        "message": "Piece 1 (shop-api): tests pass before any change",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:08.561+00:00",
+        "stage": "fix",
+        "message": "Piece 1 (shop-api), attempt 1: the agent is editing files in a sealed copy",
+        "level": "info"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:08.680+00:00",
+        "stage": "verify",
+        "message": "Piece 1 (shop-api), attempt 1 passed every check: changed shop/orders.py",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:08.846+00:00",
+        "stage": "reproduce",
+        "message": "Piece 2 (payments-worker): tests pass before any change",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:08.847+00:00",
+        "stage": "fix",
+        "message": "Piece 2 (payments-worker), attempt 1: the agent is editing files in a sealed copy",
+        "level": "info"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:08.968+00:00",
+        "stage": "verify",
+        "message": "Piece 2 (payments-worker), attempt 1 passed every check: changed worker/jobs.py",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:09.216+00:00",
+        "stage": "reproduce",
+        "message": "Piece 3 (infrastructure): tests pass before any change",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:09.216+00:00",
+        "stage": "fix",
+        "message": "Piece 3 (infrastructure), attempt 1: the agent is editing files in a sealed copy",
+        "level": "info"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:09.273+00:00",
+        "stage": "verify",
+        "message": "Piece 3 (infrastructure), attempt 1 passed every check: changed terraform/main.tf",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:09.310+00:00",
+        "stage": "verify",
+        "message": "Applying every piece in order to a fresh sealed copy and checking them together",
+        "level": "info"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:09.756+00:00",
+        "stage": "verify",
+        "message": "Together, in order: the proof passes and every test passes",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:09.757+00:00",
+        "stage": "review",
+        "message": "A separate reviewer is reading piece 1 (shop-api)",
+        "level": "info"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:09.757+00:00",
+        "stage": "review",
+        "message": "Piece 1 approved: logs the error path with the request id",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:09.758+00:00",
+        "stage": "review",
+        "message": "A separate reviewer is reading piece 2 (payments-worker)",
+        "level": "info"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:09.758+00:00",
+        "stage": "review",
+        "message": "Piece 2 approved: logs the error path with the request id",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:09.758+00:00",
+        "stage": "review",
+        "message": "A separate reviewer is reading piece 3 (infrastructure)",
+        "level": "info"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:09.758+00:00",
+        "stage": "review",
+        "message": "Piece 3 approved: logs the error path with the request id",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:09.974+00:00",
+        "stage": "deliver",
+        "message": "Pull request 1 of 3 opened for shop-api: #1 https://github.example/acme/shop/pull/1",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:10.177+00:00",
+        "stage": "deliver",
+        "message": "Pull request 2 of 3 opened for payments-worker: #2 https://github.example/acme/shop/pull/2",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:10.377+00:00",
+        "stage": "deliver",
+        "message": "Pull request 3 of 3 opened for infrastructure: #3 https://github.example/acme/shop/pull/3",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:10.378+00:00",
+        "stage": "verify",
+        "message": "Waiting for CI on #1, #2, #3",
+        "level": "info"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:10.380+00:00",
+        "stage": "verify",
+        "message": "CI passed on #1 (shop-api): 1 check",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:10.380+00:00",
+        "stage": "verify",
+        "message": "CI passed on #2 (payments-worker): 1 check",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:10.380+00:00",
+        "stage": "verify",
+        "message": "CI passed on #3 (infrastructure): 1 check",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:10.381+00:00",
+        "stage": "done",
+        "message": "verified, score 85/100",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143108364612",
+        "at": "2026-10-26T14:31:10.638+00:00",
+        "stage": "approve",
+        "message": "Merged on GitHub: #1 (shop-api), #2 (payments-worker), #3 (infrastructure)",
+        "level": "ok"
+      }
+    ]
+  },
+  "ci_failed": {
+    "run_id": "WH-INT-LOG-1-20261026143111224017",
+    "mode": "live",
+    "item": {
+      "id": "WH-INT-LOG-1",
+      "repo": "shop",
+      "title": "Errors are not logged with a request id",
+      "summary": "Both services swallow their error paths without a log line, and the log groups never expire.",
+      "severity": "high",
+      "source": "whitehats",
+      "reply_to": {},
+      "has_proof": true
+    },
+    "status": "ci_failed",
+    "note": "CI did not pass on #2 (payments-worker). The pull requests stay open for a person to look at",
+    "score": 85,
+    "score_parts": [
+      {
+        "label": "Proof passes after the fix",
+        "points": 40,
+        "max": 40
+      },
+      {
+        "label": "Project tests pass",
+        "points": 20,
+        "max": 20
+      },
+      {
+        "label": "No new scanner findings",
+        "points": 0,
+        "max": 15
+      },
+      {
+        "label": "Independent reviewer approves",
+        "points": 15,
+        "max": 15
+      },
+      {
+        "label": "Fixed on the first try",
+        "points": 10,
+        "max": 10
+      }
+    ],
+    "cost_usd": 0.07,
+    "seconds": 1.7,
+    "branch": "",
+    "delivered": "https://github.example/acme/shop/pull/1 https://github.example/acme/shop/pull/2 https://github.example/acme/shop/pull/3",
+    "verification": [
+      {
+        "check": "Proof of weakness, every piece applied",
+        "before": "failed",
+        "after": "passed"
+      },
+      {
+        "check": "Tests for shop-api",
+        "before": "passed",
+        "after": "passed"
+      },
+      {
+        "check": "Tests for payments-worker",
+        "before": "passed",
+        "after": "passed"
+      },
+      {
+        "check": "Tests for infrastructure",
+        "before": "passed",
+        "after": "passed"
+      },
+      {
+        "check": "All tests, every piece applied",
+        "before": "",
+        "after": "passed"
+      },
+      {
+        "check": "CI on pull request #1 (shop-api)",
+        "before": "",
+        "after": "passed"
+      },
+      {
+        "check": "CI on pull request #2 (payments-worker)",
+        "before": "",
+        "after": "failed"
+      },
+      {
+        "check": "CI on pull request #3 (infrastructure)",
+        "before": "",
+        "after": "passed"
+      }
+    ],
+    "triage": {
+      "in_scope": true,
+      "reason": "two services swallow errors and the log groups keep logs forever",
+      "pieces": [
+        {
+          "part": "infrastructure",
+          "plan": "set retention_in_days on both log groups"
+        },
+        {
+          "part": "payments-worker",
+          "plan": "log the refused job with its request id"
+        },
+        {
+          "part": "shop-api",
+          "plan": "log the refused order with its request id"
+        }
+      ]
+    },
+    "attempts": [],
+    "review": {
+      "approve": true,
+      "summary": "shop-api: logs the error path with the request id payments-worker: logs the error path with the request id infrastructure: logs the error path with the request id",
+      "concerns": []
+    },
+    "diff": "diff --git a/shop/orders.py b/shop/orders.py\nindex 2f318aa..f8a4242 100644\n--- a/shop/orders.py\n+++ b/shop/orders.py\n@@ -9,4 +9,5 @@ def place_order(request_id: str, payload: dict) -> dict:\n     try:\n         return {\"ok\": True, \"total\": payload[\"qty\"] * payload[\"price\"]}\n     except KeyError:\n+        log.error(\"order refused request_id=%s\", request_id)\n         return {\"ok\": False}\ndiff --git a/worker/jobs.py b/worker/jobs.py\nindex b62261b..98e609c 100644\n--- a/worker/jobs.py\n+++ b/worker/jobs.py\n@@ -9,4 +9,5 @@ def charge(request_id: str, job: dict) -> bool:\n     try:\n         return job[\"amount\"] > 0\n     except KeyError:\n+        log.error(\"job refused request_id=%s\", request_id)\n         return False\ndiff --git a/terraform/main.tf b/terraform/main.tf\nindex dc6a3f8..a980492 100644\n--- a/terraform/main.tf\n+++ b/terraform/main.tf\n@@ -1,7 +1,9 @@\n resource \"aws_cloudwatch_log_group\" \"shop\" {\n-  name = \"/whitehats-test/shop\"\n+  name              = \"/whitehats-test/shop\"\n+  retention_in_days = 30\n }\n \n resource \"aws_cloudwatch_log_group\" \"worker\" {\n-  name = \"/whitehats-test/worker\"\n+  name              = \"/whitehats-test/worker\"\n+  retention_in_days = 30\n }\n",
+    "pieces": [
+      {
+        "number": 1,
+        "total": 3,
+        "part": "shop-api",
+        "kind": "service",
+        "touches": "shop/",
+        "plan": "log the refused order with its request id",
+        "branch": "fix-factory/WH-INT-LOG-1-20261026143111224017/1-shop-api",
+        "proven": true,
+        "files": [
+          "shop/orders.py"
+        ],
+        "attempts": 1,
+        "tests": {
+          "before": "passed",
+          "after": "passed"
+        },
+        "review": {
+          "approve": true,
+          "concerns": [],
+          "summary": "logs the error path with the request id"
+        },
+        "diff": "diff --git a/shop/orders.py b/shop/orders.py\nindex 2f318aa..f8a4242 100644\n--- a/shop/orders.py\n+++ b/shop/orders.py\n@@ -9,4 +9,5 @@ def place_order(request_id: str, payload: dict) -> dict:\n     try:\n         return {\"ok\": True, \"total\": payload[\"qty\"] * payload[\"price\"]}\n     except KeyError:\n+        log.error(\"order refused request_id=%s\", request_id)\n         return {\"ok\": False}\n",
+        "pull_request": {
+          "number": 1,
+          "url": "https://github.example/acme/shop/pull/1",
+          "head_sha": "eb4cf6dfb28a38ca4bc9a686a6436423b380b9d3"
+        },
+        "ci": {
+          "state": "passed",
+          "checks": 1,
+          "failing": []
+        },
+        "merged": null
+      },
+      {
+        "number": 2,
+        "total": 3,
+        "part": "payments-worker",
+        "kind": "service",
+        "touches": "worker/",
+        "plan": "log the refused job with its request id",
+        "branch": "fix-factory/WH-INT-LOG-1-20261026143111224017/2-payments-worker",
+        "proven": true,
+        "files": [
+          "worker/jobs.py"
+        ],
+        "attempts": 1,
+        "tests": {
+          "before": "passed",
+          "after": "passed"
+        },
+        "review": {
+          "approve": true,
+          "concerns": [],
+          "summary": "logs the error path with the request id"
+        },
+        "diff": "diff --git a/worker/jobs.py b/worker/jobs.py\nindex b62261b..98e609c 100644\n--- a/worker/jobs.py\n+++ b/worker/jobs.py\n@@ -9,4 +9,5 @@ def charge(request_id: str, job: dict) -> bool:\n     try:\n         return job[\"amount\"] > 0\n     except KeyError:\n+        log.error(\"job refused request_id=%s\", request_id)\n         return False\n",
+        "pull_request": {
+          "number": 2,
+          "url": "https://github.example/acme/shop/pull/2",
+          "head_sha": "c6e07c49c727b463282486b1d9f3ba6106a41f18"
+        },
+        "ci": {
+          "state": "failed",
+          "checks": 1,
+          "failing": [
+            "ci"
+          ]
+        },
+        "merged": null
+      },
+      {
+        "number": 3,
+        "total": 3,
+        "part": "infrastructure",
+        "kind": "infrastructure",
+        "touches": "terraform/",
+        "plan": "set retention_in_days on both log groups",
+        "branch": "fix-factory/WH-INT-LOG-1-20261026143111224017/3-infrastructure",
+        "proven": true,
+        "files": [
+          "terraform/main.tf"
+        ],
+        "attempts": 1,
+        "tests": {
+          "before": "passed",
+          "after": "passed"
+        },
+        "review": {
+          "approve": true,
+          "concerns": [],
+          "summary": "logs the error path with the request id"
+        },
+        "diff": "diff --git a/terraform/main.tf b/terraform/main.tf\nindex dc6a3f8..a980492 100644\n--- a/terraform/main.tf\n+++ b/terraform/main.tf\n@@ -1,7 +1,9 @@\n resource \"aws_cloudwatch_log_group\" \"shop\" {\n-  name = \"/whitehats-test/shop\"\n+  name              = \"/whitehats-test/shop\"\n+  retention_in_days = 30\n }\n \n resource \"aws_cloudwatch_log_group\" \"worker\" {\n-  name = \"/whitehats-test/worker\"\n+  name              = \"/whitehats-test/worker\"\n+  retention_in_days = 30\n }\n",
+        "pull_request": {
+          "number": 3,
+          "url": "https://github.example/acme/shop/pull/3",
+          "head_sha": "0fcc9232bf4d1126a9bc3e33b7d46f9dd79877d5"
+        },
+        "ci": {
+          "state": "passed",
+          "checks": 1,
+          "failing": []
+        },
+        "merged": null
+      }
+    ],
+    "order_rule": "Code first, one service at a time in the order the repo lists them; infrastructure last, so an infrastructure change never lands before the code it supports.",
+    "row": {
+      "id": "WH-INT-LOG-1-20261026143111224017",
+      "item_id": "WH-INT-LOG-1",
+      "repo": "shop",
+      "source": "whitehats",
+      "title": "Errors are not logged with a request id",
+      "status": "ci_failed",
+      "score": 85,
+      "attempts": 3,
+      "cost_usd": 0.07,
+      "seconds": 1.7,
+      "delivered": "https://github.example/acme/shop/pull/1 https://github.example/acme/shop/pull/2 https://github.example/acme/shop/pull/3",
+      "started_at": "2026-10-26T14:31:11.224+00:00",
+      "finished_at": "2026-10-26T14:31:12.886+00:00",
+      "mode": "live",
+      "replay_of": null,
+      "approval": null,
+      "approved_at": null,
+      "merged": null
+    },
+    "events": [
+      {
+        "run_id": "WH-INT-LOG-1-20261026143111224017",
+        "at": "2026-10-26T14:31:11.255+00:00",
+        "stage": "intake",
+        "message": "Cloned shop into an isolated workspace to reproduce the weakness",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143111224017",
+        "at": "2026-10-26T14:31:11.255+00:00",
+        "stage": "reproduce",
+        "message": "Reproducing the weakness on the untouched code",
+        "level": "info"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143111224017",
+        "at": "2026-10-26T14:31:11.279+00:00",
+        "stage": "reproduce",
+        "message": "Weakness reproduced: silent error paths: ['req-shop-1', 'req-worker-1']; log groups without retention: 2",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143111224017",
+        "at": "2026-10-26T14:31:11.279+00:00",
+        "stage": "triage",
+        "message": "Reading the code to decide if the fix is in scope and which parts it touches",
+        "level": "info"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143111224017",
+        "at": "2026-10-26T14:31:11.279+00:00",
+        "stage": "triage",
+        "message": "In scope: two services swallow errors and the log groups keep logs forever",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143111224017",
+        "at": "2026-10-26T14:31:11.280+00:00",
+        "stage": "triage",
+        "message": "Split into 3 pull requests, in this order: 1. shop-api (code in shop/); 2. payments-worker (code in worker/); 3. infrastructure (infrastructure in terraform/).",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143111224017",
+        "at": "2026-10-26T14:31:11.280+00:00",
+        "stage": "triage",
+        "message": "Order rule: Code first, one service at a time in the order the repo lists them; infrastructure last, so an infrastructure change never lands before the code it supports.",
+        "level": "info"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143111224017",
+        "at": "2026-10-26T14:31:11.411+00:00",
+        "stage": "reproduce",
+        "message": "Piece 1 (shop-api): tests pass before any change",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143111224017",
+        "at": "2026-10-26T14:31:11.412+00:00",
+        "stage": "fix",
+        "message": "Piece 1 (shop-api), attempt 1: the agent is editing files in a sealed copy",
+        "level": "info"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143111224017",
+        "at": "2026-10-26T14:31:11.532+00:00",
+        "stage": "verify",
+        "message": "Piece 1 (shop-api), attempt 1 passed every check: changed shop/orders.py",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143111224017",
+        "at": "2026-10-26T14:31:11.699+00:00",
+        "stage": "reproduce",
+        "message": "Piece 2 (payments-worker): tests pass before any change",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143111224017",
+        "at": "2026-10-26T14:31:11.700+00:00",
+        "stage": "fix",
+        "message": "Piece 2 (payments-worker), attempt 1: the agent is editing files in a sealed copy",
+        "level": "info"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143111224017",
+        "at": "2026-10-26T14:31:11.822+00:00",
+        "stage": "verify",
+        "message": "Piece 2 (payments-worker), attempt 1 passed every check: changed worker/jobs.py",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143111224017",
+        "at": "2026-10-26T14:31:11.910+00:00",
+        "stage": "reproduce",
+        "message": "Piece 3 (infrastructure): tests pass before any change",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143111224017",
+        "at": "2026-10-26T14:31:11.911+00:00",
+        "stage": "fix",
+        "message": "Piece 3 (infrastructure), attempt 1: the agent is editing files in a sealed copy",
+        "level": "info"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143111224017",
+        "at": "2026-10-26T14:31:11.954+00:00",
+        "stage": "verify",
+        "message": "Piece 3 (infrastructure), attempt 1 passed every check: changed terraform/main.tf",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143111224017",
+        "at": "2026-10-26T14:31:11.990+00:00",
+        "stage": "verify",
+        "message": "Applying every piece in order to a fresh sealed copy and checking them together",
+        "level": "info"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143111224017",
+        "at": "2026-10-26T14:31:12.423+00:00",
+        "stage": "verify",
+        "message": "Together, in order: the proof passes and every test passes",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143111224017",
+        "at": "2026-10-26T14:31:12.423+00:00",
+        "stage": "review",
+        "message": "A separate reviewer is reading piece 1 (shop-api)",
+        "level": "info"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143111224017",
+        "at": "2026-10-26T14:31:12.423+00:00",
+        "stage": "review",
+        "message": "Piece 1 approved: logs the error path with the request id",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143111224017",
+        "at": "2026-10-26T14:31:12.424+00:00",
+        "stage": "review",
+        "message": "A separate reviewer is reading piece 2 (payments-worker)",
+        "level": "info"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143111224017",
+        "at": "2026-10-26T14:31:12.424+00:00",
+        "stage": "review",
+        "message": "Piece 2 approved: logs the error path with the request id",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143111224017",
+        "at": "2026-10-26T14:31:12.424+00:00",
+        "stage": "review",
+        "message": "A separate reviewer is reading piece 3 (infrastructure)",
+        "level": "info"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143111224017",
+        "at": "2026-10-26T14:31:12.424+00:00",
+        "stage": "review",
+        "message": "Piece 3 approved: logs the error path with the request id",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143111224017",
+        "at": "2026-10-26T14:31:12.634+00:00",
+        "stage": "deliver",
+        "message": "Pull request 1 of 3 opened for shop-api: #1 https://github.example/acme/shop/pull/1",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143111224017",
+        "at": "2026-10-26T14:31:12.679+00:00",
+        "stage": "deliver",
+        "message": "Pull request 2 of 3 opened for payments-worker: #2 https://github.example/acme/shop/pull/2",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143111224017",
+        "at": "2026-10-26T14:31:12.882+00:00",
+        "stage": "deliver",
+        "message": "Pull request 3 of 3 opened for infrastructure: #3 https://github.example/acme/shop/pull/3",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143111224017",
+        "at": "2026-10-26T14:31:12.882+00:00",
+        "stage": "verify",
+        "message": "Waiting for CI on #1, #2, #3",
+        "level": "info"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143111224017",
+        "at": "2026-10-26T14:31:12.884+00:00",
+        "stage": "verify",
+        "message": "CI passed on #1 (shop-api): 1 check",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143111224017",
+        "at": "2026-10-26T14:31:12.884+00:00",
+        "stage": "verify",
+        "message": "CI failed on #2 (payments-worker): ci",
+        "level": "fail"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143111224017",
+        "at": "2026-10-26T14:31:12.885+00:00",
+        "stage": "verify",
+        "message": "CI passed on #3 (infrastructure): 1 check",
+        "level": "ok"
+      },
+      {
+        "run_id": "WH-INT-LOG-1-20261026143111224017",
+        "at": "2026-10-26T14:31:12.886+00:00",
+        "stage": "done",
+        "message": "ci_failed, score 85/100",
+        "level": "fail"
+      }
+    ]
+  }
+}

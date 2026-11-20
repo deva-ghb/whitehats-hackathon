@@ -1,0 +1,44 @@
+id: messaging.sns
+version: 1
+family: messaging
+display_name: Amazon SNS topic
+aliases: [sns, topic, notifications, simple notification service]
+vendors: [Amazon Web Services]
+icon: messaging.sns.svg
+properties:
+  - key: topic_name
+    tier: required
+    type: string
+  - key: region
+    tier: required
+    type: string
+  - key: encryption
+    tier: recommended
+    type: enum
+    values: [sse_kms, none]
+  - key: subscriptions
+    tier: derived
+    type: list
+  - key: access_policy
+    tier: derived
+    type: string
+  - key: arn
+    tier: derived
+    type: string
+  - key: credential
+    tier: secret
+    type: string
+    scopes_hint: ["sns:GetTopicAttributes", "sns:ListSubscriptionsByTopic"]
+edges:
+  allowed_out: [publishes_to, emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [publishes_to, consumes_from, depends_on]
+connection_test:
+  kind: aws_api
+  description: "Call sns:GetTopicAttributes with the read-only role, expect 200"
+whitehat_modes: [messaging]
+default_sense_points:
+  - mode: messaging
+    reason: An outside subscription silently copies every message
+attack_techniques: [T1565, T1537]
+importers: [aws_config, terraform_aws_provider]
+deploy_guide_template: guides/messaging.sns.md

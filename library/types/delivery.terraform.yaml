@@ -1,0 +1,47 @@
+id: delivery.terraform
+version: 1
+family: code_and_delivery
+display_name: Terraform workspace
+aliases: [terraform, terraform cloud, tfc, hcp terraform, iac, terraform state]
+vendors: [HashiCorp]
+icon: delivery.terraform.svg
+properties:
+  - key: backend
+    tier: required
+    type: enum
+    values: [terraform_cloud, s3, azurerm, gcs, local]
+  - key: workspace
+    tier: required
+    type: string
+  - key: state_encrypted
+    tier: recommended
+    type: boolean
+  - key: state_locking
+    tier: recommended
+    type: boolean
+  - key: cloud_auth
+    tier: recommended
+    type: enum
+    values: [oidc, stored_keys, none]
+  - key: resource_count
+    tier: derived
+    type: number
+  - key: credential
+    tier: secret
+    type: string
+    scopes_hint: ["read state outputs only (Terraform Cloud: read-state-versions)", "s3:GetObject on the state key only"]
+edges:
+  allowed_out: [deploys_from, authenticates_via, runs_as, stores_secret_in, writes, emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [built_by, depends_on]
+connection_test:
+  kind: http
+  description: "Read the latest state version metadata, expect 200"
+whitehat_modes: [iac, secrets, supply_chain]
+default_sense_points:
+  - mode: iac
+    reason: The plan shows a public bucket or an open port before it exists
+  - mode: secrets
+    reason: "State files hold every output, including secrets"
+attack_techniques: [T1552.001, T1072, T1098.003]
+importers: [terraform_state, terraform_plan]
+deploy_guide_template: guides/delivery.terraform.md

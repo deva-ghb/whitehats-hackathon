@@ -1,0 +1,37 @@
+id: observability.log-analytics
+version: 1
+family: observability
+display_name: Azure Log Analytics workspace
+aliases: [log analytics, law, azure monitor logs, workspace]
+vendors: [Microsoft]
+icon: observability.log-analytics.svg
+properties:
+  - key: workspace_id
+    tier: required
+    type: string
+  - key: tables
+    tier: required
+    type: list
+  - key: retention_days
+    tier: recommended
+    type: number
+  - key: resource_id
+    tier: derived
+    type: string
+  - key: credential
+    tier: secret
+    type: string
+    scopes_hint: [Log Analytics Reader]
+edges:
+  allowed_out: [emits_telemetry_to, writes, depends_on, contained_in]
+  allowed_in: [emits_telemetry_to, depends_on]
+connection_test:
+  kind: azure_api
+  description: "Run a one-row query with Log Analytics Reader, expect 200"
+whitehat_modes: [telemetry, identity]
+default_sense_points:
+  - mode: telemetry
+    reason: Most Azure diagnostic logs land here
+attack_techniques: [T1685.002, T1070]
+importers: [azure_resource_graph, bicep, terraform_azurerm_provider]
+deploy_guide_template: guides/observability.log-analytics.md

@@ -1,0 +1,43 @@
+id: service.worker
+version: 1
+family: services
+display_name: Worker or back-office service
+aliases: [worker, consumer, background job, back office, batch job, fargate task]
+vendors: []
+icon: service.worker.svg
+properties:
+  - key: runtime
+    tier: required
+    type: string
+  - key: compute
+    tier: required
+    type: enum
+    values: [kubernetes, ecs_fargate, app_service, vm, lambda]
+  - key: schedule
+    tier: recommended
+    type: string
+  - key: tech_stack
+    tier: recommended
+    type: list
+  - key: config_sources
+    tier: recommended
+    type: list
+  - key: sbom
+    tier: derived
+    type: string
+  - key: packages
+    tier: optional
+    type: list
+edges:
+  allowed_out: [calls, publishes_to, consumes_from, reads, writes, deploys_from, runs_on, runs_as, routes_through, authenticates_via, stores_secret_in, emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [calls, depends_on]
+connection_test:
+  kind: cloud_api
+  description: "Read the task or deployment with the read-only role, expect it to be running"
+whitehat_modes: [code, supply_chain, secrets, telemetry]
+default_sense_points:
+  - mode: code
+    reason: Workers often skip the input checks the public API has
+attack_techniques: [T1059, T1565.001, T1552.001]
+importers: [kubernetes_api, aws_config, repo_scan]
+deploy_guide_template: guides/service.worker.md

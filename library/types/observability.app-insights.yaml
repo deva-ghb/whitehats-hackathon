@@ -1,0 +1,36 @@
+id: observability.app-insights
+version: 1
+family: observability
+display_name: Azure Application Insights
+aliases: [app insights, application insights, apm]
+vendors: [Microsoft]
+icon: observability.app-insights.svg
+properties:
+  - key: component_name
+    tier: required
+    type: string
+  - key: signals
+    tier: required
+    type: list
+  - key: workspace_based
+    tier: recommended
+    type: boolean
+  - key: retention_days
+    tier: recommended
+    type: number
+  - key: resource_id
+    tier: derived
+    type: string
+edges:
+  allowed_out: [emits_telemetry_to, writes, depends_on, contained_in]
+  allowed_in: [emits_telemetry_to, depends_on]
+connection_test:
+  kind: azure_api
+  description: "Run a one-row query with the Reader role, expect 200"
+whitehat_modes: [telemetry]
+default_sense_points:
+  - mode: telemetry
+    reason: Request failures and exceptions per service
+attack_techniques: [T1685.002, T1070]
+importers: [azure_resource_graph, bicep]
+deploy_guide_template: guides/observability.app-insights.md

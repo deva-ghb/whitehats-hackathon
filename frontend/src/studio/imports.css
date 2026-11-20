@@ -1,0 +1,50 @@
+/* Reviewing an import (PG.3). Colours, radii and type stay the tokens in styles.css. */
+.import-table .sr-only, .import-start .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.import-start { display: grid; grid-template-columns: minmax(0, 640px); gap: 20px; }
+.import-start .import-go { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.import-file { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.import-file .faint { overflow-wrap: anywhere; }
+.import-source .tabs { flex-wrap: wrap; overflow-x: visible; }  /* three sources do not fit a phone in one row */
+.import-note { font-size: 12.5px; color: var(--muted); max-width: 72ch; }
+.import-found { font-size: 13px; }
+
+.import-tools { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px 20px; flex-wrap: wrap; padding: 12px 20px 0; border-bottom: 1px solid var(--line); }
+.import-tools .tabs { border-bottom: 0; margin-bottom: 0; flex-wrap: wrap; overflow-x: visible; }
+.import-bulk { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding-bottom: 8px; font-size: 12.5px; }
+.import-table td { vertical-align: top; }
+.import-table td:first-child { max-width: 560px; }
+.import-title { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.import-title b { overflow-wrap: anywhere; }
+.import-detail { margin: 6px 0 0; padding-left: 18px; font-size: 12.5px; color: var(--ink-2); }
+.import-why { margin-top: 6px; font-size: 12.5px; color: var(--warn); }
+.import-type { position: relative; min-width: 200px; max-width: 260px; }
+.import-actions { white-space: nowrap; text-align: right; }
+.import-actions .btn + .btn { margin-left: 6px; }
+.import-row.rejected td { color: var(--muted); }
+.import-apply { display: flex; align-items: center; justify-content: space-between; gap: 12px 24px; flex-wrap: wrap; padding: 14px 20px; border-top: 1px solid var(--line); background: var(--surface-2); border-radius: 0 0 var(--r) var(--r); }
+.import-apply p { font-size: 13px; max-width: 64ch; }
+
+.makeup-row { display: grid; grid-template-columns: 200px minmax(0, 1fr) 260px; align-items: center; gap: 16px; }
+.makeup-label { font-weight: 700; font-size: 13px; }
+.makeup-figure { font-size: 13px; color: var(--ink-2); }
+.left-out summary { cursor: pointer; font-weight: 700; }
+.left-out { display: block; }
+.left-out p { margin-top: 8px; max-width: 72ch; }
+.left-out ul { margin: 8px 0 0; padding-left: 18px; columns: 2; column-gap: 32px; }
+.left-out li { break-inside: avoid; overflow-wrap: anywhere; }
+
+.import-history .t td { vertical-align: middle; }
+.import-history a { font-weight: 700; }
+
+@media (max-width: 1023px) {
+  .makeup-row { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .import-tools { padding: 8px 16px 0; }
+  .import-actions { text-align: left; white-space: normal; }
+  .import-actions .btn, .import-apply .btn, .import-bulk .btn, .import-file .btn, .import-start .btn { min-height: 44px; }
+  .import-type { max-width: none; }
+  .left-out ul { columns: 1; }
+}
+
+/* A link inside a sentence is underlined, so it never depends on colour alone. */
+.import-note a, .banner.good a { text-decoration: underline; font-weight: 700; }
+.import-type .select-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }

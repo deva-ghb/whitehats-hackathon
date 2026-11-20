@@ -1,0 +1,38 @@
+id: identity.ssm-parameter-store
+version: 1
+family: identity
+display_name: AWS Systems Manager Parameter Store
+aliases: [parameter store, ssm, ssm parameter, securestring]
+vendors: [Amazon Web Services]
+icon: identity.ssm-parameter-store.svg
+properties:
+  - key: parameter_path
+    tier: required
+    type: string
+  - key: region
+    tier: required
+    type: string
+  - key: type
+    tier: recommended
+    type: enum
+    values: [string, string_list, secure_string]
+  - key: kms_key
+    tier: recommended
+    type: string
+  - key: credential
+    tier: secret
+    type: string
+    scopes_hint: ["ssm:DescribeParameters"]
+edges:
+  allowed_out: [emits_telemetry_to, replicates_to, backs_up_to, depends_on, contained_in]
+  allowed_in: [stores_secret_in, reads, depends_on]
+connection_test:
+  kind: aws_api
+  description: "Call ssm:DescribeParameters with the read-only role, expect 200; never read a value"
+whitehat_modes: [identity, secrets]
+default_sense_points:
+  - mode: secrets
+    reason: A secret stored as a plain String parameter is readable by anyone with read access
+attack_techniques: [T1555.006, T1552.001]
+importers: [aws_config, terraform_aws_provider]
+deploy_guide_template: guides/identity.ssm-parameter-store.md

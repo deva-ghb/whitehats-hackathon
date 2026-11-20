@@ -1,0 +1,35 @@
+id: saas.persona
+version: 1
+family: saas
+display_name: Persona (identity verification)
+aliases: [persona, kyc, identity verification, withpersona]
+vendors: [Persona]
+icon: saas.persona.svg
+properties:
+  - key: environment
+    tier: required
+    type: enum
+    values: [sandbox, production]
+  - key: webhook_signatures_verified
+    tier: recommended
+    type: boolean
+  - key: data_shared
+    tier: recommended
+    type: string
+  - key: credential
+    tier: secret
+    type: string
+    scopes_hint: [API key with read access to inquiries metadata]
+edges:
+  allowed_out: [calls, syncs_with, emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [calls, syncs_with, depends_on]
+connection_test:
+  kind: http
+  description: "List one inquiry template with the API key, expect 200"
+whitehat_modes: [saas, data]
+default_sense_points:
+  - mode: data
+    reason: Identity documents and selfies are among the most sensitive data a fintech holds
+attack_techniques: [T1199, T1528, T1213]
+importers: [manual]
+deploy_guide_template: guides/saas.persona.md

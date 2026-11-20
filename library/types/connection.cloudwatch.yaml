@@ -1,0 +1,22 @@
+id: connection.cloudwatch
+version: 1
+family: boundaries
+display_name: CloudWatch logs connection
+aliases: [cloudwatch connection, cloudwatch source]
+vendors: [Amazon Web Services]
+icon: connection.cloudwatch.svg
+properties:
+  - key: connector
+    tier: required
+    type: string
+edges:
+  allowed_out: [depends_on, contained_in]
+  allowed_in: [contained_in, depends_on]
+connection_test:
+  kind: aws_api
+  description: "Assume the read-only role and read the named log groups"
+whitehat_modes: [telemetry]
+default_sense_points: []
+attack_techniques: [T1070, T1078.004]
+importers: [connector]
+deploy_guide_template: guides/connection.cloudwatch.md

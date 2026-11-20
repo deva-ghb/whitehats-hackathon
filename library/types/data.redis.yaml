@@ -1,0 +1,36 @@
+id: data.redis
+version: 1
+family: data
+display_name: Azure Cache for Redis
+aliases: [azure redis, redis, cache]
+vendors: [Microsoft]
+icon: data.redis.svg
+properties:
+  - key: cache_name
+    tier: required
+    type: string
+  - key: non_ssl_port_enabled
+    tier: recommended
+    type: boolean
+  - key: access_key_auth_disabled
+    tier: recommended
+    type: boolean
+  - key: public_network_access
+    tier: recommended
+    type: boolean
+  - key: resource_id
+    tier: derived
+    type: string
+edges:
+  allowed_out: [replicates_to, backs_up_to, emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [reads, writes, replicates_to, backs_up_to, depends_on]
+connection_test:
+  kind: azure_api
+  description: "Read the cache with the Reader role, expect 200"
+whitehat_modes: [data, network]
+default_sense_points:
+  - mode: data
+    reason: Access keys or the plain port let anyone on the network read sessions
+attack_techniques: [T1078.001, T1565.001, T1539]
+importers: [azure_resource_graph, bicep, terraform_azurerm_provider]
+deploy_guide_template: guides/data.redis.md

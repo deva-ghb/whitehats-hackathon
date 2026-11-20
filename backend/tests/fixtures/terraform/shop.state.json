@@ -1,0 +1,149 @@
+{
+  "version": 4,
+  "terraform_version": "1.9.8",
+  "serial": 3,
+  "lineage": "00000000-0000-4000-8000-000000000001",
+  "outputs": {},
+  "resources": [
+    {
+      "mode": "data",
+      "type": "aws_caller_identity",
+      "name": "current",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [{"attributes": {"account_id": "111122223333", "id": "111122223333"}}]
+    },
+    {
+      "mode": "managed",
+      "type": "google_storage_bucket",
+      "name": "logs",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [{"attributes": {"name": "other-cloud-logs"}}]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_vpc",
+      "name": "main",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [{"attributes": {"id": "vpc-0abc", "cidr_block": "10.0.0.0/16", "tags": {"Name": "app"}}}]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_subnet",
+      "name": "app",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [{"attributes": {"id": "subnet-0abc", "vpc_id": "vpc-0abc", "cidr_block": "10.0.1.0/24", "tags": {"Name": "app-aws"}}}]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_iam_role",
+      "name": "shop",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [{"attributes": {"id": "shop-api-role", "name": "shop-api-role", "arn": "arn:aws:iam::111122223333:role/shop-api"}}]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_lambda_function",
+      "name": "shop",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [{
+        "attributes": {
+          "id": "shop-api",
+          "function_name": "shop-api",
+          "runtime": "python3.12",
+          "handler": "github_pat_1234567890abcdefghij",
+          "memory_size": 256,
+          "timeout": 10,
+          "role": "arn:aws:iam::111122223333:role/shop-api",
+          "arn": "arn:aws:lambda:ap-southeast-2:111122223333:function:shop-api",
+          "invoke_arn": "arn:aws:apigateway:ap-southeast-2:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-southeast-2:111122223333:function:shop-api/invocations",
+          "vpc_config": [{"subnet_ids": ["subnet-0abc"], "vpc_id": "vpc-0abc"}],
+          "environment": [{"variables": {"WEBHOOK_SECRET": "not-copied-anywhere"}}]
+        }
+      }]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_sqs_queue",
+      "name": "jobs",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [{"attributes": {"id": "https://sqs.ap-southeast-2.amazonaws.com/111122223333/payment-jobs", "name": "payment-jobs", "arn": "arn:aws:sqs:ap-southeast-2:111122223333:payment-jobs"}}]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_lambda_event_source_mapping",
+      "name": "jobs",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [{"attributes": {"id": "map-1", "function_name": "shop-api", "event_source_arn": "arn:aws:sqs:ap-southeast-2:111122223333:payment-jobs"}}]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_s3_bucket",
+      "name": "receipts",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [{"attributes": {"id": "receipts", "bucket": "receipts", "arn": "arn:aws:s3:::receipts", "region": "ap-southeast-2"}}]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_dynamodb_table",
+      "name": "orders",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [{"attributes": {"id": "orders", "name": "orders", "hash_key": "id", "arn": "arn:aws:dynamodb:ap-southeast-2:111122223333:table/orders"}}]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_apigatewayv2_api",
+      "name": "http",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [{"attributes": {"id": "api-123", "name": "shop-http", "protocol_type": "HTTP", "arn": "arn:aws:apigateway:ap-southeast-2::/apis/api-123"}}]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_apigatewayv2_integration",
+      "name": "shop",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [{"attributes": {"id": "int-1", "api_id": "api-123", "integration_uri": "arn:aws:apigateway:ap-southeast-2:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-southeast-2:111122223333:function:shop-api/invocations"}}]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_cloudwatch_log_group",
+      "name": "shop",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [{"attributes": {"id": "/aws/lambda/shop-api", "name": "/aws/lambda/shop-api", "retention_in_days": 3, "arn": "arn:aws:logs:ap-southeast-2:111122223333:log-group:/aws/lambda/shop-api"}}]
+    },
+    {
+      "mode": "managed",
+      "type": "azurerm_resource_group",
+      "name": "app",
+      "provider": "provider[\"registry.terraform.io/hashicorp/azurerm\"]",
+      "instances": [{"attributes": {"id": "/subscriptions/0000/resourceGroups/app-rg", "name": "app-rg", "location": "australiaeast"}}]
+    },
+    {
+      "mode": "managed",
+      "type": "azurerm_virtual_network",
+      "name": "app",
+      "provider": "provider[\"registry.terraform.io/hashicorp/azurerm\"]",
+      "instances": [{"attributes": {"id": "/subscriptions/0000/resourceGroups/app-rg/virtualNetworks/app-vnet", "name": "app-vnet", "location": "australiaeast", "resource_group_name": "app-rg"}}]
+    },
+    {
+      "mode": "managed",
+      "type": "azurerm_subnet",
+      "name": "app",
+      "provider": "provider[\"registry.terraform.io/hashicorp/azurerm\"]",
+      "instances": [{"attributes": {"id": "/subscriptions/0000/resourceGroups/app-rg/virtualNetworks/app-vnet/subnets/app-azure", "name": "app-azure", "address_prefixes": ["10.1.0.0/24"], "virtual_network_name": "app-vnet", "resource_group_name": "app-rg"}}]
+    },
+    {
+      "mode": "managed",
+      "type": "azurerm_linux_virtual_machine",
+      "name": "admin",
+      "provider": "provider[\"registry.terraform.io/hashicorp/azurerm\"]",
+      "instances": [{"attributes": {"id": "/subscriptions/0000/resourceGroups/app-rg/virtualMachines/admin-vm", "name": "admin-vm", "size": "Standard_B1s", "location": "australiaeast", "resource_group_name": "app-rg", "admin_password": "not-copied-anywhere"}}]
+    },
+    {
+      "mode": "managed",
+      "type": "azurerm_storage_account",
+      "name": "files",
+      "provider": "provider[\"registry.terraform.io/hashicorp/azurerm\"]",
+      "instances": [{"attributes": {"id": "/subscriptions/0000/resourceGroups/app-rg/storageAccounts/appfiles", "name": "appfiles", "account_tier": "Standard", "location": "australiaeast", "resource_group_name": "app-rg"}}]
+    }
+  ]
+}

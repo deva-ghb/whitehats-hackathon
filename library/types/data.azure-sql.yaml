@@ -1,0 +1,42 @@
+id: data.azure-sql
+version: 1
+family: data
+display_name: Azure SQL Database
+aliases: [azure sql, sql server, sql database, mssql]
+vendors: [Microsoft]
+icon: data.azure-sql.svg
+properties:
+  - key: server_name
+    tier: required
+    type: string
+  - key: database_name
+    tier: required
+    type: string
+  - key: entra_only_auth
+    tier: recommended
+    type: boolean
+  - key: public_network_access
+    tier: recommended
+    type: boolean
+  - key: auditing
+    tier: recommended
+    type: boolean
+  - key: tde
+    tier: recommended
+    type: boolean
+  - key: resource_id
+    tier: derived
+    type: string
+edges:
+  allowed_out: [replicates_to, backs_up_to, emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [reads, writes, replicates_to, backs_up_to, depends_on]
+connection_test:
+  kind: azure_api
+  description: "Read the server and database with the Reader role, expect 200; never connect to the database"
+whitehat_modes: [data, iac]
+default_sense_points:
+  - mode: data
+    reason: Who connects and whether SQL logins bypass Entra
+attack_techniques: [T1078, T1213.006, T1565.001, T1485, T1537]
+importers: [azure_resource_graph, bicep, terraform_azurerm_provider]
+deploy_guide_template: guides/data.azure-sql.md

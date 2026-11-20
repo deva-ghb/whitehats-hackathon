@@ -1,0 +1,33 @@
+id: edge.azure-dns
+version: 1
+family: network
+display_name: Azure DNS zone
+aliases: [azure dns, dns zone, dns]
+vendors: [Microsoft]
+icon: edge.azure-dns.svg
+properties:
+  - key: zone_name
+    tier: required
+    type: string
+  - key: private
+    tier: recommended
+    type: boolean
+  - key: record_count
+    tier: derived
+    type: number
+  - key: resource_id
+    tier: derived
+    type: string
+edges:
+  allowed_out: [emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [depends_on]
+connection_test:
+  kind: azure_api
+  description: "Read the DNS zone with the subscription Reader role, expect 200"
+whitehat_modes: [iac, network]
+default_sense_points:
+  - mode: iac
+    reason: Records pointing at deleted resources allow subdomain takeover
+attack_techniques: [T1584.001, T1584.002]
+importers: [azure_resource_graph, bicep, terraform_azurerm_provider]
+deploy_guide_template: guides/edge.azure-dns.md

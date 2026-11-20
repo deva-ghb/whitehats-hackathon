@@ -1,0 +1,37 @@
+id: boundary.subnet
+version: 1
+family: boundaries
+display_name: Subnet
+aliases: [subnet, private subnet, public subnet]
+vendors: [Amazon Web Services, Microsoft, Google Cloud]
+icon: boundary.subnet.svg
+properties:
+  - key: cidr
+    tier: required
+    type: list
+  - key: exposure
+    tier: recommended
+    type: enum
+    values: [public, private, isolated]
+  - key: availability_zone
+    tier: optional
+    type: string
+  - key: route_table
+    tier: derived
+    type: string
+  - key: network_acl
+    tier: derived
+    type: string
+edges:
+  allowed_out: [emits_telemetry_to, peers_with, routes_through, depends_on, contained_in]
+  allowed_in: [contained_in, peers_with, depends_on]
+connection_test:
+  kind: cloud_api
+  description: "Describe the subnet through the read-only role, expect the CIDR to match"
+whitehat_modes: [network, iac]
+default_sense_points:
+  - mode: network
+    reason: A public subnet holding data stores is a direct path in
+attack_techniques: [T1046, T1686.001]
+importers: [aws_config, azure_resource_graph, terraform_aws_provider, terraform_azurerm_provider]
+deploy_guide_template: guides/boundary.subnet.md

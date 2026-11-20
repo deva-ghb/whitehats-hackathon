@@ -1,0 +1,55 @@
+id: data.s3
+version: 1
+family: data
+display_name: Amazon S3 bucket
+aliases: [s3, bucket, object storage, s3 bucket]
+vendors: [Amazon Web Services]
+icon: data.s3.svg
+properties:
+  - key: bucket_name
+    tier: required
+    type: string
+  - key: region
+    tier: required
+    type: string
+  - key: public_access_block
+    tier: recommended
+    type: boolean
+  - key: encryption
+    tier: recommended
+    type: enum
+    values: [sse_s3, sse_kms, none]
+  - key: versioning
+    tier: recommended
+    type: boolean
+  - key: object_lock
+    tier: recommended
+    type: boolean
+  - key: access_logging
+    tier: recommended
+    type: boolean
+  - key: lifecycle_days
+    tier: optional
+    type: number
+  - key: bucket_policy
+    tier: derived
+    type: string
+  - key: credential
+    tier: secret
+    type: string
+    scopes_hint: ["s3:GetBucketPolicy", "s3:GetBucketPolicyStatus", "s3:GetBucketPublicAccessBlock", "s3:GetEncryptionConfiguration"]
+edges:
+  allowed_out: [publishes_to, replicates_to, backs_up_to, emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [reads, writes, replicates_to, backs_up_to, depends_on]
+connection_test:
+  kind: aws_api
+  description: "Call s3:GetBucketPolicyStatus with the read-only role, expect 200; never read objects"
+whitehat_modes: [data, iac]
+default_sense_points:
+  - mode: data
+    reason: Bulk downloads and policy changes on sensitive buckets
+  - mode: iac
+    reason: "Public access, missing encryption and missing versioning"
+attack_techniques: [T1530, T1619, T1537, T1485, T1486]
+importers: [aws_config, terraform_aws_provider]
+deploy_guide_template: guides/data.s3.md

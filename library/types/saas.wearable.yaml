@@ -1,0 +1,33 @@
+id: saas.wearable
+version: 1
+family: saas
+display_name: Wearable data platform
+aliases: [wearables, fitbit, apple health, garmin, health data platform]
+vendors: []
+icon: saas.wearable.svg
+properties:
+  - key: platform
+    tier: required
+    type: string
+  - key: data_shared
+    tier: recommended
+    type: string
+  - key: oauth_scopes
+    tier: recommended
+    type: list
+  - key: webhook_signatures_verified
+    tier: recommended
+    type: boolean
+edges:
+  allowed_out: [calls, syncs_with, emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [calls, syncs_with, depends_on]
+connection_test:
+  kind: manual
+  description: "A person confirms the platform, the scopes granted and the webhook endpoint"
+whitehat_modes: [saas, data]
+default_sense_points:
+  - mode: data
+    reason: "Health data arriving from outside; webhook endpoints must check who is sending"
+attack_techniques: [T1199, T1528, T1565]
+importers: [manual]
+deploy_guide_template: guides/saas.wearable.md

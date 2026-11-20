@@ -1,0 +1,38 @@
+id: saas.plaid
+version: 1
+family: saas
+display_name: Plaid
+aliases: [plaid, bank linking, open banking]
+vendors: [Plaid]
+icon: saas.plaid.svg
+properties:
+  - key: environment
+    tier: required
+    type: enum
+    values: [sandbox, production]
+  - key: products
+    tier: recommended
+    type: list
+  - key: webhook_verification
+    tier: recommended
+    type: boolean
+  - key: data_shared
+    tier: recommended
+    type: string
+  - key: credential
+    tier: secret
+    type: string
+    scopes_hint: [client id and secret for read-only dashboard access]
+edges:
+  allowed_out: [calls, syncs_with, emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [calls, syncs_with, depends_on]
+connection_test:
+  kind: http
+  description: "Call /institutions/get with a count of 1, expect 200"
+whitehat_modes: [saas]
+default_sense_points:
+  - mode: saas
+    reason: "Access tokens to customers' bank accounts are worth stealing"
+attack_techniques: [T1657, T1199, T1552.001]
+importers: [manual]
+deploy_guide_template: guides/saas.plaid.md

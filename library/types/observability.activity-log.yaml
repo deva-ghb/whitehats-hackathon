@@ -1,0 +1,30 @@
+id: observability.activity-log
+version: 1
+family: observability
+display_name: Azure Activity Log
+aliases: [activity log, azure audit log, control plane log]
+vendors: [Microsoft]
+icon: observability.activity-log.svg
+properties:
+  - key: subscription_id
+    tier: required
+    type: string
+  - key: exported_to_workspace
+    tier: recommended
+    type: boolean
+  - key: retention_days
+    tier: optional
+    type: number
+edges:
+  allowed_out: [emits_telemetry_to, writes, depends_on, contained_in]
+  allowed_in: [emits_telemetry_to, depends_on]
+connection_test:
+  kind: azure_api
+  description: "Read one Activity Log event with the Reader role, expect 200"
+whitehat_modes: [identity, telemetry]
+default_sense_points:
+  - mode: identity
+    reason: "Role assignments, deletions and policy changes in the subscription"
+attack_techniques: [T1685.002, T1070, T1078.004]
+importers: [azure_resource_graph]
+deploy_guide_template: guides/observability.activity-log.md

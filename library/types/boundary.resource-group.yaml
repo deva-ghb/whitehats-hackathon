@@ -1,0 +1,33 @@
+id: boundary.resource-group
+version: 1
+family: boundaries
+display_name: Azure resource group
+aliases: [resource group, rg]
+vendors: [Microsoft]
+icon: boundary.resource-group.svg
+properties:
+  - key: name
+    tier: required
+    type: string
+  - key: location
+    tier: required
+    type: string
+  - key: locked
+    tier: recommended
+    type: boolean
+  - key: resource_id
+    tier: derived
+    type: string
+edges:
+  allowed_out: [emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [contained_in, depends_on]
+connection_test:
+  kind: azure_api
+  description: "Read the resource group with the subscription Reader role, expect 200"
+whitehat_modes: [iac]
+default_sense_points:
+  - mode: iac
+    reason: A resource lock and its tags decide what can be deleted by mistake
+attack_techniques: [T1580, T1485, T1578.005]
+importers: [azure_resource_graph, bicep, terraform_azurerm_provider]
+deploy_guide_template: guides/boundary.resource-group.md

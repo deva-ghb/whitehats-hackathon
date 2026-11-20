@@ -1,0 +1,39 @@
+id: identity.iam-role
+version: 1
+family: identity
+display_name: AWS IAM role
+aliases: [iam role, role, irsa, execution role, oidc role]
+vendors: [Amazon Web Services]
+icon: identity.iam-role.svg
+properties:
+  - key: role_name
+    tier: required
+    type: string
+  - key: trusted_by
+    tier: recommended
+    type: list
+  - key: permission_boundary
+    tier: recommended
+    type: string
+  - key: attached_policies
+    tier: derived
+    type: list
+  - key: last_used
+    tier: derived
+    type: string
+  - key: arn
+    tier: derived
+    type: string
+edges:
+  allowed_out: [depends_on, contained_in]
+  allowed_in: [runs_as, authenticates_via, depends_on]
+connection_test:
+  kind: aws_api
+  description: "Call iam:GetRole with the read-only role, expect 200"
+whitehat_modes: [identity]
+default_sense_points:
+  - mode: identity
+    reason: Over-broad policies and loose trust policies are the paths attackers walk
+attack_techniques: [T1078.004, T1098.003, T1098.001, T1550.001]
+importers: [aws_config, terraform_aws_provider]
+deploy_guide_template: guides/identity.iam-role.md

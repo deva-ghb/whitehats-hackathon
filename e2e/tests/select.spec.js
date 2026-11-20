@@ -1,0 +1,166 @@
+/** Every former browser dropdown opens, accepts a choice, and keeps it. */
+
+import { mkdir } from 'node:fs/promises'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { expect } from '@playwright/test'
+import { test } from '../fixtures.js'
+import { assertAccessible, attachGate, tabTo } from '../gate.js'
+import { DEMO_PASSWORD, signIn } from '../sign-in.js'
+import { totp } from '../totp.js'
+
+const SHOTS = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../screenshots/R-009')
+
+async function shootOpen(page, name) {
+  await mkdir(SHOTS, { recursive: true })
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await expect(page.locator('.select-content')).toBeVisible()
+  await page.waitForFunction(() => {
+    const active = document.activeElement
+    return active?.getAttribute('role') === 'option' || active?.classList.contains('select-search')
+  })
+  await assertAccessible(page, '.select-content')
+  await page.screenshot({ path: path.join(SHOTS, `${name}-1440.png`) })
+  await page.keyboard.press('Escape')
+  await expect(page.locator('.select-content')).toBeHidden()
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.locator(`#${name}`).click()
+  const sheet = page.locator('.select-content')
+  await expect(sheet).toBeVisible()
+  const box = await sheet.boundingBox()
+  expect(box.y + box.height).toBeGreaterThan(700)
+  const overflow = await page.evaluate(() => (
+    document.documentElement.scrollWidth - document.documentElement.clientWidth
+  ))
+  expect(overflow).toBeLessThanOrEqual(1)
+  await page.screenshot({ path: path.join(SHOTS, `${name}-390.png`) })
+  await page.keyboard.press('Escape')
+  await page.setViewportSize({ width: 1440, height: 900 })
+}
+
+test('a person can choose from every company dropdown', async ({ page, app }) => {
+  const gate = attachGate(page)
+  await signIn(page, app.baseURL)
+
+  await page.goto(`${app.baseURL}/logs`)
+  await tabTo(page, page.locator('#log-window'))
+  await page.keyboard.press('ArrowDown')
+  await expect(page.getByRole('listbox')).toBeVisible()
+  await page.keyboard.press('End')
+  await expect(page.getByRole('option', { name: 'Last 24 hours' })).toHaveAttribute('data-highlighted', '')
+  await page.keyboard.press('Home')
+  await expect(page.getByRole('option', { name: 'Last 15 min' })).toHaveAttribute('data-highlighted', '')
+  await page.keyboard.type('Last 6', { delay: 40 })
+  await expect(page.getByRole('option', { name: 'Last 6 hours' })).toHaveAttribute('data-highlighted', '')
+  await page.keyboard.press('Enter')
+  await expect(page.getByRole('listbox')).toBeHidden()
+  await expect(page.locator('#log-window')).toContainText('Last 6 hours')
+  await page.locator('#log-window').click()
+  await page.getByRole('option', { name: /Last 15 min/ }).click()
+  await expect(page.locator('#log-window')).toContainText('Last 15 min')
+  await page.locator('#log-window').click()
+  await shootOpen(page, 'log-window')
+
+  await page.goto(`${app.baseURL}/models`)
+  await page.getByRole('button', { name: 'Add a model' }).click()
+  await page.locator('#m-provider').click()
+  await expect(page.getByText('You will need an endpoint, a deployment name and an API key.')).toBeVisible()
+  await shootOpen(page, 'm-provider')
+  await page.locator('#m-provider').click()
+  await page.getByRole('option', { name: 'Built-in rules engine (offline)' }).click()
+  await expect(page.locator('#m-provider')).toContainText('Built-in rules engine')
+  await expect(page.getByLabel('Azure endpoint')).toBeHidden()
+
+  await page.goto(`${app.baseURL}/settings`)
+  await page.getByRole('tab', { name: 'People' }).click()
+  await page.getByRole('button', { name: 'Invite someone' }).click()
+  await page.locator('#u-role').click()
+  await page.getByRole('option', { name: /^CISO/ }).click()
+  await page.locator('#u-name').fill('Ravi Shah')
+  await page.locator('#u-email').fill('ravi@acme.example')
+  await page.getByRole('button', { name: 'Create invitation' }).click()
+  await expect(page.getByText('Invitation link')).toBeVisible()
+
+  await page.goto(`${app.baseURL}/setup`)
+  await page.getByRole('button', { name: 'Set up alerts' }).click()
+  await page.locator('#al-kind').click()
+  await page.getByRole('option', { name: /^Email/ }).click()
+  await expect(page.getByLabel('Email address (use a team list)')).toBeVisible()
+  await page.getByRole('button', { name: 'Cancel' }).click()
+  await page.getByRole('button', { name: 'Grant support access' }).click()
+  await page.locator('#sup-hours').click()
+  await page.getByRole('option', { name: /24 hours/ }).click()
+  await page.locator('#sup-reason').fill('Help connecting CloudWatch')
+  await page.getByRole('button', { name: 'Grant', exact: true }).click()
+  await expect(page.getByText(/granted until/i)).toBeVisible()
+
+  gate.assertClean()
+})
+
+test('the operator can choose a plan, a region and a role', async ({ page, app }) => {
+  const gate = attachGate(page)
+  await page.goto(app.baseURL)
+  await page.locator('#email').fill('operator@whitehats.example')
+  await page.locator('#password').fill(DEMO_PASSWORD)
+  await page.getByRole('button', { name: 'Sign in' }).click()
+  const secret = (await page.locator('.login-box span.mono').innerText()).trim()
+  await page.locator('#code').fill(totp(secret))
+  await page.getByRole('button', { name: 'Continue' }).click()
+  await expect(page.getByRole('heading', { level: 1, name: 'Companies' })).toBeVisible()
+
+  await page.goto(`${app.baseURL}/companies/new`)
+  await page.locator('#nc-name').fill('Select Proof')
+  await page.locator('#nc-plan').click()
+  await expect(page.getByText('Talk to us. 500 seats and 5,000 collectors.')).toBeVisible()
+  await page.getByRole('option', { name: 'Enterprise' }).click()
+  await page.locator('#nc-region').click()
+  await expect(page.getByText('India', { exact: true })).toBeVisible()
+  await page.getByRole('option', { name: 'India (Mumbai)' }).click()
+  await page.getByRole('button', { name: 'Next' }).click()
+  await page.getByRole('button', { name: 'Back' }).click()
+  await expect(page.locator('#nc-plan')).toContainText('Enterprise')
+  await expect(page.locator('#nc-region')).toContainText('Mumbai')
+
+  await page.goto(app.baseURL)
+  const acme = page.getByRole('row', { name: 'Acme (demo)' })
+  await expect(acme.getByRole('link', { name: 'Acme (demo)' })).toHaveAttribute('href', /\/companies\/\d+/)
+  const companyShots = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../screenshots/R-011')
+  await mkdir(companyShots, { recursive: true })
+  await page.screenshot({ path: path.join(companyShots, 'companies-1440.png') })
+  await page.setViewportSize({ width: 390, height: 844 })
+  const companyOverflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
+  expect(companyOverflow).toBeLessThanOrEqual(1)
+  await page.screenshot({ path: path.join(companyShots, 'companies-390.png') })
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await acme.click()
+  await page.getByRole('button', { name: 'Invite first admin' }).click()
+  await page.locator('#inv-role').click()
+  await page.getByRole('option', { name: /^CEO/ }).click()
+  await expect(page.locator('#inv-role')).toContainText('CEO')
+  await page.locator('#inv-email').fill('owner@acme.example')
+  await page.getByRole('button', { name: 'Create invitation' }).click()
+  await expect(page.getByText('Invitation link')).toBeVisible()
+
+  await page.getByRole('tab', { name: 'Settings' }).click()
+  await page.locator('#op-plan').focus()
+  await page.keyboard.press('ArrowDown')
+  await page.keyboard.type('Ent', { delay: 40 })
+  await expect(page.getByRole('option', { name: 'Enterprise' })).toHaveAttribute('data-highlighted', '')
+  await page.keyboard.press('Enter')
+  await expect(page.getByRole('listbox')).toBeHidden()
+  await expect(page.locator('#op-plan')).toContainText('Enterprise')
+  await page.getByRole('button', { name: 'Save settings' }).click()
+  await expect(page.getByText('Settings saved')).toBeVisible()
+  await page.reload()
+  await page.getByRole('tab', { name: 'Settings' }).click()
+  await expect(page.locator('#op-plan')).toContainText('Enterprise')
+
+  await page.locator('#op-plan').click()
+  await expect(page.getByText('$1,500 / month. 5 seats and 10 collectors.')).toBeVisible()
+  await page.getByRole('option', { name: 'Starter' }).click()
+  await page.getByRole('button', { name: 'Save settings' }).click()
+  await expect(page.getByText('Settings saved')).toBeVisible()
+  await expect(page.locator('#op-plan')).toContainText('Starter')
+
+  gate.assertClean()
+})

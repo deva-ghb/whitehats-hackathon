@@ -1,0 +1,225 @@
+{
+  "about": "How a weakness in the proving-ground scenario catalogue (S01 to S09) maps to a sense point: which kind of sensor would see it (its modes, in the node library's own mode names) and where it sits in the twin (a node, or an edge between two nodes). Used only by scripts/measure_sense_points.py and its test. Product code and rules never read this file and never name a scenario.",
+  "mode_words": {
+    "about": "How the catalogue's own words for the sensor become node library modes. A weakness is seen when a suggestion carries any mode listed for it.",
+    "Code": [
+      "code"
+    ],
+    "Code (secrets)": [
+      "code",
+      "secrets"
+    ],
+    "Code, then Telemetry when exploited": [
+      "code",
+      "telemetry"
+    ],
+    "Code, then Telemetry when the simulator enumerates ids": [
+      "code",
+      "telemetry"
+    ],
+    "Supply chain": [
+      "supply_chain"
+    ],
+    "Infrastructure-as-code": [
+      "iac"
+    ],
+    "Identity / infrastructure-as-code": [
+      "identity",
+      "iac"
+    ],
+    "Telemetry (logging quality) and Code": [
+      "telemetry",
+      "code"
+    ]
+  },
+  "twin_matching": "A place is named by its node library type (the part before the @) and one or more names. A node matches when its type is that type and its name is one of the names, or ends with a dash or a slash followed by one of them (the imported twin names things as the cloud does, for example the receipts bucket by its full name and a log group by its path).",
+  "next_to": "A suggestion is on a weakness when it is on a node of its place. It is next to it when its node and a node of the place are consecutive steps of one attack path that the analysis found (either order). An edge place has two nodes.",
+  "crown_jewels": {
+    "about": "What a person tells WhiteHats matters in the shop (the same five the Where to watch browser journey marks): the two tables, the receipts bucket and the two secrets. Without marks the analysis has no target and suggests nothing.",
+    "places": [
+      {
+        "type": "data.dynamodb",
+        "names": [
+          "customers"
+        ]
+      },
+      {
+        "type": "data.dynamodb",
+        "names": [
+          "orders"
+        ]
+      },
+      {
+        "type": "data.s3",
+        "names": [
+          "receipts"
+        ]
+      },
+      {
+        "type": "identity.ssm-parameter-store",
+        "names": [
+          "webhook-signing-secret"
+        ]
+      },
+      {
+        "type": "identity.ssm-parameter-store",
+        "names": [
+          "api-token"
+        ]
+      }
+    ]
+  },
+  "weaknesses": [
+    {
+      "id": "S01",
+      "title": "Receipt PDF built with a shell command on the customer name",
+      "catalogue_mode": "Code",
+      "place": {
+        "node": {
+          "type": "service.function",
+          "names": [
+            "shop-api"
+          ]
+        }
+      },
+      "why_there": "shop/pdf_receipt.py is code of the shop function."
+    },
+    {
+      "id": "S02",
+      "title": "Receipt lookup uses the caller's name as the storage key",
+      "catalogue_mode": "Code, then Telemetry when exploited",
+      "place": {
+        "edge": [
+          {
+            "type": "service.function",
+            "names": [
+              "shop-api"
+            ]
+          },
+          {
+            "type": "data.s3",
+            "names": [
+              "receipts"
+            ]
+          }
+        ]
+      },
+      "why_there": "The shop function reads the receipts bucket with a key built from the caller's input."
+    },
+    {
+      "id": "S03",
+      "title": "Provider key pasted into settings",
+      "catalogue_mode": "Code (secrets)",
+      "place": {
+        "node": {
+          "type": "service.function",
+          "names": [
+            "shop-api"
+          ]
+        }
+      },
+      "why_there": "shop/settings.py is configuration of the shop function."
+    },
+    {
+      "id": "S04",
+      "title": "Old PyYAML pinned and yaml.load used",
+      "catalogue_mode": "Supply chain",
+      "place": {
+        "node": {
+          "type": "service.function",
+          "names": [
+            "shop-api"
+          ]
+        }
+      },
+      "why_there": "The shop's dependency list and promo loader belong to the shop function."
+    },
+    {
+      "id": "S05",
+      "title": "Receipts bucket opened to the public",
+      "catalogue_mode": "Infrastructure-as-code",
+      "place": {
+        "node": {
+          "type": "data.s3",
+          "names": [
+            "receipts"
+          ]
+        }
+      },
+      "why_there": "The public access block and bucket policy are the receipts bucket's own settings."
+    },
+    {
+      "id": "S06",
+      "title": "Worker role widened to dynamodb:* on * with iam:PassRole",
+      "catalogue_mode": "Identity / infrastructure-as-code",
+      "place": {
+        "node": {
+          "type": "identity.iam-role",
+          "names": [
+            "pg-payments-worker"
+          ]
+        }
+      },
+      "why_there": "The widened policy is attached to the worker's role."
+    },
+    {
+      "id": "S07",
+      "title": "Customer record and auth header logged, an error swallowed",
+      "catalogue_mode": "Telemetry (logging quality) and Code",
+      "place": {
+        "edge": [
+          {
+            "type": "service.function",
+            "names": [
+              "shop-api"
+            ]
+          },
+          {
+            "type": "observability.cloudwatch",
+            "names": [
+              "shop-api log group",
+              "shop-api"
+            ]
+          }
+        ]
+      },
+      "why_there": "What the shop function writes to its own log group."
+    },
+    {
+      "id": "S08",
+      "title": "Owner check removed from reading an order",
+      "catalogue_mode": "Code, then Telemetry when the simulator enumerates ids",
+      "place": {
+        "edge": [
+          {
+            "type": "service.function",
+            "names": [
+              "shop-api"
+            ]
+          },
+          {
+            "type": "data.dynamodb",
+            "names": [
+              "orders"
+            ]
+          }
+        ]
+      },
+      "why_there": "The shop function reads an order from the orders table without checking whose it is."
+    },
+    {
+      "id": "S09",
+      "title": "Webhook signature check commented out",
+      "catalogue_mode": "Code",
+      "place": {
+        "node": {
+          "type": "service.function",
+          "names": [
+            "shop-api"
+          ]
+        }
+      },
+      "why_there": "shop/webhook.py is code of the shop function."
+    }
+  ]
+}

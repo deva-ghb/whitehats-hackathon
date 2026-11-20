@@ -1,0 +1,379 @@
+{
+  "about": "Recorded from moto, the AWS simulator, on 2026-11-11. Shapes are AWS's; the data is invented.",
+  "clock": 1794409947.0,
+  "calls": [
+    {
+      "service": "sts",
+      "method": "assume_role",
+      "params": {
+        "RoleArn": "arn:aws:iam::111122223333:role/whitehats-reader",
+        "RoleSessionName": "whitehats-reader",
+        "ExternalId": "recorded-external-id"
+      },
+      "region": "ap-southeast-2",
+      "response": {
+        "Credentials": {
+          "AccessKeyId": "recorded-placeholder",
+          "SecretAccessKey": "recorded-placeholder",
+          "SessionToken": "recorded-placeholder",
+          "Expiration": "2030-01-01T00:00:00Z"
+        },
+        "AssumedRoleUser": {
+          "AssumedRoleId": "AROARZPUZDIKCSUFNGKKZ:whitehats-reader",
+          "Arn": "arn:aws:sts::111122223333:assumed-role/whitehats-reader/whitehats-reader"
+        },
+        "PackedPolicySize": 6
+      }
+    },
+    {
+      "service": "cloudtrail",
+      "method": "lookup_events",
+      "params": {
+        "StartTime": "2026-11-11T14:12:27Z",
+        "MaxResults": 2,
+        "LookupAttributes": [
+          {
+            "AttributeKey": "ReadOnly",
+            "AttributeValue": "false"
+          }
+        ]
+      },
+      "region": "ap-southeast-2",
+      "response": {
+        "Events": [
+          {
+            "EventId": "evt-0",
+            "EventName": "StopLogging",
+            "EventTime": "2026-11-11T15:11:27Z",
+            "CloudTrailEvent": "{\"eventName\": \"StopLogging\"}"
+          },
+          {
+            "EventId": "evt-1",
+            "EventName": "ConsoleLogin",
+            "EventTime": "2026-11-11T15:11:28Z",
+            "CloudTrailEvent": "{\"eventName\": \"ConsoleLogin\"}"
+          }
+        ],
+        "NextToken": "2"
+      }
+    },
+    {
+      "service": "cloudtrail",
+      "method": "lookup_events",
+      "params": {
+        "StartTime": "2026-11-11T14:12:27Z",
+        "MaxResults": 2,
+        "LookupAttributes": [
+          {
+            "AttributeKey": "ReadOnly",
+            "AttributeValue": "false"
+          }
+        ],
+        "NextToken": "2"
+      },
+      "region": "ap-southeast-2",
+      "response": {
+        "Events": [
+          {
+            "EventId": "evt-2",
+            "EventName": "CreateAccessKey",
+            "EventTime": "2026-11-11T15:11:29Z",
+            "CloudTrailEvent": "{\"eventName\": \"CreateAccessKey\"}"
+          }
+        ]
+      }
+    },
+    {
+      "service": "cloudtrail",
+      "method": "lookup_events",
+      "params": {
+        "StartTime": "2026-11-11T14:12:27Z",
+        "MaxResults": 2,
+        "LookupAttributes": [
+          {
+            "AttributeKey": "ReadOnly",
+            "AttributeValue": "false"
+          }
+        ]
+      },
+      "region": "us-west-2",
+      "response": {
+        "Events": []
+      }
+    },
+    {
+      "service": "cloudtrail",
+      "method": "lookup_events",
+      "params": {
+        "StartTime": "2026-11-11T14:12:27Z",
+        "MaxResults": 2,
+        "LookupAttributes": [
+          {
+            "AttributeKey": "ReadOnly",
+            "AttributeValue": "false"
+          }
+        ]
+      },
+      "region": "us-east-1",
+      "response": {
+        "Events": []
+      }
+    },
+    {
+      "service": "ec2",
+      "method": "describe_vpcs",
+      "params": {
+        "Filters": [
+          {
+            "Name": "tag:project",
+            "Values": [
+              "whitehats-proving-ground"
+            ]
+          }
+        ]
+      },
+      "region": "ap-southeast-2",
+      "response": {
+        "Vpcs": []
+      }
+    },
+    {
+      "service": "ec2",
+      "method": "describe_flow_logs",
+      "params": {},
+      "region": "ap-southeast-2",
+      "response": {
+        "FlowLogs": []
+      }
+    },
+    {
+      "service": "ec2",
+      "method": "describe_vpcs",
+      "params": {
+        "Filters": [
+          {
+            "Name": "tag:project",
+            "Values": [
+              "whitehats-proving-ground"
+            ]
+          }
+        ]
+      },
+      "region": "us-west-2",
+      "response": {
+        "Vpcs": [
+          {
+            "OwnerId": "111122223333",
+            "InstanceTenancy": "default",
+            "Ipv6CidrBlockAssociationSet": [],
+            "CidrBlockAssociationSet": [
+              {
+                "AssociationId": "vpc-cidr-assoc-cb855a95855d3c172",
+                "CidrBlock": "10.20.0.0/16",
+                "CidrBlockState": {
+                  "State": "associated"
+                }
+              }
+            ],
+            "IsDefault": false,
+            "Tags": [
+              {
+                "Key": "project",
+                "Value": "whitehats-proving-ground"
+              }
+            ],
+            "VpcId": "vpc-bdf3f163ce468ef4d",
+            "State": "available",
+            "CidrBlock": "10.20.0.0/16",
+            "DhcpOptionsId": "default"
+          }
+        ]
+      }
+    },
+    {
+      "service": "ec2",
+      "method": "describe_flow_logs",
+      "params": {},
+      "region": "us-west-2",
+      "response": {
+        "FlowLogs": []
+      }
+    },
+    {
+      "service": "logs",
+      "method": "filter_log_events",
+      "params": {
+        "logGroupName": "/aws/lambda/shop-api",
+        "startTime": 1794406347000,
+        "limit": 2
+      },
+      "region": "ap-southeast-2",
+      "response": {
+        "events": [
+          {
+            "logStreamName": "s1",
+            "timestamp": 1794409887000,
+            "message": "{\"event\": 0}",
+            "ingestionTime": 1794409948300,
+            "eventId": "0"
+          },
+          {
+            "logStreamName": "s1",
+            "timestamp": 1794409887001,
+            "message": "{\"event\": 1}",
+            "ingestionTime": 1794409948300,
+            "eventId": "1"
+          }
+        ],
+        "searchedLogStreams": [
+          {
+            "logStreamName": "s1",
+            "searchedCompletely": true
+          }
+        ],
+        "nextToken": "/aws/lambda/shop-api@s1@1"
+      }
+    },
+    {
+      "service": "logs",
+      "method": "filter_log_events",
+      "params": {
+        "logGroupName": "/aws/lambda/shop-api",
+        "startTime": 1794406347000,
+        "limit": 2,
+        "nextToken": "/aws/lambda/shop-api@s1@1"
+      },
+      "region": "ap-southeast-2",
+      "response": {
+        "events": [
+          {
+            "logStreamName": "s1",
+            "timestamp": 1794409887002,
+            "message": "{\"event\": 2}",
+            "ingestionTime": 1794409948300,
+            "eventId": "2"
+          }
+        ],
+        "searchedLogStreams": [
+          {
+            "logStreamName": "s1",
+            "searchedCompletely": true
+          }
+        ]
+      }
+    },
+    {
+      "service": "cloudtrail",
+      "method": "lookup_events",
+      "params": {
+        "StartTime": "2026-11-11T14:56:30Z",
+        "MaxResults": 2,
+        "LookupAttributes": [
+          {
+            "AttributeKey": "ReadOnly",
+            "AttributeValue": "false"
+          }
+        ]
+      },
+      "region": "ap-southeast-2",
+      "response": {
+        "Events": [
+          {
+            "EventId": "evt-0",
+            "EventName": "StopLogging",
+            "EventTime": "2026-11-11T15:11:27Z",
+            "CloudTrailEvent": "{\"eventName\": \"StopLogging\"}"
+          },
+          {
+            "EventId": "evt-1",
+            "EventName": "ConsoleLogin",
+            "EventTime": "2026-11-11T15:11:28Z",
+            "CloudTrailEvent": "{\"eventName\": \"ConsoleLogin\"}"
+          }
+        ],
+        "NextToken": "2"
+      }
+    },
+    {
+      "service": "cloudtrail",
+      "method": "lookup_events",
+      "params": {
+        "StartTime": "2026-11-11T14:56:30Z",
+        "MaxResults": 2,
+        "LookupAttributes": [
+          {
+            "AttributeKey": "ReadOnly",
+            "AttributeValue": "false"
+          }
+        ],
+        "NextToken": "2"
+      },
+      "region": "ap-southeast-2",
+      "response": {
+        "Events": [
+          {
+            "EventId": "evt-2",
+            "EventName": "CreateAccessKey",
+            "EventTime": "2026-11-11T15:11:29Z",
+            "CloudTrailEvent": "{\"eventName\": \"CreateAccessKey\"}"
+          }
+        ]
+      }
+    },
+    {
+      "service": "cloudtrail",
+      "method": "lookup_events",
+      "params": {
+        "StartTime": "2026-11-11T13:57:27Z",
+        "MaxResults": 2,
+        "LookupAttributes": [
+          {
+            "AttributeKey": "ReadOnly",
+            "AttributeValue": "false"
+          }
+        ]
+      },
+      "region": "us-west-2",
+      "response": {
+        "Events": []
+      }
+    },
+    {
+      "service": "cloudtrail",
+      "method": "lookup_events",
+      "params": {
+        "StartTime": "2026-11-11T13:57:27Z",
+        "MaxResults": 2,
+        "LookupAttributes": [
+          {
+            "AttributeKey": "ReadOnly",
+            "AttributeValue": "false"
+          }
+        ]
+      },
+      "region": "us-east-1",
+      "response": {
+        "Events": []
+      }
+    },
+    {
+      "service": "logs",
+      "method": "filter_log_events",
+      "params": {
+        "logGroupName": "/aws/lambda/shop-api",
+        "startTime": 1794409887003,
+        "limit": 2
+      },
+      "region": "ap-southeast-2",
+      "response": {
+        "events": [],
+        "searchedLogStreams": [
+          {
+            "logStreamName": "s1",
+            "searchedCompletely": true
+          }
+        ]
+      }
+    }
+  ]
+}

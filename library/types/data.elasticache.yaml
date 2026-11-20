@@ -1,0 +1,39 @@
+id: data.elasticache
+version: 1
+family: data
+display_name: Amazon ElastiCache (Redis)
+aliases: [elasticache, redis, cache, valkey]
+vendors: [Amazon Web Services]
+icon: data.elasticache.svg
+properties:
+  - key: replication_group_id
+    tier: required
+    type: string
+  - key: region
+    tier: required
+    type: string
+  - key: transit_encryption
+    tier: recommended
+    type: boolean
+  - key: auth_enabled
+    tier: recommended
+    type: boolean
+  - key: at_rest_encryption
+    tier: recommended
+    type: boolean
+  - key: arn
+    tier: derived
+    type: string
+edges:
+  allowed_out: [replicates_to, backs_up_to, emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [reads, writes, replicates_to, backs_up_to, depends_on]
+connection_test:
+  kind: aws_api
+  description: "Call elasticache:DescribeReplicationGroups with the read-only role, expect 200"
+whitehat_modes: [data, network]
+default_sense_points:
+  - mode: data
+    reason: Sessions in a cache without auth or TLS can be read or replaced
+attack_techniques: [T1078.001, T1565.001, T1539]
+importers: [aws_config, terraform_aws_provider]
+deploy_guide_template: guides/data.elasticache.md

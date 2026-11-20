@@ -1,0 +1,42 @@
+id: ai.bedrock
+version: 1
+family: ai
+display_name: Amazon Bedrock
+aliases: [bedrock, llm, aws llm, claude on bedrock]
+vendors: [Amazon Web Services]
+icon: ai.bedrock.svg
+properties:
+  - key: region
+    tier: required
+    type: string
+  - key: models
+    tier: required
+    type: list
+  - key: data_sent
+    tier: recommended
+    type: string
+  - key: guardrails
+    tier: recommended
+    type: list
+  - key: invocation_logging
+    tier: recommended
+    type: boolean
+  - key: tools_exposed
+    tier: optional
+    type: list
+  - key: callers
+    tier: derived
+    type: list
+edges:
+  allowed_out: [emits_telemetry_to, reads, depends_on, contained_in]
+  allowed_in: [calls, depends_on]
+connection_test:
+  kind: aws_api
+  description: "Call bedrock:GetModelInvocationLoggingConfiguration with the read-only role, expect 200"
+whitehat_modes: [ai]
+default_sense_points:
+  - mode: ai
+    reason: Personal data in prompts and tool calls an assistant should not make
+attack_techniques: [T1496.004, T1552.001, T1078.004]
+importers: [aws_config, terraform_aws_provider]
+deploy_guide_template: guides/ai.bedrock.md

@@ -1,0 +1,34 @@
+id: endpoint.staff
+version: 1
+family: endpoints
+display_name: Staff and their managed devices
+aliases: [staff, employees, client staff, users]
+vendors: []
+icon: endpoint.staff.svg
+properties:
+  - key: count
+    tier: required
+    type: number
+  - key: managed_by
+    tier: recommended
+    type: enum
+    values: [intune, jamf, other, unmanaged]
+  - key: mfa
+    tier: recommended
+    type: boolean
+  - key: roles
+    tier: optional
+    type: list
+edges:
+  allowed_out: [authenticates_via, calls, routes_through, depends_on, contained_in]
+  allowed_in: [depends_on]
+connection_test:
+  kind: manual
+  description: "A person confirms the group, its sign-in method and its device management"
+whitehat_modes: [identity]
+default_sense_points:
+  - mode: identity
+    reason: Phishing and MFA fatigue against staff accounts
+attack_techniques: [T1566, T1078, T1621, T1539]
+importers: [graph_api, okta_api, manual]
+deploy_guide_template: guides/endpoint.staff.md

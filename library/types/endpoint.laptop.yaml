@@ -1,0 +1,37 @@
+id: endpoint.laptop
+version: 1
+family: endpoints
+display_name: Developer or consultant laptops
+aliases: [laptop, workstation, developer machine, consultant laptop]
+vendors: []
+icon: endpoint.laptop.svg
+properties:
+  - key: count
+    tier: required
+    type: number
+  - key: managed_by
+    tier: recommended
+    type: enum
+    values: [intune, jamf, other, unmanaged]
+  - key: edr
+    tier: recommended
+    type: boolean
+  - key: vpn_client
+    tier: recommended
+    type: string
+  - key: os
+    tier: optional
+    type: list
+edges:
+  allowed_out: [authenticates_via, calls, routes_through, depends_on, contained_in]
+  allowed_in: [depends_on]
+connection_test:
+  kind: manual
+  description: "A person confirms the fleet size, management and VPN client"
+whitehat_modes: [identity]
+default_sense_points:
+  - mode: identity
+    reason: A stolen laptop with VPN profiles and repo keys is a way in
+attack_techniques: [T1566, T1204, T1552.004, T1133]
+importers: [intune_api, manual]
+deploy_guide_template: guides/endpoint.laptop.md

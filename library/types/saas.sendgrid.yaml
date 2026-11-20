@@ -1,0 +1,34 @@
+id: saas.sendgrid
+version: 1
+family: saas
+display_name: SendGrid
+aliases: [sendgrid, email, transactional email]
+vendors: [Twilio]
+icon: saas.sendgrid.svg
+properties:
+  - key: account
+    tier: required
+    type: string
+  - key: domain_authentication
+    tier: recommended
+    type: boolean
+  - key: event_webhook_signed
+    tier: recommended
+    type: boolean
+  - key: credential
+    tier: secret
+    type: string
+    scopes_hint: [API key with read-only access]
+edges:
+  allowed_out: [calls, syncs_with, emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [calls, syncs_with, depends_on]
+connection_test:
+  kind: http
+  description: "Read /v3/scopes with the API key, expect 200"
+whitehat_modes: [saas]
+default_sense_points:
+  - mode: saas
+    reason: A leaked send key lets anyone send mail as the brand
+attack_techniques: [T1566, T1199, T1552.001]
+importers: [manual]
+deploy_guide_template: guides/saas.sendgrid.md

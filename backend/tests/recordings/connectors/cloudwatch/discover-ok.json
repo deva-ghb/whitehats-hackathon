@@ -1,0 +1,81 @@
+{
+  "about": "Recorded from moto, the AWS simulator, on 2026-10-23. Shapes are AWS's; the data is invented.",
+  "clock": 1792756519.0,
+  "calls": [
+    {
+      "service": "sts",
+      "method": "assume_role",
+      "params": {
+        "RoleArn": "arn:aws:iam::111122223333:role/whitehats-reader",
+        "RoleSessionName": "whitehats-reader",
+        "ExternalId": "recorded-external-id"
+      },
+      "response": {
+        "Credentials": {
+          "AccessKeyId": "recorded-placeholder",
+          "SecretAccessKey": "recorded-placeholder",
+          "SessionToken": "recorded-placeholder",
+          "Expiration": "2030-01-01T00:00:00Z"
+        },
+        "AssumedRoleUser": {
+          "AssumedRoleId": "AROA3X42LBCD1I0TFQFTU:whitehats-reader",
+          "Arn": "arn:aws:sts::111122223333:assumed-role/whitehats-reader/whitehats-reader"
+        },
+        "PackedPolicySize": 6
+      }
+    },
+    {
+      "service": "logs",
+      "method": "filter_log_events",
+      "params": {
+        "logGroupName": "cloudtrail",
+        "startTime": 0,
+        "limit": 1
+      },
+      "response": {
+        "events": [
+          {
+            "logStreamName": "s1",
+            "timestamp": 1792756459000,
+            "message": "{\"eventName\": \"StopLogging\", \"userIdentity\": {\"type\": \"IAMUser\", \"arn\": \"arn:aws:iam::1:user/mallory\"}}",
+            "ingestionTime": 1792756519182,
+            "eventId": "0"
+          }
+        ],
+        "searchedLogStreams": [
+          {
+            "logStreamName": "s1",
+            "searchedCompletely": true
+          }
+        ],
+        "nextToken": "cloudtrail@s1@0"
+      }
+    },
+    {
+      "service": "logs",
+      "method": "filter_log_events",
+      "params": {
+        "logGroupName": "/aws/lambda/payments",
+        "startTime": 0,
+        "limit": 1
+      },
+      "response": {
+        "events": [
+          {
+            "logStreamName": "s1",
+            "timestamp": 1792756459000,
+            "message": "{\"level\": \"error\", \"message\": \"payment provider timed out after 30s\"}",
+            "ingestionTime": 1792756519184,
+            "eventId": "3"
+          }
+        ],
+        "searchedLogStreams": [
+          {
+            "logStreamName": "s1",
+            "searchedCompletely": true
+          }
+        ]
+      }
+    }
+  ]
+}

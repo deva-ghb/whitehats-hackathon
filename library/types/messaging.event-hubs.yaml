@@ -1,0 +1,40 @@
+id: messaging.event-hubs
+version: 1
+family: messaging
+display_name: Azure Event Hubs
+aliases: [event hubs, event hub, stream, kafka on azure]
+vendors: [Microsoft]
+icon: messaging.event-hubs.svg
+properties:
+  - key: namespace
+    tier: required
+    type: string
+  - key: local_auth_enabled
+    tier: recommended
+    type: boolean
+  - key: public_network_access
+    tier: recommended
+    type: boolean
+  - key: hubs
+    tier: derived
+    type: list
+  - key: resource_id
+    tier: derived
+    type: string
+  - key: credential
+    tier: secret
+    type: string
+    scopes_hint: [Reader]
+edges:
+  allowed_out: [emits_telemetry_to, depends_on, contained_in]
+  allowed_in: [publishes_to, consumes_from, depends_on]
+connection_test:
+  kind: azure_api
+  description: "Read the namespace with the Reader role, expect 200; never read events"
+whitehat_modes: [messaging]
+default_sense_points:
+  - mode: messaging
+    reason: A stream of personal or health data needs tight send and listen rights
+attack_techniques: [T1565, T1020]
+importers: [azure_resource_graph, bicep, terraform_azurerm_provider]
+deploy_guide_template: guides/messaging.event-hubs.md

@@ -1,0 +1,37 @@
+# Sample type from design section 9.1. ATT&CK ids are required (decision C6a).
+id: repo.bitbucket
+version: 3
+family: code_and_delivery
+display_name: Bitbucket repository
+aliases: [bitbucket, bb repo, atlassian git, stash]
+vendors: [Atlassian]
+icon: bitbucket.svg
+properties:
+  - key: provider
+    tier: required
+    type: enum
+    values: [cloud, data_center]
+  - key: url
+    tier: required
+    type: url
+  - key: auth_method
+    tier: required
+    type: enum
+    values: [access_token, app_password, oauth_consumer, ssh_key, http_access_token]
+  - key: credential
+    tier: secret
+    type: string
+    scopes_hint: [repository:read]
+edges:
+  allowed_out: [built_by]
+  allowed_in: [deploys_from]
+connection_test:
+  kind: http
+  description: List the default branch using the credential, expect 200
+whitehat_modes: [code, supply_chain, secrets]
+default_sense_points:
+  - mode: code
+    reason: Source of every service deployed from this repo
+attack_techniques: [T1195.002, T1552.001]
+importers: [bitbucket_api, terraform_bitbucket_provider]
+deploy_guide_template: guides/repo.bitbucket.md

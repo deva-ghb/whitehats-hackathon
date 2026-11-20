@@ -1,0 +1,37 @@
+id: identity.managed-identity
+version: 1
+family: identity
+display_name: Azure managed identity
+aliases: [managed identity, msi, workload identity, service principal]
+vendors: [Microsoft]
+icon: identity.managed-identity.svg
+properties:
+  - key: identity_name
+    tier: required
+    type: string
+  - key: kind
+    tier: required
+    type: enum
+    values: [user_assigned, system_assigned]
+  - key: role_assignments
+    tier: derived
+    type: list
+  - key: principal_id
+    tier: derived
+    type: string
+  - key: resource_id
+    tier: derived
+    type: string
+edges:
+  allowed_out: [depends_on, contained_in]
+  allowed_in: [runs_as, authenticates_via, depends_on]
+connection_test:
+  kind: azure_api
+  description: "Read the identity and its role assignments with the Reader role, expect 200"
+whitehat_modes: [identity]
+default_sense_points:
+  - mode: identity
+    reason: Role assignments decide how far a compromised workload can reach
+attack_techniques: [T1078.004, T1528, T1552.005, T1098.003]
+importers: [azure_resource_graph, bicep, graph_api]
+deploy_guide_template: guides/identity.managed-identity.md

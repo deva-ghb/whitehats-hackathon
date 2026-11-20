@@ -1,0 +1,1127 @@
+{
+  "schema_version": 1,
+  "clone": "preventive-health",
+  "environment": "prod",
+  "library_version": "2026.10",
+  "version": {
+    "number": 1,
+    "author": "template",
+    "reason": "Initial estate from design section 15",
+    "created_at": "2026-10-22T00:00:00Z"
+  },
+  "groups": [
+    {
+      "id": "g_tenant",
+      "type": "boundary.entra-tenant@1",
+      "name": "Entra tenant",
+      "kind": "organisation",
+      "environment": "shared",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      }
+    },
+    {
+      "id": "g_sub_prod",
+      "type": "boundary.subscription@1",
+      "name": "subscription platform-prod",
+      "kind": "subscription",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "parent": "g_tenant"
+    },
+    {
+      "id": "g_sub_nonprod",
+      "type": "boundary.subscription@1",
+      "name": "subscription platform-nonprod",
+      "kind": "subscription",
+      "environment": "staging",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "parent": "g_tenant"
+    },
+    {
+      "id": "g_rg_prod",
+      "type": "boundary.resource-group@1",
+      "name": "resource group prod",
+      "kind": "resource-group",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "parent": "g_sub_prod"
+    },
+    {
+      "id": "g_rg_nonprod",
+      "type": "boundary.resource-group@1",
+      "name": "resource group nonprod",
+      "kind": "resource-group",
+      "environment": "staging",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "parent": "g_sub_nonprod"
+    },
+    {
+      "id": "g_hub",
+      "type": "boundary.vpc@1",
+      "name": "hub VNet",
+      "kind": "vpc",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "parent": "g_rg_prod"
+    },
+    {
+      "id": "g_spoke",
+      "type": "boundary.vpc@1",
+      "name": "spoke VNet",
+      "kind": "vpc",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "parent": "g_rg_prod"
+    },
+    {
+      "id": "g_aks",
+      "type": "boundary.aks@1",
+      "name": "AKS cluster",
+      "kind": "cluster",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "parent": "g_spoke"
+    },
+    {
+      "id": "g_corp",
+      "type": "boundary.corporate-network@1",
+      "name": "corporate network",
+      "kind": "trust-zone",
+      "environment": "shared",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      }
+    }
+  ],
+  "access_paths": [
+    {
+      "id": "ap_p2s",
+      "name": "Azure P2S VPN into the hub",
+      "kind": "vpn-client",
+      "environment": "prod",
+      "client": "openvpn",
+      "routes": [
+        "10.20.0.0/16"
+      ],
+      "credential": "cr_vpn"
+    },
+    {
+      "id": "ap_forti",
+      "name": "FortiClient into the firm network",
+      "kind": "vpn-client",
+      "environment": "shared",
+      "client": "forticlient",
+      "routes": [
+        "10.30.0.0/16"
+      ],
+      "credential": "cr_forti"
+    },
+    {
+      "id": "ap_public",
+      "name": "public APIs for SaaS",
+      "kind": "public-api",
+      "environment": "shared"
+    }
+  ],
+  "credential_refs": [
+    {
+      "id": "cr_bitbucket",
+      "vault_uri": "vault://tenant/preventive/bitbucket",
+      "purpose": "Bitbucket app for repo reads"
+    },
+    {
+      "id": "cr_openai",
+      "vault_uri": "vault://tenant/preventive/azure-openai",
+      "purpose": "Azure OpenAI for nudges and summaries"
+    },
+    {
+      "id": "cr_stripe",
+      "vault_uri": "vault://tenant/preventive/stripe",
+      "purpose": "Stripe for self-pay screenings"
+    },
+    {
+      "id": "cr_twilio",
+      "vault_uri": "vault://tenant/preventive/twilio",
+      "purpose": "Twilio for SMS reminders"
+    },
+    {
+      "id": "cr_vpn",
+      "vault_uri": "vault://tenant/preventive/p2s-vpn",
+      "purpose": "Azure point-to-site VPN profile"
+    },
+    {
+      "id": "cr_forti",
+      "vault_uri": "vault://tenant/preventive/forticlient",
+      "purpose": "FortiClient into the firm network"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "n_afd",
+      "type": "edge.front-door@1",
+      "name": "Azure Front Door",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "location": "g_rg_prod",
+      "access_path": "ap_public"
+    },
+    {
+      "id": "n_dns",
+      "type": "edge.azure-dns@1",
+      "name": "Azure DNS",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "location": "g_rg_prod",
+      "access_path": "ap_public"
+    },
+    {
+      "id": "n_apim",
+      "type": "edge.apim@1",
+      "name": "APIM",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "location": "g_hub",
+      "access_path": "ap_p2s"
+    },
+    {
+      "id": "n_patient",
+      "type": "service.backend@1",
+      "name": "patient-api",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "location": "g_aks",
+      "access_path": "ap_p2s",
+      "criticality": "high",
+      "data_classification": [
+        "PHI",
+        "PII"
+      ],
+      "compliance_scope": [
+        "HIPAA"
+      ],
+      "properties": {
+        "runtime": "node 20",
+        "exposure": "public"
+      }
+    },
+    {
+      "id": "n_sched",
+      "type": "service.backend@1",
+      "name": "scheduling-api",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "location": "g_aks",
+      "access_path": "ap_p2s",
+      "criticality": "high",
+      "data_classification": [
+        "PII"
+      ]
+    },
+    {
+      "id": "n_nudges",
+      "type": "service.backend@1",
+      "name": "nudges-service",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "location": "g_aks",
+      "access_path": "ap_p2s",
+      "criticality": "high",
+      "data_classification": [
+        "PHI"
+      ],
+      "compliance_scope": [
+        "HIPAA"
+      ]
+    },
+    {
+      "id": "n_admin",
+      "type": "service.backend@1",
+      "name": "admin-portal",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "location": "g_aks",
+      "access_path": "ap_p2s",
+      "criticality": "medium"
+    },
+    {
+      "id": "n_wear",
+      "type": "service.function@2",
+      "name": "wearable-ingest",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "location": "g_rg_prod",
+      "access_path": "ap_p2s"
+    },
+    {
+      "id": "n_report",
+      "type": "service.function@2",
+      "name": "report-generator",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "location": "g_rg_prod",
+      "access_path": "ap_p2s",
+      "data_classification": [
+        "PHI"
+      ]
+    },
+    {
+      "id": "n_clinic",
+      "type": "service.frontend@1",
+      "name": "clinician-web",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "location": "g_rg_prod",
+      "access_path": "ap_p2s"
+    },
+    {
+      "id": "n_sql",
+      "type": "data.azure-sql@1",
+      "name": "Azure SQL appointments",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "location": "g_spoke",
+      "access_path": "ap_p2s",
+      "criticality": "high",
+      "data_classification": [
+        "PII"
+      ]
+    },
+    {
+      "id": "n_cosmos",
+      "type": "data.cosmos@1",
+      "name": "Cosmos DB wearable",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "location": "g_spoke",
+      "access_path": "ap_p2s",
+      "data_classification": [
+        "PHI"
+      ]
+    },
+    {
+      "id": "n_blob_labs",
+      "type": "data.blob@1",
+      "name": "Blob lab reports",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "location": "g_spoke",
+      "access_path": "ap_p2s",
+      "data_classification": [
+        "PHI"
+      ]
+    },
+    {
+      "id": "n_blob_phi",
+      "type": "data.blob@1",
+      "name": "Blob PHI",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "location": "g_spoke",
+      "access_path": "ap_p2s",
+      "criticality": "crown-jewel",
+      "data_classification": [
+        "PHI"
+      ],
+      "compliance_scope": [
+        "HIPAA",
+        "GDPR",
+        "DPDP"
+      ]
+    },
+    {
+      "id": "n_fhir",
+      "type": "data.fhir@1",
+      "name": "FHIR service",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "location": "g_spoke",
+      "access_path": "ap_p2s",
+      "criticality": "crown-jewel",
+      "data_classification": [
+        "PHI"
+      ],
+      "compliance_scope": [
+        "HIPAA"
+      ]
+    },
+    {
+      "id": "n_redis",
+      "type": "data.redis@1",
+      "name": "Azure Cache for Redis",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "location": "g_spoke",
+      "access_path": "ap_p2s"
+    },
+    {
+      "id": "n_search",
+      "type": "data.search@1",
+      "name": "AI Search",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "location": "g_spoke",
+      "access_path": "ap_p2s",
+      "data_classification": [
+        "internal"
+      ]
+    },
+    {
+      "id": "n_sb",
+      "type": "messaging.service-bus@1",
+      "name": "Service Bus",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "location": "g_rg_prod",
+      "access_path": "ap_p2s"
+    },
+    {
+      "id": "n_eh",
+      "type": "messaging.event-hubs@1",
+      "name": "Event Hubs",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "location": "g_rg_prod",
+      "access_path": "ap_p2s"
+    },
+    {
+      "id": "n_eg",
+      "type": "messaging.event-grid@1",
+      "name": "Event Grid",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "location": "g_rg_prod",
+      "access_path": "ap_p2s"
+    },
+    {
+      "id": "n_entra",
+      "type": "identity.entra@1",
+      "name": "Entra ID",
+      "environment": "shared",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "location": "g_tenant",
+      "access_path": "ap_public"
+    },
+    {
+      "id": "n_b2c",
+      "type": "identity.entra-external@1",
+      "name": "Entra External ID",
+      "environment": "shared",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "location": "g_tenant",
+      "access_path": "ap_public"
+    },
+    {
+      "id": "n_mi",
+      "type": "identity.managed-identity@1",
+      "name": "managed identities",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "location": "g_rg_prod",
+      "access_path": "ap_p2s"
+    },
+    {
+      "id": "n_kv",
+      "type": "identity.key-vault@1",
+      "name": "Key Vault",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "location": "g_rg_prod",
+      "access_path": "ap_p2s",
+      "criticality": "high"
+    },
+    {
+      "id": "n_oai",
+      "type": "ai.azure-openai@1",
+      "name": "Azure OpenAI",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "location": "g_rg_prod",
+      "access_path": "ap_p2s",
+      "credential": "cr_openai"
+    },
+    {
+      "id": "n_langfuse",
+      "type": "ai.langfuse@1",
+      "name": "Langfuse",
+      "environment": "shared",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "access_path": "ap_public"
+    },
+    {
+      "id": "n_repo_patient",
+      "type": "repo.bitbucket@3",
+      "name": "repo patient-api",
+      "environment": "shared",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "location": "g_corp",
+      "access_path": "ap_public",
+      "credential": "cr_bitbucket"
+    },
+    {
+      "id": "n_repo_sched",
+      "type": "repo.bitbucket@3",
+      "name": "repo scheduling-api",
+      "environment": "shared",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "location": "g_corp",
+      "access_path": "ap_public",
+      "credential": "cr_bitbucket"
+    },
+    {
+      "id": "n_repo_nudges",
+      "type": "repo.bitbucket@3",
+      "name": "repo nudges-service",
+      "environment": "shared",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "location": "g_corp",
+      "access_path": "ap_public",
+      "credential": "cr_bitbucket"
+    },
+    {
+      "id": "n_repo_admin",
+      "type": "repo.bitbucket@3",
+      "name": "repo admin-portal",
+      "environment": "shared",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "location": "g_corp",
+      "access_path": "ap_public",
+      "credential": "cr_bitbucket"
+    },
+    {
+      "id": "n_repo_wear",
+      "type": "repo.bitbucket@3",
+      "name": "repo wearable-ingest",
+      "environment": "shared",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "location": "g_corp",
+      "access_path": "ap_public",
+      "credential": "cr_bitbucket"
+    },
+    {
+      "id": "n_repo_report",
+      "type": "repo.bitbucket@3",
+      "name": "repo report-generator",
+      "environment": "shared",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "location": "g_corp",
+      "access_path": "ap_public",
+      "credential": "cr_bitbucket"
+    },
+    {
+      "id": "n_repo_clinic",
+      "type": "repo.bitbucket@3",
+      "name": "repo clinician-web",
+      "environment": "shared",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "location": "g_corp",
+      "access_path": "ap_public",
+      "credential": "cr_bitbucket"
+    },
+    {
+      "id": "n_repo_bicep",
+      "type": "repo.bitbucket@3",
+      "name": "repo bicep",
+      "environment": "shared",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "location": "g_corp",
+      "access_path": "ap_public",
+      "credential": "cr_bitbucket"
+    },
+    {
+      "id": "n_pipes",
+      "type": "delivery.bitbucket-pipelines@1",
+      "name": "Bitbucket Pipelines",
+      "environment": "shared",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "location": "g_corp",
+      "access_path": "ap_forti",
+      "credential": "cr_bitbucket"
+    },
+    {
+      "id": "n_acr",
+      "type": "delivery.acr@1",
+      "name": "ACR",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "location": "g_rg_prod",
+      "access_path": "ap_p2s"
+    },
+    {
+      "id": "n_appi",
+      "type": "observability.app-insights@1",
+      "name": "Application Insights",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "location": "g_rg_prod",
+      "access_path": "ap_p2s"
+    },
+    {
+      "id": "n_law",
+      "type": "observability.log-analytics@1",
+      "name": "Log Analytics",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "location": "g_rg_prod",
+      "access_path": "ap_p2s"
+    },
+    {
+      "id": "n_activity",
+      "type": "observability.activity-log@1",
+      "name": "Activity Log",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "location": "g_sub_prod",
+      "access_path": "ap_public"
+    },
+    {
+      "id": "n_nsg",
+      "type": "observability.nsg-flow-logs@1",
+      "name": "NSG flow logs",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "location": "g_hub",
+      "access_path": "ap_p2s"
+    },
+    {
+      "id": "n_sentinel",
+      "type": "observability.sentinel@1",
+      "name": "Microsoft Sentinel",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "location": "g_rg_prod",
+      "access_path": "ap_p2s"
+    },
+    {
+      "id": "n_twilio",
+      "type": "saas.twilio@1",
+      "name": "Twilio",
+      "environment": "shared",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "access_path": "ap_public",
+      "credential": "cr_twilio"
+    },
+    {
+      "id": "n_sendgrid",
+      "type": "saas.sendgrid@1",
+      "name": "SendGrid",
+      "environment": "shared",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "access_path": "ap_public"
+    },
+    {
+      "id": "n_wearable",
+      "type": "saas.wearable@1",
+      "name": "wearable platform",
+      "environment": "shared",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "access_path": "ap_public"
+    },
+    {
+      "id": "n_stripe",
+      "type": "saas.stripe@1",
+      "name": "Stripe",
+      "environment": "shared",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "access_path": "ap_public",
+      "credential": "cr_stripe"
+    },
+    {
+      "id": "n_laptops",
+      "type": "endpoint.laptop@1",
+      "name": "consultant laptops",
+      "environment": "shared",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "location": "g_corp",
+      "access_path": "ap_forti"
+    },
+    {
+      "id": "n_staff",
+      "type": "endpoint.staff@1",
+      "name": "client staff",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "access_path": "ap_public"
+    },
+    {
+      "id": "n_patients",
+      "type": "endpoint.customer@1",
+      "name": "patients",
+      "environment": "prod",
+      "provenance": {
+        "kind": "drawn",
+        "source": "template-a"
+      },
+      "access_path": "ap_public"
+    }
+  ],
+  "edges": [
+    {
+      "from": "n_afd",
+      "to": "n_dns",
+      "type": "depends_on"
+    },
+    {
+      "from": "n_apim",
+      "to": "n_afd",
+      "type": "routes_through"
+    },
+    {
+      "from": "n_patient",
+      "to": "n_apim",
+      "type": "routes_through"
+    },
+    {
+      "from": "n_clinic",
+      "to": "n_patient",
+      "type": "calls"
+    },
+    {
+      "from": "n_admin",
+      "to": "n_patient",
+      "type": "calls"
+    },
+    {
+      "from": "n_patient",
+      "to": "n_sched",
+      "type": "calls"
+    },
+    {
+      "from": "n_patient",
+      "to": "n_sql",
+      "type": "writes"
+    },
+    {
+      "from": "n_patient",
+      "to": "n_fhir",
+      "type": "reads"
+    },
+    {
+      "from": "n_patient",
+      "to": "n_blob_phi",
+      "type": "writes"
+    },
+    {
+      "from": "n_patient",
+      "to": "n_redis",
+      "type": "reads"
+    },
+    {
+      "from": "n_sched",
+      "to": "n_sb",
+      "type": "publishes_to"
+    },
+    {
+      "from": "n_nudges",
+      "to": "n_sb",
+      "type": "consumes_from"
+    },
+    {
+      "from": "n_wear",
+      "to": "n_cosmos",
+      "type": "writes"
+    },
+    {
+      "from": "n_wear",
+      "to": "n_eh",
+      "type": "publishes_to"
+    },
+    {
+      "from": "n_nudges",
+      "to": "n_eh",
+      "type": "consumes_from"
+    },
+    {
+      "from": "n_nudges",
+      "to": "n_cosmos",
+      "type": "reads"
+    },
+    {
+      "from": "n_nudges",
+      "to": "n_search",
+      "type": "reads"
+    },
+    {
+      "from": "n_nudges",
+      "to": "n_oai",
+      "type": "calls"
+    },
+    {
+      "from": "n_nudges",
+      "to": "n_wearable",
+      "type": "depends_on"
+    },
+    {
+      "from": "n_nudges",
+      "to": "n_langfuse",
+      "type": "emits_telemetry_to"
+    },
+    {
+      "from": "n_report",
+      "to": "n_fhir",
+      "type": "reads"
+    },
+    {
+      "from": "n_report",
+      "to": "n_blob_labs",
+      "type": "writes"
+    },
+    {
+      "from": "n_report",
+      "to": "n_oai",
+      "type": "calls"
+    },
+    {
+      "from": "n_blob_labs",
+      "to": "n_eg",
+      "type": "publishes_to"
+    },
+    {
+      "from": "n_patient",
+      "to": "n_mi",
+      "type": "runs_as"
+    },
+    {
+      "from": "n_patient",
+      "to": "n_kv",
+      "type": "stores_secret_in"
+    },
+    {
+      "from": "n_patient",
+      "to": "n_b2c",
+      "type": "authenticates_via"
+    },
+    {
+      "from": "n_clinic",
+      "to": "n_entra",
+      "type": "authenticates_via"
+    },
+    {
+      "from": "n_patients",
+      "to": "n_b2c",
+      "type": "authenticates_via"
+    },
+    {
+      "from": "n_staff",
+      "to": "n_entra",
+      "type": "authenticates_via"
+    },
+    {
+      "from": "n_patient",
+      "to": "n_appi",
+      "type": "emits_telemetry_to"
+    },
+    {
+      "from": "n_appi",
+      "to": "n_law",
+      "type": "depends_on"
+    },
+    {
+      "from": "n_sentinel",
+      "to": "n_law",
+      "type": "depends_on"
+    },
+    {
+      "from": "g_sub_prod",
+      "to": "n_activity",
+      "type": "emits_telemetry_to"
+    },
+    {
+      "from": "g_hub",
+      "to": "n_nsg",
+      "type": "emits_telemetry_to"
+    },
+    {
+      "from": "g_hub",
+      "to": "g_spoke",
+      "type": "peers_with"
+    },
+    {
+      "from": "n_patient",
+      "to": "n_twilio",
+      "type": "depends_on"
+    },
+    {
+      "from": "n_patient",
+      "to": "n_stripe",
+      "type": "depends_on"
+    },
+    {
+      "from": "n_sched",
+      "to": "n_sendgrid",
+      "type": "depends_on"
+    },
+    {
+      "from": "n_repo_bicep",
+      "to": "n_pipes",
+      "type": "built_by"
+    },
+    {
+      "from": "n_pipes",
+      "to": "n_acr",
+      "type": "pushes_image_to"
+    },
+    {
+      "from": "n_patient",
+      "to": "n_repo_patient",
+      "type": "deploys_from",
+      "properties": {
+        "branch": "main",
+        "path": "/"
+      }
+    },
+    {
+      "from": "n_sched",
+      "to": "n_repo_sched",
+      "type": "deploys_from",
+      "properties": {
+        "branch": "main",
+        "path": "/"
+      }
+    },
+    {
+      "from": "n_nudges",
+      "to": "n_repo_nudges",
+      "type": "deploys_from",
+      "properties": {
+        "branch": "main",
+        "path": "/"
+      }
+    },
+    {
+      "from": "n_admin",
+      "to": "n_repo_admin",
+      "type": "deploys_from",
+      "properties": {
+        "branch": "main",
+        "path": "/"
+      }
+    },
+    {
+      "from": "n_wear",
+      "to": "n_repo_wear",
+      "type": "deploys_from",
+      "properties": {
+        "branch": "main",
+        "path": "/"
+      }
+    },
+    {
+      "from": "n_report",
+      "to": "n_repo_report",
+      "type": "deploys_from",
+      "properties": {
+        "branch": "main",
+        "path": "/"
+      }
+    },
+    {
+      "from": "n_clinic",
+      "to": "n_repo_clinic",
+      "type": "deploys_from",
+      "properties": {
+        "branch": "main",
+        "path": "/"
+      }
+    },
+    {
+      "from": "n_repo_patient",
+      "to": "n_pipes",
+      "type": "built_by"
+    },
+    {
+      "from": "n_repo_sched",
+      "to": "n_pipes",
+      "type": "built_by"
+    },
+    {
+      "from": "n_repo_nudges",
+      "to": "n_pipes",
+      "type": "built_by"
+    },
+    {
+      "from": "n_repo_admin",
+      "to": "n_pipes",
+      "type": "built_by"
+    },
+    {
+      "from": "n_repo_wear",
+      "to": "n_pipes",
+      "type": "built_by"
+    },
+    {
+      "from": "n_repo_report",
+      "to": "n_pipes",
+      "type": "built_by"
+    },
+    {
+      "from": "n_repo_clinic",
+      "to": "n_pipes",
+      "type": "built_by"
+    }
+  ]
+}

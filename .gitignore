@@ -1,0 +1,25 @@
+# Build output and local test artefacts for the hackathon copy.
+frontend/dist/
+e2e/screenshots/
+
+# Dependencies and environments
+node_modules/
+.venv/
+venv/
+
+# Local runtime data, private keys and databases - never publish
+backend/.data/
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.db
+*.sqlite*
+
+# Caches
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.DS_Store
